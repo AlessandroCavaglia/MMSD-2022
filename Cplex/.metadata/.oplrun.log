@@ -1,0 +1,158 @@
+!SESSION 2022-06-21 17:44:27.640 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.5.0 - pwa6480sr5-20170905_01(SR5)
+JRE 1.8.0 IBM J9 2.9 Windows 10 amd64-64 Compressed References 20170901_363591 (JIT enabled, AOT enabled)
+J9VM - d56eb84
+JIT  - tr.open_20170901_140853_d56eb84
+OMR  - b033a01
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+Command-line arguments:  -clean -nl it_IT -configuration D:\UniversityProjects\MMSD\Cplex\.metadata\workspace_oplrun
+
+!ENTRY ilog.odms.ide.opllang.remote 1 0 2022-06-21 17:44:27.640
+!MESSAGE Run Configuration1 in D:/UniversityProjects/MMSD/Cplex/FIrstTest
+!SESSION 2022-06-21 17:47:36.845 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.5.0 - pwa6480sr5-20170905_01(SR5)
+JRE 1.8.0 IBM J9 2.9 Windows 10 amd64-64 Compressed References 20170901_363591 (JIT enabled, AOT enabled)
+J9VM - d56eb84
+JIT  - tr.open_20170901_140853_d56eb84
+OMR  - b033a01
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+Command-line arguments:  -clean -nl it_IT -configuration D:\UniversityProjects\MMSD\Cplex\.metadata\workspace_oplrun
+
+!ENTRY ilog.odms.ide.opllang.remote 1 0 2022-06-21 17:47:36.845
+!MESSAGE Run Configuration1 in D:/UniversityProjects/MMSD/Cplex/FIrstTest
+
+!ENTRY ilog.odms.ide.opllang.remote 4 0 2022-06-21 17:47:36.939
+!MESSAGE load failed
+!STACK 1
+org.eclipse.core.runtime.CoreException: load failed
+	at ilog.odms.ide.opllang.remote.IloOplRunConfigRunner.doSetUpModel(IloOplRunConfigRunner.java:146)
+	at ilog.odms.ide.opllang.remote.IloOplRunConfigRunner.doRun(IloOplRunConfigRunner.java:374)
+	at ilog.odms.ide.opllang.run.IloAbstractRunShell$2.run(IloAbstractRunShell.java:1587)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+Caused by: ilog.concert.IloException: Impossible to load model.
+	at ilog.opl.opl_lang_wrapJNI.IloOplRunConfiguration_getCppOplModel(Native Method)
+	at ilog.opl.IloOplRunConfiguration.getCppOplModel(IloOplRunConfiguration.java:226)
+	at ilog.opl.IloOplRunConfiguration.getOplModel(IloOplRunConfiguration.java:116)
+	at ilog.odms.ide.opllang.remote.IloOplRunConfigRunner.doSetUpModel(IloOplRunConfigRunner.java:140)
+	... 3 more
+!SUBENTRY 1 ilog.odms.ide.opllang.remote 4 0 2022-06-21 17:47:36.939
+!MESSAGE load failed
+!STACK 0
+ilog.concert.IloException: Impossible to load model.
+	at ilog.opl.opl_lang_wrapJNI.IloOplRunConfiguration_getCppOplModel(Native Method)
+	at ilog.opl.IloOplRunConfiguration.getCppOplModel(IloOplRunConfiguration.java:226)
+	at ilog.opl.IloOplRunConfiguration.getOplModel(IloOplRunConfiguration.java:116)
+	at ilog.odms.ide.opllang.remote.IloOplRunConfigRunner.doSetUpModel(IloOplRunConfigRunner.java:140)
+	at ilog.odms.ide.opllang.remote.IloOplRunConfigRunner.doRun(IloOplRunConfigRunner.java:374)
+	at ilog.odms.ide.opllang.run.IloAbstractRunShell$2.run(IloAbstractRunShell.java:1587)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+!SESSION 2022-06-21 17:48:13.408 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.5.0 - pwa6480sr5-20170905_01(SR5)
+JRE 1.8.0 IBM J9 2.9 Windows 10 amd64-64 Compressed References 20170901_363591 (JIT enabled, AOT enabled)
+J9VM - d56eb84
+JIT  - tr.open_20170901_140853_d56eb84
+OMR  - b033a01
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+Command-line arguments:  -clean -nl it_IT -configuration D:\UniversityProjects\MMSD\Cplex\.metadata\workspace_oplrun
+
+!ENTRY ilog.odms.ide.opllang.remote 1 0 2022-06-21 17:48:13.408
+!MESSAGE Run Configuration1 in D:/UniversityProjects/MMSD/Cplex/FIrstTest
+!SESSION 2022-06-21 17:51:41.479 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.5.0 - pwa6480sr5-20170905_01(SR5)
+JRE 1.8.0 IBM J9 2.9 Windows 10 amd64-64 Compressed References 20170901_363591 (JIT enabled, AOT enabled)
+J9VM - d56eb84
+JIT  - tr.open_20170901_140853_d56eb84
+OMR  - b033a01
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+Command-line arguments:  -clean -nl it_IT -configuration D:\UniversityProjects\MMSD\Cplex\.metadata\workspace_oplrun
+
+!ENTRY ilog.odms.ide.opllang.remote 1 0 2022-06-21 17:51:41.479
+!MESSAGE Run Configuration1 in D:/UniversityProjects/MMSD/Cplex/FIrstTest
+!SESSION 2022-06-21 17:52:30.537 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.5.0 - pwa6480sr5-20170905_01(SR5)
+JRE 1.8.0 IBM J9 2.9 Windows 10 amd64-64 Compressed References 20170901_363591 (JIT enabled, AOT enabled)
+J9VM - d56eb84
+JIT  - tr.open_20170901_140853_d56eb84
+OMR  - b033a01
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+Command-line arguments:  -clean -nl it_IT -configuration D:\UniversityProjects\MMSD\Cplex\.metadata\workspace_oplrun
+
+!ENTRY ilog.odms.ide.opllang.remote 1 0 2022-06-21 17:52:30.537
+!MESSAGE Run Configuration1 in D:/UniversityProjects/MMSD/Cplex/FIrstTest
+!SESSION 2022-06-21 17:52:59.303 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.5.0 - pwa6480sr5-20170905_01(SR5)
+JRE 1.8.0 IBM J9 2.9 Windows 10 amd64-64 Compressed References 20170901_363591 (JIT enabled, AOT enabled)
+J9VM - d56eb84
+JIT  - tr.open_20170901_140853_d56eb84
+OMR  - b033a01
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+Command-line arguments:  -clean -nl it_IT -configuration D:\UniversityProjects\MMSD\Cplex\.metadata\workspace_oplrun
+
+!ENTRY ilog.odms.ide.opllang.remote 1 0 2022-06-21 17:52:59.303
+!MESSAGE Run Configuration1 in D:/UniversityProjects/MMSD/Cplex/FIrstTest
+!SESSION 2022-06-21 17:57:52.528 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.5.0 - pwa6480sr5-20170905_01(SR5)
+JRE 1.8.0 IBM J9 2.9 Windows 10 amd64-64 Compressed References 20170901_363591 (JIT enabled, AOT enabled)
+J9VM - d56eb84
+JIT  - tr.open_20170901_140853_d56eb84
+OMR  - b033a01
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+Command-line arguments:  -clean -nl it_IT -configuration D:\UniversityProjects\MMSD\Cplex\.metadata\workspace_oplrun
+
+!ENTRY ilog.odms.ide.opllang.remote 1 0 2022-06-21 17:57:52.529
+!MESSAGE Run Configuration1 in D:/UniversityProjects/MMSD/Cplex/FIrstTest
+!SESSION 2022-06-21 17:58:49.092 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.5.0 - pwa6480sr5-20170905_01(SR5)
+JRE 1.8.0 IBM J9 2.9 Windows 10 amd64-64 Compressed References 20170901_363591 (JIT enabled, AOT enabled)
+J9VM - d56eb84
+JIT  - tr.open_20170901_140853_d56eb84
+OMR  - b033a01
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+Command-line arguments:  -clean -nl it_IT -configuration D:\UniversityProjects\MMSD\Cplex\.metadata\workspace_oplrun
+
+!ENTRY ilog.odms.ide.opllang.remote 1 0 2022-06-21 17:58:49.092
+!MESSAGE Run Configuration1 in D:/UniversityProjects/MMSD/Cplex/FIrstTest
+!SESSION 2022-06-21 17:59:00.202 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.5.0 - pwa6480sr5-20170905_01(SR5)
+JRE 1.8.0 IBM J9 2.9 Windows 10 amd64-64 Compressed References 20170901_363591 (JIT enabled, AOT enabled)
+J9VM - d56eb84
+JIT  - tr.open_20170901_140853_d56eb84
+OMR  - b033a01
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+Command-line arguments:  -clean -nl it_IT -configuration D:\UniversityProjects\MMSD\Cplex\.metadata\workspace_oplrun
+
+!ENTRY ilog.odms.ide.opllang.remote 1 0 2022-06-21 17:59:00.202
+!MESSAGE Run Configuration1 in D:/UniversityProjects/MMSD/Cplex/FIrstTest
+!SESSION 2022-06-21 17:59:21.203 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.5.0 - pwa6480sr5-20170905_01(SR5)
+JRE 1.8.0 IBM J9 2.9 Windows 10 amd64-64 Compressed References 20170901_363591 (JIT enabled, AOT enabled)
+J9VM - d56eb84
+JIT  - tr.open_20170901_140853_d56eb84
+OMR  - b033a01
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+Command-line arguments:  -clean -nl it_IT -configuration D:\UniversityProjects\MMSD\Cplex\.metadata\workspace_oplrun
+
+!ENTRY ilog.odms.ide.opllang.remote 1 0 2022-06-21 17:59:21.203
+!MESSAGE Run Configuration1 in D:/UniversityProjects/MMSD/Cplex/FIrstTest
+!SESSION 2022-06-21 17:59:44.705 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.5.0 - pwa6480sr5-20170905_01(SR5)
+JRE 1.8.0 IBM J9 2.9 Windows 10 amd64-64 Compressed References 20170901_363591 (JIT enabled, AOT enabled)
+J9VM - d56eb84
+JIT  - tr.open_20170901_140853_d56eb84
+OMR  - b033a01
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+Command-line arguments:  -clean -nl it_IT -configuration D:\UniversityProjects\MMSD\Cplex\.metadata\workspace_oplrun
+
+!ENTRY ilog.odms.ide.opllang.remote 1 0 2022-06-21 17:59:44.705
+!MESSAGE Run Configuration1 in D:/UniversityProjects/MMSD/Cplex/FIrstTest
