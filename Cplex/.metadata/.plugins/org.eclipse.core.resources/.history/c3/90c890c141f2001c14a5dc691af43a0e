@@ -1,0 +1,27 @@
+/*********************************************
+ * OPL 12.8.0.0 Model
+ * Author: Alessandro
+ * Creation Date: 21/giu/2022 at 17:26:14
+ *********************************************/
+ int numero_giorni =...;
+ int numero_esami =...;
+ 
+ range giorni= 1..numero_giorni;
+ range esami = 1..numero_esami;
+ 
+ int distanza_minima_stesso_semestre=...;
+ 
+ dvar boolean x [esami][giorni];
+ dvar int dummy;
+ 
+ minimize dummy;
+ 
+ subject to {
+  
+ 	//Assegno ad ogni esame il valore il valore intero del giorno in cui è assegnato
+	forall(esame in esami, giorni in giorni) sum(j in giorni..distanza_minima_semestre+dummy) x[esame][j] <= 1
+	
+ 
+
+	MinimoDummy: dummy >= 0;
+}

@@ -9,6 +9,14 @@
 			<ref name="FIrstTest.dat" type="data">
 			</ref>
 		</config>
+		<config default="false" name="Configuration2" category="opl">
+			<ref name="FIrstTest2.mod" type="model">
+			</ref>
+			<ref name="FIrstTest.dat" type="data">
+			</ref>
+			<ref name="FIrstTest.ops" type="setting">
+			</ref>
+		</config>
 	</configs>
 	
 </project>
