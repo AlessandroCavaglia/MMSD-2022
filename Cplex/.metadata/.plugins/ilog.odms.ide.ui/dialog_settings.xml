@@ -3,4 +3,7 @@
 	<section name="IloNewOplProjectWizard">
 		<item value="D:\UniversityProjects\MMSD\Cplex" key="IloNewOplProjectWizard.STORE_ROOT_DIRECTORY"/>
 	</section>
+	<section name="IloNewRunConfigWizard">
+		<item value="false" key="IloNewRunConfigWizard.STORE_SET_AS_DEFAULT"/>
+	</section>
 </section>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ASCII"?><project>
+	<version>1.0</version>
+	<configs>
+		<config default="true" name="Configuration1" category="opl">
+			<ref name="FIrstTest.mod" type="model">
+			</ref>
+			<ref name="FIrstTest.ops" type="setting">
+			</ref>
+			<ref name="FIrstTest.dat" type="data">
+			</ref>
+		</config>
+		<config default="false" name="Configuration2" category="opl">
+			<ref name="FIrstTest2.mod" type="model">
+			</ref>
+			<ref name="FIrstTest.dat" type="data">
+			</ref>
+			<ref name="FIrstTest.ops" type="setting">
+			</ref>
+		</config>
+		<config default="false" name="Configuration3" category="opl">
+			<ref name="FIrstTest3.dat" type="data">
+			</ref>
+			<ref name="FIrstTest3.mod" type="model">
+			</ref>
+		</config>
+	</configs>
+	
+</project>

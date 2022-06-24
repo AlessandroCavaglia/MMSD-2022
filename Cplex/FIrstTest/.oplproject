@@ -17,6 +17,14 @@
 			<ref name="FIrstTest.ops" type="setting">
 			</ref>
 		</config>
+		<config default="false" name="Configuration3" category="opl">
+			<ref name="FIrstTest3.dat" type="data">
+			</ref>
+			<ref name="FIrstTest3.mod" type="model">
+			</ref>
+			<ref name="FIrstTest.ops" type="setting">
+			</ref>
+		</config>
 	</configs>
 	
 </project>

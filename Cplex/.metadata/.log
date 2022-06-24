@@ -1640,3 +1640,125 @@ java.lang.InterruptedException
 	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getElementHover(IloModelTextHoverAST.java:101)
 	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getHoverInfo(IloModelTextHoverAST.java:116)
 	at org.eclipse.jface.text.TextViewerHoverManager$4.run(TextViewerHoverManager.java:168)
+
+!ENTRY ilog.odms.ide.opllang 1 0 2022-06-22 18:53:54.214
+!MESSAGE concert_wrap.IloEndMT
+!SESSION 2022-06-24 17:48:12.248 -----------------------------------------------
+eclipse.buildId=Build 0
+java.fullversion=8.0.5.0 - pwa6480sr5-20170905_01(SR5)
+JRE 1.8.0 IBM J9 2.9 Windows 8 amd64-64 Compressed References 20170901_363591 (JIT enabled, AOT enabled)
+J9VM - d56eb84
+JIT  - tr.open_20170901_140853_d56eb84
+OMR  - b033a01
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+
+!ENTRY org.eclipse.osgi 4 0 2022-06-24 17:48:13.627
+!MESSAGE The -clean (osgi.clean) option was not successful. Unable to clean the storage area: D:\Programs\Cplex\opl\oplide\configuration\org.eclipse.osgi
+
+!ENTRY org.eclipse.update.configurator 4 0 2022-06-24 17:48:15.403
+!MESSAGE Impossibile eseguire il backup della configurazione corrente
+
+!ENTRY org.eclipse.update.configurator 4 0 2022-06-24 17:48:15.434
+!MESSAGE Impossibile rinominare il file temp di configurazione
+
+!ENTRY org.eclipse.update.configurator 4 0 2022-06-24 17:48:15.434
+!MESSAGE Impossibile salvare il file di configurazione "D:\Programs\Cplex\opl\oplide\configuration\org.eclipse.update\platform.xml.tmp"
+!STACK 0
+java.io.IOException: Impossibile salvare il file di configurazione "D:\Programs\Cplex\opl\oplide\configuration\org.eclipse.update\platform.xml.tmp"
+	at org.eclipse.update.internal.configurator.PlatformConfiguration.save(PlatformConfiguration.java:690)
+	at org.eclipse.update.internal.configurator.PlatformConfiguration.save(PlatformConfiguration.java:574)
+	at org.eclipse.update.internal.configurator.PlatformConfiguration.startup(PlatformConfiguration.java:714)
+	at org.eclipse.update.internal.configurator.ConfigurationActivator.getPlatformConfiguration(ConfigurationActivator.java:404)
+	at org.eclipse.update.internal.configurator.ConfigurationActivator.initialize(ConfigurationActivator.java:136)
+	at org.eclipse.update.internal.configurator.ConfigurationActivator.start(ConfigurationActivator.java:69)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:771)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:1)
+	at java.security.AccessController.doPrivileged(AccessController.java:677)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.startActivator(BundleContextImpl.java:764)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.start(BundleContextImpl.java:721)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.startWorker0(EquinoxBundle.java:936)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle$EquinoxModule.startWorker(EquinoxBundle.java:319)
+	at org.eclipse.osgi.container.Module.doStart(Module.java:571)
+	at org.eclipse.osgi.container.Module.start(Module.java:439)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1582)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1562)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1533)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1476)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+
+!ENTRY org.eclipse.ui.ide 4 4 2022-06-24 17:48:16.571
+!MESSAGE -data /valid/path, workspace already set:file:/D:/UniversityProjects/MMSD/Cplex/
+
+!ENTRY ilog.odms.ide.core 1 0 2022-06-24 17:48:24.627
+!MESSAGE ODM Bundle is OFF
+
+!ENTRY org.eclipse.jface 4 0 2022-06-24 17:51:52.437
+!MESSAGE Il comando ("ilog.odms.ide.ui.references") non è definito
+!STACK 0
+java.lang.Exception
+	at org.eclipse.jface.action.ExternalActionManager$CommandCallback.isActive(ExternalActionManager.java:381)
+	at org.eclipse.jface.action.ActionContributionItem.isCommandActive(ActionContributionItem.java:656)
+	at org.eclipse.jface.action.ActionContributionItem.isVisible(ActionContributionItem.java:712)
+	at org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer.reconcileManagerToModel(MenuManagerRenderer.java:1017)
+	at org.eclipse.ui.internal.PopupMenuExtender.addMenuContributions(PopupMenuExtender.java:420)
+	at org.eclipse.ui.internal.PopupMenuExtender.menuAboutToShow(PopupMenuExtender.java:393)
+	at org.eclipse.jface.action.MenuManager.fireAboutToShow(MenuManager.java:352)
+	at org.eclipse.jface.action.MenuManager.handleAboutToShow(MenuManager.java:492)
+	at org.eclipse.jface.action.MenuManager.access$1(MenuManager.java:487)
+	at org.eclipse.jface.action.MenuManager$2.menuShown(MenuManager.java:519)
+	at org.eclipse.swt.widgets.TypedListener.handleEvent(TypedListener.java:255)
+	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:84)
+	at org.eclipse.swt.widgets.Display.sendEvent(Display.java:4353)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1061)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1085)
+	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1066)
+	at org.eclipse.swt.widgets.Control.WM_INITMENUPOPUP(Control.java:4963)
+	at org.eclipse.swt.widgets.Control.windowProc(Control.java:4639)
+	at org.eclipse.swt.widgets.Canvas.windowProc(Canvas.java:339)
+	at org.eclipse.swt.widgets.Decorations.windowProc(Decorations.java:1626)
+	at org.eclipse.swt.widgets.Shell.windowProc(Shell.java:2075)
+	at org.eclipse.swt.widgets.Display.windowProc(Display.java:5023)
+	at org.eclipse.swt.internal.win32.OS.TrackPopupMenu(Native Method)
+	at org.eclipse.swt.widgets.Menu._setVisible(Menu.java:256)
+	at org.eclipse.swt.widgets.Display.runPopups(Display.java:4213)
+	at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:3755)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine$9.run(PartRenderingEngine.java:1151)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:332)
+	at org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.run(PartRenderingEngine.java:1032)
+	at org.eclipse.e4.ui.internal.workbench.E4Workbench.createAndRunUI(E4Workbench.java:148)
+	at org.eclipse.ui.internal.Workbench$5.run(Workbench.java:636)
+	at org.eclipse.core.databinding.observable.Realm.runWithDefault(Realm.java:332)
+	at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:579)
+	at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:150)
+	at ilog.odms.ide.rcp.IloApplication.start(IloApplication.java:125)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:196)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:134)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:380)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:235)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:90)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:55)
+	at java.lang.reflect.Method.invoke(Method.java:508)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:648)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:603)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1465)
+
+!ENTRY ilog.odms.ide.core 1 0 2022-06-24 18:16:15.397
+!MESSAGE 
+!STACK 0
+java.lang.InterruptedException
+	at java.util.concurrent.FutureTask.awaitDone(FutureTask.java:415)
+	at java.util.concurrent.FutureTask.get(FutureTask.java:202)
+	at ilog.odms.ide.internal.core.run.IloAbstractRunController.syncRequestScript(IloAbstractRunController.java:414)
+	at ilog.odms.ide.internal.core.run.IloAbstractRunController.syncRequestScript(IloAbstractRunController.java:337)
+	at ilog.odms.ide.internal.core.run.remote.IloRemoteRunController.syncRequestScript(IloRemoteRunController.java:190)
+	at ilog.odms.ide.core.bridge.IloScriptRequestHelper.executeRequest(IloScriptRequestHelper.java:34)
+	at ilog.odms.ide.core.bridge.remote.IloScriptRequestBase.genericRequest(IloScriptRequestBase.java:55)
+	at ilog.odms.ide.core.bridge.remote.IloRemoteModelBridge.getElements(IloRemoteModelBridge.java:83)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.findElement(IloModelTextHoverAST.java:56)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getElementHover(IloModelTextHoverAST.java:101)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getHoverInfo(IloModelTextHoverAST.java:116)
+	at org.eclipse.jface.text.TextViewerHoverManager$4.run(TextViewerHoverManager.java:168)
