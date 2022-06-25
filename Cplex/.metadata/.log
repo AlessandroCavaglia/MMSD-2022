@@ -1762,3 +1762,121 @@ java.lang.InterruptedException
 	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getElementHover(IloModelTextHoverAST.java:101)
 	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getHoverInfo(IloModelTextHoverAST.java:116)
 	at org.eclipse.jface.text.TextViewerHoverManager$4.run(TextViewerHoverManager.java:168)
+
+!ENTRY ilog.odms.ide.opllang 1 0 2022-06-24 18:20:14.048
+!MESSAGE concert_wrap.IloEndMT
+!SESSION 2022-06-25 15:02:14.539 -----------------------------------------------
+eclipse.buildId=Build 0
+java.fullversion=8.0.5.0 - pwa6480sr5-20170905_01(SR5)
+JRE 1.8.0 IBM J9 2.9 Windows 8 amd64-64 Compressed References 20170901_363591 (JIT enabled, AOT enabled)
+J9VM - d56eb84
+JIT  - tr.open_20170901_140853_d56eb84
+OMR  - b033a01
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=it_IT
+
+!ENTRY org.eclipse.osgi 4 0 2022-06-25 15:02:16.176
+!MESSAGE The -clean (osgi.clean) option was not successful. Unable to clean the storage area: D:\Programs\Cplex\opl\oplide\configuration\org.eclipse.osgi
+
+!ENTRY org.eclipse.update.configurator 4 0 2022-06-25 15:02:31.931
+!MESSAGE Impossibile eseguire il backup della configurazione corrente
+
+!ENTRY org.eclipse.update.configurator 4 0 2022-06-25 15:02:31.962
+!MESSAGE Impossibile rinominare il file temp di configurazione
+
+!ENTRY org.eclipse.update.configurator 4 0 2022-06-25 15:02:31.962
+!MESSAGE Impossibile salvare il file di configurazione "D:\Programs\Cplex\opl\oplide\configuration\org.eclipse.update\platform.xml.tmp"
+!STACK 0
+java.io.IOException: Impossibile salvare il file di configurazione "D:\Programs\Cplex\opl\oplide\configuration\org.eclipse.update\platform.xml.tmp"
+	at org.eclipse.update.internal.configurator.PlatformConfiguration.save(PlatformConfiguration.java:690)
+	at org.eclipse.update.internal.configurator.PlatformConfiguration.save(PlatformConfiguration.java:574)
+	at org.eclipse.update.internal.configurator.PlatformConfiguration.startup(PlatformConfiguration.java:714)
+	at org.eclipse.update.internal.configurator.ConfigurationActivator.getPlatformConfiguration(ConfigurationActivator.java:404)
+	at org.eclipse.update.internal.configurator.ConfigurationActivator.initialize(ConfigurationActivator.java:136)
+	at org.eclipse.update.internal.configurator.ConfigurationActivator.start(ConfigurationActivator.java:69)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:771)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl$3.run(BundleContextImpl.java:1)
+	at java.security.AccessController.doPrivileged(AccessController.java:677)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.startActivator(BundleContextImpl.java:764)
+	at org.eclipse.osgi.internal.framework.BundleContextImpl.start(BundleContextImpl.java:721)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle.startWorker0(EquinoxBundle.java:936)
+	at org.eclipse.osgi.internal.framework.EquinoxBundle$EquinoxModule.startWorker(EquinoxBundle.java:319)
+	at org.eclipse.osgi.container.Module.doStart(Module.java:571)
+	at org.eclipse.osgi.container.Module.start(Module.java:439)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1582)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.incStartLevel(ModuleContainer.java:1562)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.doContainerStartLevel(ModuleContainer.java:1533)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1476)
+	at org.eclipse.osgi.container.ModuleContainer$ContainerStartLevel.dispatchEvent(ModuleContainer.java:1)
+	at org.eclipse.osgi.framework.eventmgr.EventManager.dispatchEvent(EventManager.java:230)
+	at org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run(EventManager.java:340)
+
+!ENTRY ilog.odms.ide.core 1 0 2022-06-25 15:02:44.729
+!MESSAGE ODM Bundle is OFF
+
+!ENTRY ilog.odms.ide.core 1 0 2022-06-25 15:07:41.762
+!MESSAGE 
+!STACK 0
+java.lang.InterruptedException
+	at java.util.concurrent.FutureTask.awaitDone(FutureTask.java:415)
+	at java.util.concurrent.FutureTask.get(FutureTask.java:202)
+	at ilog.odms.ide.internal.core.run.IloAbstractRunController.syncRequestScript(IloAbstractRunController.java:414)
+	at ilog.odms.ide.internal.core.run.IloAbstractRunController.syncRequestScript(IloAbstractRunController.java:337)
+	at ilog.odms.ide.internal.core.run.remote.IloRemoteRunController.syncRequestScript(IloRemoteRunController.java:190)
+	at ilog.odms.ide.core.bridge.IloScriptRequestHelper.executeRequest(IloScriptRequestHelper.java:34)
+	at ilog.odms.ide.core.bridge.remote.IloScriptRequestBase.genericRequest(IloScriptRequestBase.java:55)
+	at ilog.odms.ide.core.bridge.remote.IloRemoteModelBridge.getElements(IloRemoteModelBridge.java:83)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.findElement(IloModelTextHoverAST.java:56)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getElementHover(IloModelTextHoverAST.java:101)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getHoverInfo(IloModelTextHoverAST.java:116)
+	at org.eclipse.jface.text.TextViewerHoverManager$4.run(TextViewerHoverManager.java:168)
+
+!ENTRY ilog.odms.ide.core 1 0 2022-06-25 15:14:37.118
+!MESSAGE 
+!STACK 0
+java.lang.InterruptedException
+	at java.util.concurrent.FutureTask.awaitDone(FutureTask.java:415)
+	at java.util.concurrent.FutureTask.get(FutureTask.java:202)
+	at ilog.odms.ide.internal.core.run.IloAbstractRunController.syncRequestScript(IloAbstractRunController.java:414)
+	at ilog.odms.ide.internal.core.run.IloAbstractRunController.syncRequestScript(IloAbstractRunController.java:337)
+	at ilog.odms.ide.internal.core.run.remote.IloRemoteRunController.syncRequestScript(IloRemoteRunController.java:190)
+	at ilog.odms.ide.core.bridge.IloScriptRequestHelper.executeRequest(IloScriptRequestHelper.java:34)
+	at ilog.odms.ide.core.bridge.remote.IloScriptRequestBase.genericRequest(IloScriptRequestBase.java:55)
+	at ilog.odms.ide.core.bridge.remote.IloRemoteModelBridge.getElements(IloRemoteModelBridge.java:83)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.findElement(IloModelTextHoverAST.java:56)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getElementHover(IloModelTextHoverAST.java:101)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getHoverInfo(IloModelTextHoverAST.java:116)
+	at org.eclipse.jface.text.TextViewerHoverManager$4.run(TextViewerHoverManager.java:168)
+
+!ENTRY ilog.odms.ide.core 1 0 2022-06-25 15:16:10.095
+!MESSAGE 
+!STACK 0
+java.lang.InterruptedException
+	at java.util.concurrent.FutureTask.awaitDone(FutureTask.java:415)
+	at java.util.concurrent.FutureTask.get(FutureTask.java:202)
+	at ilog.odms.ide.internal.core.run.IloAbstractRunController.syncRequestScript(IloAbstractRunController.java:414)
+	at ilog.odms.ide.internal.core.run.IloAbstractRunController.syncRequestScript(IloAbstractRunController.java:337)
+	at ilog.odms.ide.internal.core.run.remote.IloRemoteRunController.syncRequestScript(IloRemoteRunController.java:190)
+	at ilog.odms.ide.core.bridge.IloScriptRequestHelper.executeRequest(IloScriptRequestHelper.java:34)
+	at ilog.odms.ide.core.bridge.remote.IloScriptRequestBase.genericRequest(IloScriptRequestBase.java:55)
+	at ilog.odms.ide.core.bridge.remote.IloRemoteModelBridge.getElements(IloRemoteModelBridge.java:83)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.findElement(IloModelTextHoverAST.java:56)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getElementHover(IloModelTextHoverAST.java:101)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getHoverInfo(IloModelTextHoverAST.java:116)
+	at org.eclipse.jface.text.TextViewerHoverManager$4.run(TextViewerHoverManager.java:168)
+
+!ENTRY ilog.odms.ide.core 1 0 2022-06-25 15:19:11.481
+!MESSAGE 
+!STACK 0
+java.lang.InterruptedException
+	at java.util.concurrent.FutureTask.awaitDone(FutureTask.java:415)
+	at java.util.concurrent.FutureTask.get(FutureTask.java:202)
+	at ilog.odms.ide.internal.core.run.IloAbstractRunController.syncRequestScript(IloAbstractRunController.java:414)
+	at ilog.odms.ide.internal.core.run.IloAbstractRunController.syncRequestScript(IloAbstractRunController.java:337)
+	at ilog.odms.ide.internal.core.run.remote.IloRemoteRunController.syncRequestScript(IloRemoteRunController.java:190)
+	at ilog.odms.ide.core.bridge.IloScriptRequestHelper.executeRequest(IloScriptRequestHelper.java:34)
+	at ilog.odms.ide.core.bridge.remote.IloScriptRequestBase.genericRequest(IloScriptRequestBase.java:55)
+	at ilog.odms.ide.core.bridge.remote.IloRemoteModelBridge.getElements(IloRemoteModelBridge.java:83)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.findElement(IloModelTextHoverAST.java:56)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getElementHover(IloModelTextHoverAST.java:101)
+	at ilog.odms.ide.ui.editors.model.IloModelTextHoverAST.getHoverInfo(IloModelTextHoverAST.java:116)
+	at org.eclipse.jface.text.TextViewerHoverManager$4.run(TextViewerHoverManager.java:168)
