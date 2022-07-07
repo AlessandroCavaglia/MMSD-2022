@@ -17,3 +17,8 @@ class Exam:
         self.date_preferenza = date_preferenza
         self.date_indisponibilita = date_indisponibilita
         self.note = note
+
+class ExamRoom:
+    def __init__(self,nome,indisponibilita):
+        self.nome=nome
+        self.indisponibilita=indisponibilita
