@@ -7,6 +7,7 @@ import pyomo.environ as pyo
 MIN_DISTANCE_APPELLI = 10
 SLOT_AULE = 2
 SLOT_LABORATORI = 3
+GUADAGNO_GIORNI_PREFERITI = 2
 
 
 def main():
@@ -17,20 +18,20 @@ def main():
             ExamRoom("Aula E", []),
             ExamRoom("Aula F", []),
             ExamRoom("Sala conferenze", [])]
-    laboratori = [ExamRoom("Laboratorio Dijkstra", [datetime.strptime("09/06/2023", '%d/%m/%Y')]), #NECESSARIO BUGFIX PER ASSEGNIAMENTO GIORNI CONTIGUI
+    laboratori = [ExamRoom("Laboratorio Dijkstra", []),
                   ExamRoom("Laboratorio Vonneumann", []),
                   ExamRoom("Laboratorio Turing", []),
                   ExamRoom("Laboratorio Babbage", []),
                   ExamRoom("Laboratorio Postel", [])]
 
     data_inizio = datetime.strptime("08/06/2023", '%d/%m/%Y')
-    data_fine = datetime.strptime("28/07/2023", '%d/%m/%Y')
+    data_fine = datetime.strptime("30/06/2023", '%d/%m/%Y')
 
     exams = list()
     exams.append(
         Exam("CMRO", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 3, 2, [], [], "Note"))
     exams.append(
-        Exam("MDL", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [0, 1, 2, 3], 2, [], 0, 1, [], [], "Note"))
+        Exam("MDL", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [0, 1, 2, 3], 2, [], 0, 1, [], [datetime.strptime("08/06/2023", '%d/%m/%Y'),datetime.strptime("30/06/2023", '%d/%m/%Y')], "Note"))
 
     model = build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
@@ -39,17 +40,19 @@ def main():
 
 
 def build_model(aule, laboratori, data_inizio, data_fine, exams):
-    days = (data_fine - data_inizio).days + 1  # Calculate the number of days of the range counting for also the first and last day
+    days = (
+                       data_fine - data_inizio).days + 1  # Calculate the number of days of the range counting for also the first and last day
 
     model = ConcreteModel()
     model.days = range(days)
     model.exams = range(len(exams))
     model.aule = range(len(aule))
     model.lab = range(len(laboratori))
-    model.richieste_lab_esami=build_richieste_lab_esami(exams,laboratori)
-    model.richieste_aule_esami=build_richieste_aule_esami(exams,aule)
-    model.aule_disponibilita=build_aule_disponibilita(aule,days,data_inizio)
-    model.lab_disponibilita=build_lab_disponibilita(laboratori,days,data_inizio)
+    model.richieste_lab_esami = build_richieste_lab_esami(exams, laboratori)
+    model.richieste_aule_esami = build_richieste_aule_esami(exams, aule)
+    model.aule_disponibilita = build_aule_disponibilita(aule, days, data_inizio)
+    model.lab_disponibilita = build_lab_disponibilita(laboratori, days, data_inizio)
+    model.preferenze_professori = build_preferenze_professori(exams, days, data_inizio)
 
     model.x = Var(model.exams, model.days, within=pyo.Binary)
     model.dummy = Var(within=pyo.NonNegativeIntegers)
@@ -59,7 +62,7 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
     for i in model.exams:
         model.correct_exam_days.add(
             sum(model.x[i, j] for j in model.days) == (
-                        exams[i].numero_appelli_sessione_full * exams[i].numero_giorni_durata))
+                    exams[i].numero_appelli_sessione_full * exams[i].numero_giorni_durata))
 
     model.min_distance_appelli = ConstraintList()  # Per ogni esame la distanza minima tra i due appelli deve essere almeno MIN_DISTANCE_APPELLI
     for esame in model.exams:
@@ -67,30 +70,31 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
             for giorno_2 in model.days:
                 if giorno_1 != giorno_2 and abs(giorno_1 - giorno_2) >= exams[esame].numero_giorni_durata:
                     model.min_distance_appelli.add(
-                        (abs(giorno_1 - giorno_2) - 1) * (model.x[esame,giorno_1] * model.x[esame,giorno_2]) +
-                        (days * (1 - (model.x[esame,giorno_1] * model.x[esame,giorno_2]))) >= MIN_DISTANCE_APPELLI)
+                        (abs(giorno_1 - giorno_2) - 1) * (model.x[esame, giorno_1] * model.x[esame, giorno_2]) +
+                        (days * (1 - (model.x[esame, giorno_1] * model.x[esame, giorno_2]))) >= MIN_DISTANCE_APPELLI)
 
-    model.assegniamenti_contigui = ConstraintList()  #Per ogni esame assegno i giorni contigui necessari
+    model.assegniamenti_contigui = ConstraintList()  # Per ogni esame assegno i giorni contigui necessari
     for esame in model.exams:
-        if(exams[esame].numero_giorni_durata>1):
-            for giorno in range(1,days-exams[esame].numero_giorni_durata):
+        if (exams[esame].numero_giorni_durata > 1):
+            for giorno in range(1, days - exams[esame].numero_giorni_durata):
                 model.assegniamenti_contigui.add(
-                    ((1-model.x[esame,giorno-1]) * model.x[esame,giorno] * exams[esame].numero_giorni_durata) <=
-                    sum(model.x[esame,giorno_2] for giorno_2 in range(giorno,giorno+exams[esame].numero_giorni_durata))
+                    ((1 - model.x[esame, (giorno - 1)]) * model.x[esame, giorno] * exams[esame].numero_giorni_durata) <=
+                    sum(model.x[esame, giorno_2] for giorno_2 in
+                        range(giorno, (giorno + exams[esame].numero_giorni_durata)))
                 )
 
     model.limiti_aule = ConstraintList()  # Per ogni giorno non superiamo i limiti di assegniamento delle aule
     for giorno in model.days:
         for aula in model.aule:
-            found=False
+            found = False
             for exam in exams:
-                if(aula in exam.aule_richieste):
-                    found=True
+                if (aula in exam.aule_richieste):
+                    found = True
             if found:
                 model.limiti_aule.add((
-                    sum(model.x[esame, giorno] * model.richieste_aule_esami[esame][aula]
-                        for esame in model.exams) <=
-                    model.aule_disponibilita[aula][giorno]
+                        sum(model.x[esame, giorno] * model.richieste_aule_esami[esame][aula]
+                            for esame in model.exams) <=
+                        model.aule_disponibilita[aula][giorno]
                 ))
 
     model.limiti_lab = ConstraintList()  # Per ogni giorno non superiamo i limiti di assegniamento delle aule
@@ -106,10 +110,18 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
                             for esame in model.exams) <=
                         model.lab_disponibilita[lab][giorno]
                 ))
+    model.indisp_professori = ConstraintList()  # Per ogni esame non lo assegno nei giorni di indisponibilità dei professori
+    for exam in model.exams:
+        for day in model.days:
+            if model.preferenze_professori[exam][day] == 0:
+                model.indisp_professori.add(
+                    model.x[exam, day] == 0
+                )
 
     return model
 
-def build_richieste_lab_esami(exams,laboratori):
+
+def build_richieste_lab_esami(exams, laboratori):
     richieste_lab_esami = list()  # Lista di laboratori richiesti dagli esami, per ogni esame assegna un array di dimensione aule elementi settati a 0
     for exam_index in range(len(exams)):
         richieste_lab_esami.append(list())
@@ -120,7 +132,8 @@ def build_richieste_lab_esami(exams,laboratori):
             richieste_lab_esami[exam_index][lab] = exams[exam_index].numero_lab_slot
     return richieste_lab_esami
 
-def build_richieste_aule_esami(exams,aule):
+
+def build_richieste_aule_esami(exams, aule):
     richieste_aule_esami = list()  # Lista di aule richieste dagli esami, per ogni esame assegna un array di dimensione aule elementi settati a 0
     for exam_index in range(len(exams)):
         richieste_aule_esami.append(list())
@@ -131,7 +144,8 @@ def build_richieste_aule_esami(exams,aule):
             richieste_aule_esami[exam_index][aula] = exams[exam_index].numero_aule_slot
     return richieste_aule_esami
 
-def build_lab_disponibilita(laboratori,days,data_inizio):
+
+def build_lab_disponibilita(laboratori, days, data_inizio):
     lab_disponibilita = list()  # Lista di giorni di disponibilità dei laboratori, per ogni laboratorio assegna un array di dimensione days elementi settati a 1
     for lab_index in range(len(laboratori)):
         lab_disponibilita.append(list())
@@ -143,7 +157,8 @@ def build_lab_disponibilita(laboratori,days,data_inizio):
             lab_disponibilita[lab_index][distance] = 0
     return lab_disponibilita
 
-def build_aule_disponibilita(aule,days,data_inizio):
+
+def build_aule_disponibilita(aule, days, data_inizio):
     aule_disponibilita = list()  # Lista di giorni di disponibilità delle aule, per ogni aula assegna un array di dimensione days elementi settati a 1
     for aula_index in range(len(aule)):
         aule_disponibilita.append(list())
@@ -154,6 +169,23 @@ def build_aule_disponibilita(aule,days,data_inizio):
             distance = (data_indisponibilita - data_inizio).days
             aule_disponibilita[aula_index][distance] = 0
     return aule_disponibilita
+
+
+def build_preferenze_professori(exams, days, data_inizio):
+    preferenze_professori = list()  # Lista di giorni di disponibilità delle aule, per ogni aula assegna un array di dimensione days elementi settati a 1
+    for exam_index in range(len(exams)):
+        preferenze_professori.append(list())
+        for giorno in range(days):
+            preferenze_professori[exam_index].append(1)
+        # Ora metto a 0 i giorni di indisponibilita
+        for data_indisponibilita in exams[exam_index].date_indisponibilita:
+            distance = (data_indisponibilita - data_inizio).days
+            preferenze_professori[exam_index][distance] = 0
+        for data_preferenza in exams[exam_index].date_preferenza:
+            distance = (data_preferenza - data_inizio).days
+            preferenze_professori[exam_index][distance] = GUADAGNO_GIORNI_PREFERITI
+        # Ora metto a costante moltiplicativa le date preferite
+    return preferenze_professori
 
 
 def print_results(model, exams, data_inizio, data_fine):
