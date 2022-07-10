@@ -8,6 +8,8 @@ MIN_DISTANCE_APPELLI = 10
 SLOT_AULE = 2
 SLOT_LABORATORI = 3
 GUADAGNO_GIORNI_PREFERITI = 2
+COSTANTE_IMPORTANZA_PRIMO_ANNO = 4
+COSTANTE_IMPORTANZA_SECONDO_ANNO = 4
 
 
 def main():
@@ -31,7 +33,7 @@ def main():
     exams.append(
         Exam("CMRO", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 3, 2, [], [], "Note"))
     exams.append(
-        Exam("MDL", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [0, 1, 2, 3], 2, [], 0, 1, [], [datetime.strptime("08/06/2023", '%d/%m/%Y'),datetime.strptime("30/06/2023", '%d/%m/%Y')], "Note"))
+        Exam("MDL", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [0, 1, 2, 3], 2, [], 0, 1, [datetime.strptime("10/06/2023", '%d/%m/%Y'),datetime.strptime("29/06/2023", '%d/%m/%Y')], [datetime.strptime("08/06/2023", '%d/%m/%Y'),datetime.strptime("30/06/2023", '%d/%m/%Y')], "Note"))
 
     model = build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
@@ -40,10 +42,10 @@ def main():
 
 
 def build_model(aule, laboratori, data_inizio, data_fine, exams):
-    days = (
-                       data_fine - data_inizio).days + 1  # Calculate the number of days of the range counting for also the first and last day
-
     model = ConcreteModel()
+    days = (data_fine - data_inizio).days + 1  # Calculate the number of days of the range counting for also the first and last day
+
+    #Parametri del modello
     model.days = range(days)
     model.exams = range(len(exams))
     model.aule = range(len(aule))
@@ -54,10 +56,19 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
     model.lab_disponibilita = build_lab_disponibilita(laboratori, days, data_inizio)
     model.preferenze_professori = build_preferenze_professori(exams, days, data_inizio)
 
-    model.x = Var(model.exams, model.days, within=pyo.Binary)
-    model.dummy = Var(within=pyo.NonNegativeIntegers)
-    model.obj = Objective(expr=model.dummy)
 
+    #Variabili
+    model.x = Var(model.exams, model.days, within=pyo.Binary)
+    model.dummy_primo_anno = Var(within=pyo.NonNegativeIntegers)
+    model.dummy_secondo_anno = Var(within=pyo.NonNegativeIntegers)
+
+    #Funzione obiettivo
+    def obj_rule(model):
+        return sum(model.x[esame,giorno]*model.preferenze_professori[esame][giorno] for giorno in model.days for esame in model.exams) - (model.dummy_primo_anno * COSTANTE_IMPORTANZA_PRIMO_ANNO + model.dummy_secondo_anno*COSTANTE_IMPORTANZA_SECONDO_ANNO)
+    model.obj = Objective(expr=obj_rule,sense=maximize)
+
+
+    #Vincoli
     model.correct_exam_days = ConstraintList()  # Assegniamo esattamente il numero di giorni richiesto da un esame
     for i in model.exams:
         model.correct_exam_days.add(
@@ -133,14 +144,26 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
                     model.esami_stesso_semestre_diversi.add(
                         sum(model.x[esame1,giorno] for esame1 in esami_semestre[anno][semestre])<=1
                     )
-    print(esami_semestre)
 
+    model.esami_primo_anno_diversi = ConstraintList()  # Provo a non assegnare due esami del primo anno lo stesso giorno
+    esami_primo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    for esame in model.exams:
+        if exams[esame].anno == 1:
+            esami_primo_anno.append(esame)
+    if len(esami_primo_anno) > 1:
+        for giorno in model.days:
+            model.esami_stesso_semestre_diversi.add(
+                sum(model.x[esame1, giorno] for esame1 in esami_primo_anno) <= model.dummy_primo_anno)
 
-
-
-
-
-
+    model.esami_secondo_anno_diversi = ConstraintList()  # Provo a non assegnare due esami del secondo anno lo stesso giorno
+    esami_secondo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    for esame in model.exams:
+        if exams[esame].anno == 1:
+            esami_secondo_anno.append(esame)
+    if len(esami_secondo_anno) > 1:
+        for giorno in model.days:
+            model.esami_stesso_semestre_diversi.add(
+                sum(model.x[esame1, giorno] for esame1 in esami_secondo_anno) <= model.dummy_secondo_anno)
 
 
 
