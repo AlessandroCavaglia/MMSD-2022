@@ -118,6 +118,32 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
                     model.x[exam, day] == 0
                 )
 
+    model.esami_stesso_semestre_diversi = ConstraintList()  # Non assegno due esami dello stesso semestre lo stesso giorno
+    esami_semestre=list()       #Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    for anno in range(3):
+        esami_semestre.append([])
+        for semestre in range(2):
+            esami_semestre[anno].append([])
+            for esame in model.exams:
+                if exams[esame].anno==(anno+1):
+                    if(semestre+1) in exams[esame].lista_semestri:
+                        esami_semestre[anno][semestre].append(esame)
+            if len(esami_semestre[anno][semestre]) > 1:
+                for giorno in model.days:
+                    model.esami_stesso_semestre_diversi.add(
+                        sum(model.x[esame1,giorno] for esame1 in esami_semestre[anno][semestre])<=1
+                    )
+    print(esami_semestre)
+
+
+
+
+
+
+
+
+
+
     return model
 
 
