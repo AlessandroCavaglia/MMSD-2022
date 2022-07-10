@@ -19,6 +19,13 @@ if __name__ == '__main__':
     print_hi('PyCharm')
 
 #init aule
+aule_df = pd.read_excel('input/input modello.xlsx',sheet_name='Input generali 2.0',skiprows=1,usecols=[4,5])
+laboratorio_df = pd.read_excel('input/input modello.xlsx',sheet_name='Input generali 2.0',skiprows=1,usecols=[7,8])
+sessione_df = pd.read_excel('input/input modello.xlsx',sheet_name='Input generali 2.0',skiprows=1,usecols=[0,1,2])
+print(aule_df,)
+print(laboratorio_df)
+print(sessione_df)
+
 df = pd.read_excel('input/input modello.xlsx',skiprows=8, index_col=0, na_values=['string1', 'string2'],dtype={'Nome Aula': str, 'Date indisponibilità (Divise da ,)': datetime})
 df = df.reset_index()
 aule = []

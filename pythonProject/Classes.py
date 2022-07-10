@@ -1,7 +1,7 @@
 class Exam:
-    def __init__(self, nome, tipo, insegnanti, lista_semestri,anno,numero_appelli_sessione_full,
-                 numero_appelli_sessione_small,aule_richieste,numero_aule_slot,laboratori_richiesti,
-                 numero_lab_slot,numero_giorni_durata,date_preferenza,date_indisponibilita,note):
+    def __init__(self, nome, tipo, insegnanti, lista_semestri, anno, numero_appelli_sessione_full,
+                 numero_appelli_sessione_small, aule_richieste, numero_aule_slot, laboratori_richiesti,
+                 numero_lab_slot, numero_giorni_durata, date_preferenza, date_indisponibilita, note):
         self.nome = nome
         self.tipo = tipo
         self.insegnanti = insegnanti
@@ -18,7 +18,16 @@ class Exam:
         self.date_indisponibilita = date_indisponibilita
         self.note = note
 
+
 class ExamRoom:
-    def __init__(self,nome,indisponibilita):
-        self.nome=nome
-        self.indisponibilita=indisponibilita
+    def __init__(self, nome, indisponibilita):
+        self.nome = nome
+        self.indisponibilita = indisponibilita
+
+
+class Session:
+    def __init__(self, nome, data_inizio, data_fine):
+        self.nome = nome
+        self.dataInizio = data_inizio
+        self.dataFine = data_fine
+        self.durata = abs(data_fine - data_inizio).days
