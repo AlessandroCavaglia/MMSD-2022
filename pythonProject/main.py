@@ -8,7 +8,7 @@ from datetime import datetime
 import xlrd as x
 import openpyxl as op
 import pandas as pd
-import Classes
+import classes
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.

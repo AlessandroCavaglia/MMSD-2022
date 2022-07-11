@@ -1,5 +1,5 @@
-from Classes import Exam
-from Classes import ExamRoom
+from classes import Exam
+from classes import ExamRoom
 from datetime import datetime
 from pyomo.environ import *
 import pyomo.environ as pyo
@@ -10,45 +10,6 @@ SLOT_LABORATORI = 3
 GUADAGNO_GIORNI_PREFERITI = 2
 COSTANTE_IMPORTANZA_PRIMO_ANNO = 4
 COSTANTE_IMPORTANZA_SECONDO_ANNO = 4
-
-
-def main():
-    aule = [ExamRoom("Aula A", []),
-            ExamRoom("Aula B", []),
-            ExamRoom("Aula C", []),
-            ExamRoom("Aula D", []),
-            ExamRoom("Aula E", []),
-            ExamRoom("Aula F", []),
-            ExamRoom("Sala conferenze", [])]
-    laboratori = [ExamRoom("Laboratorio Dijkstra", []),
-                  ExamRoom("Laboratorio Vonneumann", []),
-                  ExamRoom("Laboratorio Turing", []),
-                  ExamRoom("Laboratorio Babbage", []),
-                  ExamRoom("Laboratorio Postel", [])]
-
-    data_inizio = datetime.strptime("09/06/2023", '%d/%m/%Y')
-    data_fine = datetime.strptime("28/07/2023", '%d/%m/%Y')
-
-    exams = list()
-    exams.append(
-        Exam("CMRO", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 1, 2, [], [], "Note"))
-    exams.append(
-        Exam("CMRO2", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 2, 2, [], [], "Note"))
-    exams.append(
-        Exam("CMRO3", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 1, 2, [], [], "Note"))
-    exams.append(
-        Exam("CMRO4", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 3, 2, [], [], "Note"))
-    exams.append(
-        Exam("CMRO5", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 2, 2, [], [], "Note"))
-    exams.append(
-        Exam("MDL", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [0, 1, 2, 3], 2, [], 0, 1, [datetime.strptime("10/06/2023", '%d/%m/%Y'),datetime.strptime("29/06/2023", '%d/%m/%Y')], [datetime.strptime("08/06/2023", '%d/%m/%Y'),datetime.strptime("30/06/2023", '%d/%m/%Y')], "Note"))
-
-
-    model = build_model(aule, laboratori, data_inizio, data_fine, exams)
-    opt = pyo.SolverFactory('cplex')
-    opt.solve(model)
-    print_results(model, exams, data_inizio, data_fine)
-
 
 def build_model(aule, laboratori, data_inizio, data_fine, exams):
     model = ConcreteModel()
@@ -261,7 +222,6 @@ def build_preferenze_professori(exams, days, data_inizio):
         # Ora metto a costante moltiplicativa le date preferite
     return preferenze_professori
 
-
 def print_results(model, exams, data_inizio, data_fine):
     days = (data_fine - data_inizio).days + 1
     for i in range(len(exams)):
@@ -274,9 +234,7 @@ def print_results(model, exams, data_inizio, data_fine):
                 print(int(model.x[i, j].value), end="]")
 
         print("]")
-    print("Dummy primo anno: ",'\033[92m',model.dummy_primo_anno.value,'\033[0m')
-    print("Dummy secondo anno: ",'\033[92m',model.dummy_secondo_anno.value,'\033[0m')
+    print("Dummy primo anno: ", '\033[92m', model.dummy_primo_anno.value, '\033[0m')
+    print("Dummy secondo anno: ", '\033[92m', model.dummy_secondo_anno.value, '\033[0m')
 
 
-if __name__ == '__main__':
-    main()

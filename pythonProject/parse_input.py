@@ -7,8 +7,13 @@
 import pandas as pd
 from datetime import datetime, timedelta
 import numpy as np
-import Classes
+import classes 
 import costants
+import holidays
+
+
+from model_building import *
+import pyomo.environ as pyo
 
 laboratori = []
 aule = []
@@ -24,7 +29,9 @@ def get_non_working_days(sdate, edate):
         day = data_inizio + timedelta(days=i)
         if day.weekday() > 4:
             weekend.append(day)
-
+    #Aggiungo i giorni festivi
+        if day in holidays.Italy(years=data_inizio.year) and day not in weekend:
+            weekend.append(day)
     return weekend
 
 
@@ -41,7 +48,7 @@ def load_laboratori():
     for index, row in laboratorii_df.iterrows():
         # row[0] -> Nome Laboratorio -> String
         # row[1] -> Indisponibilità -> String {Data1,...,DataN}
-        aule.append(Classes.ExamRoom(row[0], row[1]))
+        aule.append(classes.ExamRoom(row[0], row[1]))
 
 
 def load_aule():
@@ -50,7 +57,7 @@ def load_aule():
     for index, row in aule_df.iterrows():
         # row[0] -> Nome Aula -> String
         # row[1] -> Indisponibilità -> String {Data1,...,DataN}
-        aule.append(Classes.ExamRoom(row[0], row[1]))
+        aule.append(classes.ExamRoom(row[0], row[1]))
 
 
 def load_exams():
@@ -81,7 +88,7 @@ def load_exams():
         # row[12] -> Date di indisponibilità dei professori -> String {Data1,...,DataN}
         # row[13] -> Note -> String
         exams.append(
-            Classes.Exam(row[0], row[1], row[2], parse_list(row[3]), 1, row[4], row[5], parse_list(row[6]), row[7],
+            classes.Exam(row[0], row[1], row[2], parse_list(row[3]), 1, row[4], row[5], parse_list(row[6]), row[7],
                          parse_list(row[8]), row[9], parse_list(row[10]), parse_list(row[11]), row[12], row[13]))
 
     return True
@@ -98,3 +105,11 @@ if __name__ == '__main__':
     if load_exams():
         print(exams[2].aule_richieste)
     print(get_non_working_days("01/07/2022", "31/07/2022"))
+
+    '''Prova del modello sui dati di input
+    data_inizio = datetime.strptime("09/06/2023", '%d/%m/%Y')
+    data_fine = datetime.strptime("28/07/2023", '%d/%m/%Y')
+    model = build_model(aule, laboratori, data_inizio, data_fine, exams)
+    opt = pyo.SolverFactory('cplex')
+    opt.solve(model)
+    print_results(model, exams, data_inizio, data_fine)'''
