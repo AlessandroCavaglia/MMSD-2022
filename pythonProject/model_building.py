@@ -1,8 +1,9 @@
 from classes import Exam
 from classes import ExamRoom
-from datetime import datetime
+from datetime import datetime,timedelta
 from pyomo.environ import *
 import pyomo.environ as pyo
+import holidays
 
 MIN_DISTANCE_APPELLI = 10
 SLOT_AULE = 2
@@ -10,6 +11,19 @@ SLOT_LABORATORI = 3
 GUADAGNO_GIORNI_PREFERITI = 2
 COSTANTE_IMPORTANZA_PRIMO_ANNO = 4
 COSTANTE_IMPORTANZA_SECONDO_ANNO = 4
+
+def get_non_working_days(data_inizio, data_fine):
+
+    delta = data_fine - data_inizio  # as timedelta
+    weekend = []
+    for i in range(delta.days + 1):
+        day = data_inizio + timedelta(days=i)
+        if day.weekday() > 4:
+            weekend.append( (day - data_inizio).days)
+    #Aggiungo i giorni festivi
+        if day in holidays.Italy(years=data_inizio.year) and day not in weekend:
+            weekend.append((day - data_inizio).days)
+    return weekend
 
 def build_model(aule, laboratori, data_inizio, data_fine, exams):
     model = ConcreteModel()
@@ -189,7 +203,8 @@ def build_lab_disponibilita(laboratori, days, data_inizio):
         # Ora metto a 0 i giorni di indisponibilita
         for data_indisponibilita in laboratori[lab_index].indisponibilita:
             distance = (data_indisponibilita - data_inizio).days
-            lab_disponibilita[lab_index][distance] = 0
+            if distance>=0 and distance<len(lab_disponibilita[lab_index]):
+                lab_disponibilita[lab_index][distance] = 0
     return lab_disponibilita
 
 
@@ -223,15 +238,20 @@ def build_preferenze_professori(exams, days, data_inizio):
     return preferenze_professori
 
 def print_results(model, exams, data_inizio, data_fine):
+    giorni_indisp_generali=get_non_working_days(data_inizio,data_fine)
+
     days = (data_fine - data_inizio).days + 1
     for i in range(len(exams)):
         print(exams[i].nome)
         for j in range(days):
+            if j in giorni_indisp_generali:
+                print('\033[91m',end="")
             print("[", end="")
             if (int(model.x[i, j].value) == 1):
                 print('\033[92m' + str(int(model.x[i, j].value)) + '\033[0m', end="]")
             else:
                 print(int(model.x[i, j].value), end="]")
+            print('\033[0m', end="")
 
         print("]")
     print("Dummy primo anno: ", '\033[92m', model.dummy_primo_anno.value, '\033[0m')

@@ -19,6 +19,8 @@ class Exam:
         self.note = note
 
 
+
+
 class ExamRoom:
     def __init__(self, nome, indisponibilita):
         self.nome = nome
