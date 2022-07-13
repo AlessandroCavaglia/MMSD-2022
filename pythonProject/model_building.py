@@ -118,7 +118,7 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
                         model.aule_disponibilita[aula][giorno]
                 ))
 
-    model.limiti_lab = ConstraintList()  # Per ogni giorno non superiamo i limiti di assegniamento delle aule
+    model.limiti_lab = ConstraintList()  # Per ogni giorno non superiamo i limiti di assegniamento deli laboratori
     for giorno in model.days:
         for lab in model.lab:
             found = False

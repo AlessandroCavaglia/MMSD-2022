@@ -27,6 +27,7 @@ class ExamRoom:
         self.indisponibilita = indisponibilita
 
 
+
 class Session:
     def __init__(self, nome, data_inizio, data_fine):
         self.nome = nome
