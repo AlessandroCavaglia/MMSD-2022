@@ -7,7 +7,7 @@
 import pandas as pd
 from datetime import datetime, timedelta
 import numpy as np
-import classes 
+import classes
 import costants
 import holidays
 
@@ -15,9 +15,11 @@ import holidays
 from model_building import *
 import pyomo.environ as pyo
 
+sessioni = []
 laboratori = []
 aule = []
 exams = []
+ERRORE=""
 
 def printLaboratori():
     print("LABORATORI:")
@@ -30,6 +32,11 @@ def printAule():
     for aula in aule:
         print(aula.nome)
         print(aula.indisponibilita)
+
+def printSessioni():
+    print("Sessioni:")
+    for index,sessione in enumerate(sessioni):
+        print("Sessione "+str(index+1)+" Data inizio: "+str(sessione[0])+" Data fine: "+str(sessione[1]))
 
 def printCorsi():
     print("Esami:")
@@ -65,9 +72,7 @@ def printCorsi():
         print("Note")
         print(corso.note)
 
-def get_non_working_days(sdate, edate):
-    data_inizio = datetime.strptime(sdate, '%d/%m/%Y')
-    data_fine = datetime.strptime(edate, '%d/%m/%Y')
+def get_non_working_days(data_inizio, data_fine):
     delta = data_fine - data_inizio  # as timedelta
     weekend = []
     for i in range(delta.days + 1):
@@ -80,14 +85,28 @@ def get_non_working_days(sdate, edate):
     return weekend
 
 
-def load_input():
-    sessione_df = pd.read_excel('input/input modello.xlsx', sheet_name='Input generali 2.0', skiprows=1,
-                                usecols=costants.COLONNE_SESSIONI)
-    exams_df = pd.read_excel('input/input modello.xlsx', sheet_name='Corsi I anno triennale')
-    #print(exams_df)
 
+def load_date(): #Errori gestiti da testare a fondo
+    sessioni_df = pd.read_excel('input/input modello.xlsx', sheet_name='Input generali 2.0', skiprows=1,
+                                   usecols=costants.COLONNE_SESSIONI)
+    for index, row in sessioni_df.iterrows():
+        #row[0] -> Data  Inizio -> Date
+        #row[1] -> Data fine -> Dateù
+        if not pd.isnull(row[0]) and not pd.isnull(row[1]):
+            sessioni.append([])
+            try:
+                if datetime.strptime(str(row[1]).strip(), '%Y-%m-%d %H:%M:%S') > datetime.strptime(str(row[0]).strip(), '%Y-%m-%d %H:%M:%S'):
+                    sessioni[index].append(datetime.strptime(str(row[0]).strip(), '%Y-%m-%d %H:%M:%S'))
+                    sessioni[index].append(datetime.strptime(str(row[1]).strip(), '%Y-%m-%d %H:%M:%S'))
+                else:
+                    print("Data finale successiva alla data iniziale")
+                    return False
+            except:
+                print("Date in formato errato tra le seguenti: ", row[0], " e ", row[1])
+                return False
+    return True
 
-def load_laboratori():
+def load_laboratori():  #Errori gestiti da testare a fondo
     laboratorii_df = pd.read_excel('input/input modello.xlsx', sheet_name='Input generali 2.0', skiprows=1,
                                    usecols=costants.COLONNE_LABORATORI)
     for index, row in laboratorii_df.iterrows():
@@ -99,15 +118,29 @@ def load_laboratori():
                 dateindisp=parse_list(row[1])
                 for index in range(len(dateindisp)):
                     if '00:00:00' in dateindisp[index]:
-                        dateindisp[index] = datetime.strptime(dateindisp[index], '%Y-%m-%d %H:%M:%S')
+                        try:
+                            dateindisp[index] = datetime.strptime(dateindisp[index], '%Y-%m-%d %H:%M:%S')
+                        except:
+                            ERRORE="Data di indisponibilità del laboratorio "+row[0]+" in un formato non valido"
+                            return False
                     else:
-                        dateindisp[index] = datetime.strptime(dateindisp[index].strip(), '%d/%m/%Y')
-            #TODO CONTROLLO CHE LA DATA SIA IN FORMATO CORRETTO
-            #TODO CONTROLLO CHE LA DATA SIA CONTENUTA TRA LA DATA DI INIZIO E DI FINE
+                        try:
+                            dateindisp[index] = datetime.strptime(dateindisp[index].strip(), '%d/%m/%Y')
+                        except:
+                            ERRORE = "Data di indisponibilità del laboratorio " + row[0] + " in un formato non valido"
+                            return False
+                    found=False #Per ogni data di indisponibilità verifico che sia in qualche sessione
+                    for sessione in sessioni:
+                        if dateindisp[index] >= sessione[0] and dateindisp[index] <= sessione[1]:
+                            found=True
+                    if not found:
+                        ERRORE = "Data di indisponibilità del laboratorio " + row[0] + " non è in nessuna sessione di quelle impostate"
+                        return False
             laboratori.append(classes.ExamRoom(row[0], dateindisp))
+    return True
 
 
-def load_aule():
+def load_aule(): #Errori gestiti da testare a fondo
     aule_df = pd.read_excel('input/input modello.xlsx', sheet_name='Input generali 2.0', skiprows=1,
                             usecols=costants.COLONNE_AULE)
     for index, row in aule_df.iterrows():
@@ -119,13 +152,27 @@ def load_aule():
                 dateindisp = parse_list(row[1])
                 for index in range(len(dateindisp)):
                     if '00:00:00' in dateindisp[index]:
-                        dateindisp[index] = datetime.strptime(dateindisp[index], '%Y-%m-%d %H:%M:%S')
+                        try:
+                            dateindisp[index] = datetime.strptime(dateindisp[index], '%Y-%m-%d %H:%M:%S')
+                        except:
+                            ERRORE = "Data di indisponibilità del laboratorio " + row[0] + " in un formato non valido"
+                            return False
                     else:
-                        dateindisp[index] = datetime.strptime(dateindisp[index].strip(), '%d/%m/%Y')
-
-                # TODO CONTROLLO CHE LA DATA SIA IN FORMATO CORRETTO
-                # TODO CONTROLLO CHE LA DATA SIA CONTENUTA TRA LA DATA DI INIZIO E DI FINE
+                        try:
+                            dateindisp[index] = datetime.strptime(dateindisp[index].strip(), '%d/%m/%Y')
+                        except:
+                            ERRORE = "Data di indisponibilità del laboratorio " + row[0] + " in un formato non valido"
+                            return False
+                found = False  # Per ogni data di indisponibilità verifico che sia in qualche sessione
+                for sessione in sessioni:
+                    if dateindisp[index] >= sessione[0] and dateindisp[index] <= sessione[1]:
+                        found = True
+                if not found:
+                    ERRORE = "Data di indisponibilità del laboratorio " + row[
+                        0] + " non è in nessuna sessione di quelle impostate"
+                    return False
             aule.append(classes.ExamRoom(row[0], dateindisp))
+    return True
 
 
 def load_exams_first_year():
@@ -156,6 +203,11 @@ def load_exams_first_year():
         # row[12] -> Date di indisponibilità dei professori -> String {Data1,...,DataN}
         # row[13] -> Note -> String
         semestri=str(row[3]).replace('.0','')
+        semestri=parse_list(semestri,'.')
+        for semestre in semestri:
+            if semestre!="1" and semestre!="2":
+                ERRORE="Formato dei semestri errato "+str(row[3])
+                return False
         aule_richieste=[]
         laboratori_richiesti=[]
         date_indisponibilita=[]
@@ -198,12 +250,12 @@ def load_exams_first_year():
                 else:
                     date_indisponibilita[index_indisponibilita] = datetime.strptime(date_indisponibilita[index_indisponibilita].strip(), '%d/%m/%Y')
 
-        giorni_indisponibili=get_non_working_days("09/06/2023", "28/07/2023") #UTILIZZARE DATE GIUSTE
+        giorni_indisponibili=get_non_working_days(sessioni[1][0], sessioni[1][1]) #UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
         date_indisponibilita=[*date_indisponibilita,*giorni_indisponibili]
 
 
         exams.append(
-            classes.Exam(row[0], row[1], row[2], parse_list(semestri,'.'), 1, int(row[4]), int(row[5]), aule_richieste, int(row[7]),
+            classes.Exam(row[0], row[1], row[2], semestri, 1, int(row[4]), int(row[5]), aule_richieste, int(row[7]),
                          laboratori_richiesti, int(row[9]), int(row[10]), date_preferenza, date_indisponibilita, note))
 
     return True
@@ -214,27 +266,35 @@ def parse_list(input,delimiter=','):
         return str(input).split(delimiter)
     return [str(input)]
 
-
-if __name__ == '__main__':
-    #load_input()
-    #TODO GESTIRE ERRORI
-    load_laboratori()
-    load_aule()
-    printAule()
+def main():
+    if not load_date():
+        print("Errore durante il caricamento delle sessioni: "+ERRORE)
+        return
+    printSessioni()
+    if not load_laboratori():
+        print("Errore durante il caricamento dei laboratori: "+ERRORE)
+        return
     printLaboratori()
-    if load_exams_first_year():
-        printCorsi()
-        #print(exams[2].aule_richieste)
+    if not load_aule():
+        print("Errore durante il caricamento delle aule: "+ERRORE)
+        return
+    printAule()
+    if not load_exams_first_year():
+        print("Errore durante il caricamento dei corsi del primo anno: "+ERRORE)
+        return
+    printCorsi()
 
-
-
-    #print(get_non_working_days("01/07/2022", "31/07/2022"))
-
-    #Prova del modello sui dati di input
-    data_inizio = datetime.strptime("09/06/2023", '%d/%m/%Y')
-    data_fine = datetime.strptime("28/07/2023", '%d/%m/%Y')
+    #Test del modello
+    data_inizio = sessioni[1][0]  # Data inizio sessione estiva
+    data_fine = sessioni[1][1]  # Data fine sessione estiva
     model = build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
     opt.solve(model)
     print_results(model, exams, data_inizio, data_fine)
+
+
+
+if __name__ == '__main__':
+    main()
+
 

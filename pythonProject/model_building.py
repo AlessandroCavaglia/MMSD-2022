@@ -72,13 +72,12 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
                 (1-model.x[esame,giorno] + (model.x[esame,giorno+1]))*days >=
                 sum(model.x[esame,giorno_2] for giorno_2 in range((giorno+1) , upper_bound))
             )
-            if exams[esame].numero_giorni_durata > 1:
-                model.min_distance_appelli.add(     #Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarat
-                    (model.x[esame, giorno] * (1 - model.x[esame, giorno + 1])) * exams[esame].numero_giorni_durata +
-                    (model.x[esame,giorno+1])* days +
-                    (1-model.x[esame, giorno]) * days >=
-                    sum(model.x[esame, giorno_2] for giorno_2 in range(giorno, lower_bound-1, -1))
-                )
+            model.min_distance_appelli.add(     #Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarat
+                (model.x[esame, giorno] * (1 - model.x[esame, giorno + 1])) * exams[esame].numero_giorni_durata +
+                (model.x[esame,giorno+1])* days +
+                (1-model.x[esame, giorno]) * days >=
+                sum(model.x[esame, giorno_2] for giorno_2 in range(giorno, lower_bound-1, -1)))
+
         if exams[esame].numero_giorni_durata > 1:
             model.min_distance_appelli.add(
                 # Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarat
