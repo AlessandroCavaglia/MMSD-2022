@@ -69,15 +69,24 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
             if giorno+MIN_DISTANCE_APPELLI<upper_bound:
                 upper_bound=giorno+MIN_DISTANCE_APPELLI
             model.min_distance_appelli.add(     #Per ogni esame se siamo nell'ultimo giorno di assegnamento, nei successivi MIN_DISTANCE_APPELLI giorni non ci devono essere assegniamenti
-                (1-model.x[esame,giorno]+(model.x[esame,giorno+1]))*days >=
+                (1-model.x[esame,giorno] + (model.x[esame,giorno+1]))*days >=
                 sum(model.x[esame,giorno_2] for giorno_2 in range((giorno+1) , upper_bound))
             )
-            model.min_distance_appelli.add(     #Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarat
-                (model.x[esame, giorno] * (1 - model.x[esame, giorno + 1])) * exams[esame].numero_giorni_durata +
-                (model.x[esame,giorno+1])* days +
-                (1-model.x[esame, giorno]) * days >=
-                sum(model.x[esame, giorno_2] for giorno_2 in range(giorno, lower_bound, -1))
+            if exams[esame].numero_giorni_durata > 1:
+                model.min_distance_appelli.add(     #Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarat
+                    (model.x[esame, giorno] * (1 - model.x[esame, giorno + 1])) * exams[esame].numero_giorni_durata +
+                    (model.x[esame,giorno+1])* days +
+                    (1-model.x[esame, giorno]) * days >=
+                    sum(model.x[esame, giorno_2] for giorno_2 in range(giorno, lower_bound-1, -1))
+                )
+        if exams[esame].numero_giorni_durata > 1:
+            model.min_distance_appelli.add(
+                # Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarat
+                (model.x[esame, days - 1]) * exams[esame].numero_giorni_durata +
+                (1 - model.x[esame, days - 1]) * days >=
+                sum(model.x[esame, giorno_2] for giorno_2 in range(days - 1, days - 1 - MIN_DISTANCE_APPELLI, -1))
             )
+
 
     model.assegniamenti_contigui = ConstraintList()  # Per ogni esame assegno i giorni contigui necessari
     for esame in model.exams:
@@ -98,13 +107,15 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
     for giorno in model.days:
         for aula in model.aule:
             found = False
-            for exam in exams:
+            esami_in_aula=[]
+            for index,exam in enumerate(exams):
                 if (aula in exam.aule_richieste):
                     found = True
+                    esami_in_aula.append(index)
             if found:
                 model.limiti_aule.add((
                         sum(model.x[esame, giorno] * model.richieste_aule_esami[esame][aula]
-                            for esame in model.exams) <=
+                            for esame in esami_in_aula) <=
                         model.aule_disponibilita[aula][giorno]
                 ))
 
@@ -112,13 +123,15 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
     for giorno in model.days:
         for lab in model.lab:
             found = False
-            for exam in exams:
+            esame_in_lab=[]
+            for index,exam in enumerate(exams):
                 if (lab in exam.laboratori_richiesti):
                     found = True
+                    esame_in_lab.append(index)
             if found:
                 model.limiti_lab.add((
                         sum(model.x[esame, giorno] * model.richieste_lab_esami[esame][lab]
-                            for esame in model.exams) <=
+                            for esame in esame_in_lab) <=
                         model.lab_disponibilita[lab][giorno]
                 ))
     model.indisp_professori = ConstraintList()  # Per ogni esame non lo assegno nei giorni di indisponibilità dei professori
@@ -158,7 +171,7 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
     model.esami_secondo_anno_diversi = ConstraintList()  # Provo a non assegnare due esami del secondo anno lo stesso giorno
     esami_secondo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
     for esame in model.exams:
-        if exams[esame].anno == 1:
+        if exams[esame].anno == 2:
             esami_secondo_anno.append(esame)
     if len(esami_secondo_anno) > 1:
         for giorno in model.days:

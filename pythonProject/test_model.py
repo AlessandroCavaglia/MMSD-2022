@@ -20,23 +20,13 @@ def main():
                   ExamRoom("Laboratorio Postel", [])]
 
     data_inizio = datetime.strptime("09/06/2023", '%d/%m/%Y')
-    data_fine = datetime.strptime("28/07/2023", '%d/%m/%Y')
+    data_fine = datetime.strptime("23/06/2023", '%d/%m/%Y')
 
     exams = list()
     exams.append(
-        Exam("CMRO", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 1, 2, [], [], "Note"))
+        Exam("CMRO", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 3, 2, [], [], "Note"))
     exams.append(
-        Exam("CMRO2", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 2, 2, [], [], "Note"))
-    exams.append(
-        Exam("CMRO3", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 1, 2, [], [], "Note"))
-    exams.append(
-        Exam("CMRO4", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 3, 2, [], [], "Note"))
-    exams.append(
-        Exam("CMRO5", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 2, 2, [], [], "Note"))
-    exams.append(
-        Exam("MDL", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [0, 1, 2, 3], 2, [], 0, 1,
-             [datetime.strptime("10/06/2023", '%d/%m/%Y'), datetime.strptime("29/06/2023", '%d/%m/%Y')],
-             [datetime.strptime("08/06/2023", '%d/%m/%Y'), datetime.strptime("30/06/2023", '%d/%m/%Y')], "Note"))
+        Exam("CMRO2", "Scritto", "Insegnante1, Insegnante 2", [1], 2, 2, 1, [], 0, [0, 1], 1, 2, [], [], "Note"))
 
     model = build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
