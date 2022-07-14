@@ -342,7 +342,7 @@ def main():
     opt = pyo.SolverFactory('cplex')
     opt.solve(model)
     print_results(model, exams, data_inizio, data_fine)
-    create_output.build_output(exams, laboratori, aule, model)
+    create_output.build_output(exams, laboratori, aule, "",model,"",sessioni)
 
 if __name__ == '__main__':
     main()
