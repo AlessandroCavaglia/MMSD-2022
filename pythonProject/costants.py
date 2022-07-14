@@ -1,3 +1,5 @@
 COLONNE_LABORATORI = [7,8]
 COLONNE_AULE = [4,5]
 COLONNE_SESSIONI = [1, 2]
+INPUT_FILE_NAME="input modello.xlsx"
+OUTPUT_FILE_NAME="output modello.xlsx"

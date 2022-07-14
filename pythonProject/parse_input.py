@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import classes
 import costants
+import create_output
 import holidays
 
 from model_building import *
@@ -90,7 +91,7 @@ def get_non_working_days(data_inizio, data_fine):
 
 
 def load_date():  # Errori gestiti da testare a fondo
-    sessioni_df = pd.read_excel('input/input modello.xlsx', sheet_name='Input generali 2.0', skiprows=1,
+    sessioni_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali 2.0', skiprows=1,
                                 usecols=costants.COLONNE_SESSIONI)
     for index, row in sessioni_df.iterrows():
         # row[0] -> Data  Inizio -> Date
@@ -112,7 +113,7 @@ def load_date():  # Errori gestiti da testare a fondo
 
 
 def load_laboratori():  # Errori gestiti da testare a fondo
-    laboratorii_df = pd.read_excel('input/input modello.xlsx', sheet_name='Input generali 2.0', skiprows=1,
+    laboratorii_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali 2.0', skiprows=1,
                                    usecols=costants.COLONNE_LABORATORI)
     for index, row in laboratorii_df.iterrows():
         # row[0] -> Nome Laboratorio -> String
@@ -147,7 +148,7 @@ def load_laboratori():  # Errori gestiti da testare a fondo
 
 
 def load_aule():  # Errori gestiti da testare a fondo
-    aule_df = pd.read_excel('input/input modello.xlsx', sheet_name='Input generali 2.0', skiprows=1,
+    aule_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali 2.0', skiprows=1,
                             usecols=costants.COLONNE_AULE)
     for index, row in aule_df.iterrows():
         # row[0] -> Nome Aula -> String
@@ -187,7 +188,7 @@ def load_exams_first_year():
     date_indisponibilita = []
     date_preferenza = []
     note = ""
-    exams_df = pd.read_excel('input/input modello.xlsx', sheet_name='Corsi I anno triennale')
+    exams_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Corsi I anno triennale')
     for index, row in exams_df.iterrows():
         # row[0] -> Nome Corso -> String
         # row[1] -> Tipologia -> String
@@ -341,7 +342,7 @@ def main():
     opt = pyo.SolverFactory('cplex')
     opt.solve(model)
     print_results(model, exams, data_inizio, data_fine)
-
+    create_output.build_output(exams, laboratori, aule, model)
 
 if __name__ == '__main__':
     main()
