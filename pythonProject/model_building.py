@@ -62,8 +62,9 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
     model.correct_exam_place_session = ConstraintList() # Per ogni esame verifico che il primo appello sia nella prima metà della sessione, vincolo implicito che il secondo sia nella seconda metà
     middle_session = int(len(model.days) / 2) #TODO da modellare in base alle indicazioni del prof
     for i in model.exams:
-        model.correct_exam_place_session.add(
-            sum(model.x[i, j] for j in range(0,middle_session)) == exams[i].numero_giorni_durata)
+        if(exams[i].numero_appelli_sessione_full>1):    #Metto il vincolo solo se modelliamo un solo appello TODO distinguere sessioni full da sessioni small
+            model.correct_exam_place_session.add(
+                sum(model.x[i, j] for j in range(0,middle_session)) == exams[i].numero_giorni_durata)
 
     model.min_distance_appelli = ConstraintList()  # Per ogni esame la distanza minima tra i due appelli deve essere almeno MIN_DISTANCE_APPELLI
     for esame in model.exams:

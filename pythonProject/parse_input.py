@@ -128,21 +128,21 @@ def load_laboratori():  # Errori gestiti da testare a fondo
                         try:
                             dateindisp[index] = datetime.strptime(dateindisp[index], '%Y-%m-%d %H:%M:%S')
                         except:
-                            ERRORE = "Data di indisponibilità del laboratorio " + row[0] + " in un formato non valido"
+                            print("Data di indisponibilità del laboratorio " + row[0] + " in un formato non valido")
                             return False
                     else:
                         try:
                             dateindisp[index] = datetime.strptime(dateindisp[index].strip(), '%d/%m/%Y')
                         except:
-                            ERRORE = "Data di indisponibilità del laboratorio " + row[0] + " in un formato non valido"
+                            print("Data di indisponibilità del laboratorio " + row[0] + " in un formato non valido")
                             return False
                     found = False  # Per ogni data di indisponibilità verifico che sia in qualche sessione
                     for sessione in sessioni:
                         if dateindisp[index] >= sessione[0] and dateindisp[index] <= sessione[1]:
                             found = True
                     if not found:
-                        ERRORE = "Data di indisponibilità del laboratorio " + row[
-                            0] + " non è in nessuna sessione di quelle impostate"
+                        print("Data di indisponibilità del laboratorio " + row[
+                            0] + " non è in nessuna sessione di quelle impostate")
                         return False
             laboratori.append(classes.ExamRoom(row[0], dateindisp))
     return True
@@ -163,21 +163,21 @@ def load_aule():  # Errori gestiti da testare a fondo
                         try:
                             dateindisp[index] = datetime.strptime(dateindisp[index], '%Y-%m-%d %H:%M:%S')
                         except:
-                            ERRORE = "Data di indisponibilità del laboratorio " + row[0] + " in un formato non valido"
+                            print("Data di indisponibilità del laboratorio " + row[0] + " in un formato non valido")
                             return False
                     else:
                         try:
                             dateindisp[index] = datetime.strptime(dateindisp[index].strip(), '%d/%m/%Y')
                         except:
-                            ERRORE = "Data di indisponibilità del laboratorio " + row[0] + " in un formato non valido"
+                            print("Data di indisponibilità del laboratorio " + row[0] + " in un formato non valido")
                             return False
                 found = False  # Per ogni data di indisponibilità verifico che sia in qualche sessione
                 for sessione in sessioni:
                     if dateindisp[index] >= sessione[0] and dateindisp[index] <= sessione[1]:
                         found = True
                 if not found:
-                    ERRORE = "Data di indisponibilità del laboratorio " + row[
-                        0] + " non è in nessuna sessione di quelle impostate"
+                    print("Data di indisponibilità del laboratorio " + row[
+                        0] + " non è in nessuna sessione di quelle impostate")
                     return False
             aule.append(classes.ExamRoom(row[0], dateindisp))
     return True
@@ -209,7 +209,7 @@ def load_exams(nome_foglio, anno):
         semestri = parse_list(semestri, '.')
         for semestre in semestri:
             if semestre != "1" and semestre != "2":
-                ERRORE = " Formato dei semestri errato " + str(row[3])
+                print(" Formato dei semestri errato " + str(row[3]))
                 return False
 
         if not pd.isnull(row[6]):  # Controllo che gli esami abbiano aule esistenti inseriti in input generali
@@ -217,8 +217,8 @@ def load_exams(nome_foglio, anno):
             for index_aule_richieste in range(len(aule_richieste)):
                 for index, aula in enumerate(aule):
                     if not check_exist(aule, str(aule_richieste[index_aule_richieste]).strip()):
-                        ERRORE = "Errore nel caricamento del flusso " + str(
-                            aule_richieste[index_aule_richieste]).strip() + " mancante"
+                        print("Errore nel caricamento del flusso " + str(
+                            aule_richieste[index_aule_richieste]).strip() + " mancante")
                         return False
 
         if not pd.isnull(row[6]):  # Parsifico le aule e inserisco l'indice associato ad esse
@@ -234,19 +234,20 @@ def load_exams(nome_foglio, anno):
         if not pd.isnull(row[8]):  # Controllo che gli esami abbiano laboratori esistenti inseriti in input generali
             laboratori_richiesti = parse_list(row[8])
             for index_laboratori_richieste in range(len(laboratori_richiesti)):
-                if laboratori_richiesti[index_laboratori_richieste].strip()!='' and laboratori_richiesti[index_laboratori_richieste].strip()!=' ':
+                if laboratori_richiesti[index_laboratori_richieste] != '' and laboratori_richiesti[index_laboratori_richieste]!=' ':
                     for index, lab in enumerate(laboratori):
                         if not check_exist(laboratori, str(laboratori_richiesti[index_laboratori_richieste]).strip()):
-                            ERRORE = "Errore nel caricamento del flusso " + str(
-                                laboratori_richiesti[index_laboratori_richieste]).strip() + " mancante"
+                            print("Errore nel caricamento del flusso " + str(
+                                laboratori_richiesti[index_laboratori_richieste]).strip() + " mancante")
                             return False
 
         if not pd.isnull(row[8]):  # Parsifico i laboratori e inserisco gli indici associati ad essi
             laboratori_richiesti = parse_list(row[8])
             for index_laboratori_richieste in range(len(laboratori_richiesti)):
-                for index, lab in enumerate(laboratori):
-                    if str(lab.nome).strip() == str(laboratori_richiesti[index_laboratori_richieste]).strip():
-                        laboratori_richiesti[index_laboratori_richieste] = index
+                if laboratori_richiesti[index_laboratori_richieste] != '' and laboratori_richiesti[index_laboratori_richieste] != ' ':
+                    for index, lab in enumerate(laboratori):
+                        if str(lab.nome).strip() == str(laboratori_richiesti[index_laboratori_richieste]).strip():
+                            laboratori_richiesti[index_laboratori_richieste] = index
 
         if pd.isnull(row[9]):
             row[9] = 0
@@ -259,16 +260,16 @@ def load_exams(nome_foglio, anno):
                     date = datetime.strptime(
                         date_preferenza[index_preferenza], '%Y-%m-%d %H:%M:%S')
                     if date < sessioni[1][0] or date > sessioni[1][1]: # TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
-                        ERRORE = "Date di preferenza errate, non comprese nella sessione Inizio(" + str(
-                            sessioni[1][0]) + "-" + str(sessioni[1][1]) + ") inserito: " + str(date)
+                        print("Date di preferenza errate, non comprese nella sessione Inizio(" + str(
+                            sessioni[1][0]) + "-" + str(sessioni[1][1]) + ") inserito: " + str(date))
                         return False
                     date_preferenza[index_preferenza] = date
                 else:
                     date = datetime.strptime(
                         date_preferenza[index_preferenza].strip(), '%d/%m/%Y')
                     if date < sessioni[1][0] or date > sessioni[1][1]: #TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
-                        ERRORE = "Date di preferenza errate, non comprese nella sessione Inizio(" + str(
-                            sessioni[1][0]) + "-" + str(sessioni[1][1]) + ") inserito: " + str(date)
+                        print("Date di preferenza errate, non comprese nella sessione Inizio(" + str(
+                            sessioni[1][0]) + "-" + str(sessioni[1][1]) + ") inserito: " + str(date))
                         return False
                     date_preferenza[index_preferenza] = date
 
@@ -280,16 +281,16 @@ def load_exams(nome_foglio, anno):
                     date = datetime.strptime(
                         date_indisponibilita[index_indisponibilita], '%Y-%m-%d %H:%M:%S')
                     if date < sessioni[1][0] or date > sessioni[1][1]: #TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
-                        ERRORE = "Date di indisponibilità errate, non comprese nella sessione Inizio(" + str(
-                            sessioni[1][0]) + "-" + str(sessioni[1][1]) + ") inserito: " + str(date)
+                        print("Date di indisponibilità errate, non comprese nella sessione Inizio(" + str(
+                            sessioni[1][0]) + "-" + str(sessioni[1][1]) + ") inserito: " + str(date))
                         return False
                     date_indisponibilita[index_indisponibilita] = date
                 else:
                     date = datetime.strptime(
                         date_indisponibilita[index_indisponibilita].strip(), '%d/%m/%Y')
                     if date < sessioni[1][0] or date > sessioni[1][1]: #TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
-                        ERRORE = "Date di indisponibilità errate, non comprese nella sessione: Inizio(" + str(
-                            sessioni[1][0]) + "-" + str(sessioni[1][1]) + ") inserito: " + str(date)
+                        print("Date di indisponibilità errate, non comprese nella sessione: Inizio(" + str(
+                            sessioni[1][0]) + "-" + str(sessioni[1][1]) + ") inserito: " + str(date))
                         print(ERRORE)
                         return False
                     date_indisponibilita[index_indisponibilita] = date
@@ -338,7 +339,12 @@ def main():
     if not load_exams('Corsi II anno triennale', 2):
         print("Errore durante il caricamento dei corsi del secondo anno: " + ERRORE)
         return
+    if not load_exams('Corsi III anno triennale', 3):
+        print("Errore durante il caricamento dei corsi del terzo anno: " + ERRORE)
+        return
     printCorsi()
+    printCorsi()
+
 
     # Test del modello
     data_inizio = sessioni[1][0]  # Data inizio sessione estiva
