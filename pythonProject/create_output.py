@@ -36,7 +36,7 @@ def build_exams_output(esami_anno,nome_foglio,laboratori,aule,model_sessione_inv
         index=exams.index(esame)
         date_esitive_esame=[]
         durata_sessione = abs(sessione[1][1]-sessione[1][0])
-        for i in range(durata_sessione.days):
+        for i in range(durata_sessione.days+1):
             if model_sessione_estiva.x[index,i].value==1:
 
                 data = sessione[1][0] + timedelta(days=i)
