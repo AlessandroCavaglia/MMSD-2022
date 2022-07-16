@@ -78,11 +78,20 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
                 (1-model.x[esame,giorno] + (model.x[esame,giorno+1]))*days >=
                 sum(model.x[esame,giorno_2] for giorno_2 in range((giorno+1) , upper_bound))
             )
+
+            '''
             model.min_distance_appelli.add(     #Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarat
                 (model.x[esame, giorno] * (1 - model.x[esame, giorno + 1])) * exams[esame].numero_giorni_durata +
                 (model.x[esame,giorno+1])* days +
                 (1-model.x[esame, giorno]) * days >=
-                sum(model.x[esame, giorno_2] for giorno_2 in range(giorno, lower_bound-1, -1)))
+                sum(model.x[esame, giorno_2] for giorno_2 in range(giorno, lower_bound-1, -1)))'''
+
+            model.min_distance_appelli.add(
+                # Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarat
+                ((model.x[esame, giorno] * exams[esame].numero_giorni_durata) - ((model.x[esame, giorno + 1])) * exams[esame].numero_giorni_durata) +
+                (model.x[esame, giorno + 1]) * days +
+                (1 - model.x[esame, giorno]) * days >=
+                sum(model.x[esame, giorno_2] for giorno_2 in range(giorno, lower_bound - 1, -1)))
 
         if exams[esame].numero_giorni_durata > 1:
             model.min_distance_appelli.add(
@@ -97,8 +106,19 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
     for esame in model.exams:
         if (exams[esame].numero_giorni_durata > 1):
             for giorno in range(1, days - exams[esame].numero_giorni_durata):
+                '''
                 model.assegniamenti_contigui.add(
                     ((1 - model.x[esame, (giorno - 1)]) * model.x[esame, giorno] * exams[esame].numero_giorni_durata) <=
+                    sum(model.x[esame, giorno_2] for giorno_2 in
+                        range(giorno, (giorno + exams[esame].numero_giorni_durata)))
+                )
+            model.assegniamenti_contigui.add(
+                (model.x[esame, 0] * exams[esame].numero_giorni_durata) <=
+                sum(model.x[esame, giorno_2] for giorno_2 in
+                    range(exams[esame].numero_giorni_durata))
+            )'''
+                model.assegniamenti_contigui.add(
+                    (model.x[esame, giorno] * exams[esame].numero_giorni_durata) - ((model.x[esame, (giorno - 1)]) * exams[esame].numero_giorni_durata)  <=
                     sum(model.x[esame, giorno_2] for giorno_2 in
                         range(giorno, (giorno + exams[esame].numero_giorni_durata)))
                 )
@@ -182,9 +202,6 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
         for giorno in model.days:
             model.esami_stesso_semestre_diversi.add(
                 sum(model.x[esame1, giorno] for esame1 in esami_secondo_anno) <= 1 + model.dummy_secondo_anno)
-
-
-
     return model
 
 

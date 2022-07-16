@@ -3,6 +3,7 @@
 # LABORATORI (Nome,Indisponibilità)
 # SESSIONE (Nome, DataInizio, DataFine)
 # ESAME(
+import os.path
 
 import pandas as pd
 from datetime import datetime, timedelta
@@ -340,7 +341,8 @@ def main():
     data_fine = sessioni[1][1]  # Data fine sessione estiva
     model = build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
-    opt.solve(model)
+    path=os.path.join('log', str(datetime.today().strftime('Resolution_%d-%m-%y_%H-%M-%S.log')))
+    opt.solve(model,logfile=path)
     print_results(model, exams, data_inizio, data_fine)
     create_output.build_output(exams, laboratori, aule, "",model,"",sessioni)
 
