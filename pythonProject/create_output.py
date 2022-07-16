@@ -57,7 +57,7 @@ def build_exams_output(esami_anno,nome_foglio,laboratori,aule,model_sessione_inv
 
 def build_output(exams,laboratori,aule,model_sessione_invernale,model_sessione_estiva,model_sessione_settembre,sessioni):
     #Move the general input page to the new document
-    sessioni_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name='Input generali 2.0')
+    sessioni_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name='Input generali')
     writer = pd.ExcelWriter('output/'+costants.OUTPUT_FILE_NAME, engine='xlsxwriter')
     for column in sessioni_df.columns:
         if('Unnamed' in column):

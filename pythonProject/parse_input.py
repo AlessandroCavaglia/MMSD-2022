@@ -92,7 +92,7 @@ def get_non_working_days(data_inizio, data_fine):
 
 
 def load_date():  # Errori gestiti da testare a fondo
-    sessioni_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali 2.0', skiprows=1,
+    sessioni_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
                                 usecols=costants.COLONNE_SESSIONI)
     for index, row in sessioni_df.iterrows():
         # row[0] -> Data  Inizio -> Date
@@ -114,7 +114,7 @@ def load_date():  # Errori gestiti da testare a fondo
 
 
 def load_laboratori():  # Errori gestiti da testare a fondo
-    laboratorii_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali 2.0', skiprows=1,
+    laboratorii_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
                                    usecols=costants.COLONNE_LABORATORI)
     for index, row in laboratorii_df.iterrows():
         # row[0] -> Nome Laboratorio -> String
@@ -149,7 +149,7 @@ def load_laboratori():  # Errori gestiti da testare a fondo
 
 
 def load_aule():  # Errori gestiti da testare a fondo
-    aule_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali 2.0', skiprows=1,
+    aule_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
                             usecols=costants.COLONNE_AULE)
     for index, row in aule_df.iterrows():
         # row[0] -> Nome Aula -> String
@@ -183,13 +183,13 @@ def load_aule():  # Errori gestiti da testare a fondo
     return True
 
 
-def load_exams_first_year():
+def load_exams(nome_foglio, anno):
     aule_richieste = []
     laboratori_richiesti = []
     date_indisponibilita = []
     date_preferenza = []
     note = ""
-    exams_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Corsi I anno triennale')
+    exams_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name=nome_foglio)
     for index, row in exams_df.iterrows():
         # row[0] -> Nome Corso -> String
         # row[1] -> Tipologia -> String
@@ -234,11 +234,12 @@ def load_exams_first_year():
         if not pd.isnull(row[8]):  # Controllo che gli esami abbiano laboratori esistenti inseriti in input generali
             laboratori_richiesti = parse_list(row[8])
             for index_laboratori_richieste in range(len(laboratori_richiesti)):
-                for index, lab in enumerate(laboratori):
-                    if not check_exist(laboratori, str(laboratori_richiesti[index_laboratori_richieste]).strip()):
-                        ERRORE = "Errore nel caricamento del flusso " + str(
-                            laboratori_richiesti[index_laboratori_richieste]).strip() + " mancante"
-                        return False
+                if laboratori_richiesti[index_laboratori_richieste].strip()!='' and laboratori_richiesti[index_laboratori_richieste].strip()!=' ':
+                    for index, lab in enumerate(laboratori):
+                        if not check_exist(laboratori, str(laboratori_richiesti[index_laboratori_richieste]).strip()):
+                            ERRORE = "Errore nel caricamento del flusso " + str(
+                                laboratori_richiesti[index_laboratori_richieste]).strip() + " mancante"
+                            return False
 
         if not pd.isnull(row[8]):  # Parsifico i laboratori e inserisco gli indici associati ad essi
             laboratori_richiesti = parse_list(row[8])
@@ -298,7 +299,7 @@ def load_exams_first_year():
         date_indisponibilita = [*date_indisponibilita, *giorni_indisponibili]
 
         exams.append(
-            classes.Exam(row[0], row[1], row[2], semestri, 1, int(row[4]), int(row[5]), aule_richieste, int(row[7]),
+            classes.Exam(row[0], row[1], row[2], semestri, anno, int(row[4]), int(row[5]), aule_richieste, int(row[7]),
                          laboratori_richiesti, int(row[9]), int(row[10]), date_preferenza, date_indisponibilita, note))
 
     return True
@@ -331,8 +332,11 @@ def main():
         print("Errore durante il caricamento delle aule: " + ERRORE)
         return
     printAule()
-    if not load_exams_first_year():
+    if not load_exams('Corsi I anno triennale', 1):
         print("Errore durante il caricamento dei corsi del primo anno: " + ERRORE)
+        return
+    if not load_exams('Corsi II anno triennale', 2):
+        print("Errore durante il caricamento dei corsi del secondo anno: " + ERRORE)
         return
     printCorsi()
 
