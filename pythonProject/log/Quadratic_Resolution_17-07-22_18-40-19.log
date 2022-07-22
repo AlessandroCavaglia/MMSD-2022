@@ -1,0 +1,80 @@
+Solver command line: ['C:\\Program Files\\IBM\\ILOG\\CPLEX_Studio128\\cplex\\bin\\x64_win64\\cplex.exe']
+
+
+Welcome to IBM(R) ILOG(R) CPLEX(R) Interactive Optimizer 12.8.0.0
+  with Simplex, Mixed Integer & Barrier Optimizers
+5725-A06 5725-A29 5724-Y48 5724-Y49 5724-Y54 5724-Y55 5655-Y21
+Copyright IBM Corp. 1988, 2017.  All Rights Reserved.
+
+Type 'help' for a list of available commands.
+Type 'help' followed by a command name for more
+information on commands.
+
+CPLEX> Logfile 'cplex.log' closed.
+Logfile 'log\Resolution_17-07-22_18-40-19.log' open.
+CPLEX> Problem 'C:\Users\Alberto\AppData\Local\Temp\tmp71d1ogcz.pyomo.lp' read.
+Read time = 0.01 sec. (1.18 ticks)
+CPLEX> Problem name         : C:\Users\Alberto\AppData\Local\Temp\tmp71d1ogcz.pyomo.lp
+Objective sense      : Maximize
+Variables            :    1635  [Nneg: 1,  Binary: 1632,  General Integer: 2]
+Objective nonzeros   :    1186
+Linear constraints   :    2825  [Less: 2280,  Greater: 32,  Equal: 513]
+  Nonzeros           :   21661
+  RHS nonzeros       :    2279
+Quadratic constraints:    1600  [Less: 1600]
+  Linear terms       :   17440
+  Quadratic terms    :    1600
+  RHS nonzeros       :    1600
+
+Variables            : Min LB: 0.000000         Max UB: 1.000000       
+Objective nonzeros   : Min   : 1.000000         Max   : 4.000000       
+Linear constraints   :
+  Nonzeros           : Min   : 1.000000         Max   : 51.00000       
+  RHS nonzeros       : Min   : 1.000000         Max   : 51.00000       
+Quadratic constraints:
+  Linear terms       : Min   : 1.000000         Max   : 51.00000       
+  Quadratic terms    : Min   : 1.000000         Max   : 2.000000       
+  RHS nonzeros       : Min   : 51.00000         Max   : 51.00000       
+CPLEX> Tried aggregator 2 times.
+MIQCP Presolve eliminated 2779 rows and 449 columns.
+MIQCP Presolve modified 6030 coefficients.
+Aggregator did 2 substitutions.
+Reduced MIQCP has 5356 rows, 6749 columns, and 24264 nonzeros.
+Reduced MIQCP has 1182 binaries, 2 generals, 0 SOSs, and 0 indicators.
+Reduced MIQCP has 928 quadratic constraints.
+Presolve time = 0.11 sec. (31.10 ticks)
+Probing fixed 0 vars, tightened 2021 bounds.
+Probing time = 0.02 sec. (8.27 ticks)
+Clique table members: 1494.
+MIP emphasis: balance optimality and feasibility.
+MIP search method: dynamic search.
+Parallel mode: deterministic, using up to 4 threads.
+Root relaxation solution time = 0.02 sec. (12.81 ticks)
+
+        Nodes                                         Cuts/
+   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap
+
+      0     0       68.0000     0                   1184.0000      219         
+      0     0       68.0000    78                     68.0000      219         
+*     0+    0                           64.0000       68.0000             6.25%
+*     0+    0                           68.0000       68.0000             0.00%
+      0     0        cutoff             68.0000       68.0000      219    0.00%
+Elapsed time = 0.25 sec. (157.53 ticks, tree = 0.01 MB, solutions = 2)
+
+Root node processing (before b&c):
+  Real time             =    0.27 sec. (157.77 ticks)
+Parallel b&c, 4 threads:
+  Real time             =    0.00 sec. (0.00 ticks)
+  Sync time (average)   =    0.00 sec.
+  Wait time (average)   =    0.00 sec.
+                          ------------
+Total (root+branch&cut) =    0.27 sec. (157.77 ticks)
+
+Solution pool: 2 solutions saved.
+
+MIP - Integer optimal solution:  Objective =  6.8000000000e+01
+Solution time =    0.27 sec.  Iterations = 219  Nodes = 0
+Deterministic time = 157.77 ticks  (593.13 ticks/sec)
+
+CPLEX> Incumbent solution written to file 'C:\Users\Alberto\AppData\Local\Temp\tmp86hsvunr.cplex.sol'.
+CPLEX> 
