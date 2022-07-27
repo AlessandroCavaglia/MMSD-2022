@@ -26,6 +26,10 @@ def main():
 
     exams = list()
     exams.append(
+        Exam("CMRO", "Scritto", "Insegnante1, Insegnante 2", [1], 2, 2, 1, [], 0, [0, 1], 3, 2, [], [], "Note"))
+    exams.append(
+        Exam("CMRO2", "Scritto", "Insegnante1, Insegnante 2", [1], 2, 2, 1, [], 0, [0, 1], 1, 2, [], [], "Note"))
+    exams.append(
         Exam("CMRO", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 3, 2, [], [], "Note"))
     exams.append(
         Exam("CMRO2", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 1, 2, [], [], "Note"))

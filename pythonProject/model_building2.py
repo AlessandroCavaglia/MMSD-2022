@@ -51,7 +51,7 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
 
     #Funzione obiettivo
     def obj_rule(model):
-        return sum(model.x[esame,giorno]*model.preferenze_professori[esame][giorno] for giorno in model.days for esame in model.exams) + (model.dummy_primo_anno *COSTANTE_IMPORTANZA_PRIMO_ANNO + model.dummy_secondo_anno*COSTANTE_IMPORTANZA_SECONDO_ANNO)
+        return sum(model.x[esame,giorno]*model.preferenze_professori[esame][giorno] for giorno in model.days for esame in model.exams) + (model.dummy_primo_anno *COSTANTE_IMPORTANZA_PRIMO_ANNO ) #+ model.dummy_secondo_anno*COSTANTE_IMPORTANZA_SECONDO_ANNO
     model.obj = Objective(expr=obj_rule,sense=maximize)
 
 
@@ -210,10 +210,10 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
                         if esame1 != esame2 and esame1 > esame2:    #Aumento efficenza
                             model.esami_primo_anno_diversi.add(
                                 (model.x[esame1, giorno1] * (abs(giorno1 - giorno2) / 2) + model.x[esame2, giorno2] * ( abs(giorno1 - giorno2) / 2)) +
-                                ((1-model.x[esame1,giorno1])*days + (1-model.x[esame2,giorno2])*days) >= model.dummy_secondo_anno
+                                ((1-model.x[esame1,giorno1])*days + (1-model.x[esame2,giorno2])*days) >= model.dummy_primo_anno
                             )
-    else:
-        model.esami_secondo_anno_diversi.add(model.dummy_secondo_anno <= 0)
+
+
 
 
 
