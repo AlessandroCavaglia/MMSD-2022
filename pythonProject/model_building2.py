@@ -203,7 +203,6 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
         if exams[esame].anno == 2:
             esami_secondo_anno.append(esame)
     if len(esami_secondo_anno) > 1:
-        model.esami_secondo_anno_diversi.add(model.dummy_secondo_anno <= 0)
         for esame1 in esami_secondo_anno:
             for esame2 in esami_secondo_anno:
                 for giorno1 in model.days:
