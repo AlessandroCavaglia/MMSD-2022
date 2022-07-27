@@ -1,7 +1,9 @@
+import os
+
 from classes import Exam
 from classes import ExamRoom
 from datetime import datetime
-from model_building import *
+from model_building2 import *
 import pyomo.environ as pyo
 
 
@@ -19,18 +21,20 @@ def main():
                   ExamRoom("Laboratorio Babbage", []),
                   ExamRoom("Laboratorio Postel", [])]
 
-    data_inizio = datetime.strptime("09/06/2023", '%d/%m/%Y')
-    data_fine = datetime.strptime("23/06/2023", '%d/%m/%Y')
+    data_inizio = datetime.strptime("08/06/2023", '%d/%m/%Y')
+    data_fine = datetime.strptime("28/07/2023", '%d/%m/%Y')
 
     exams = list()
     exams.append(
         Exam("CMRO", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 3, 2, [], [], "Note"))
     exams.append(
-        Exam("CMRO2", "Scritto", "Insegnante1, Insegnante 2", [1], 2, 2, 1, [], 0, [0, 1], 1, 2, [], [], "Note"))
+        Exam("CMRO2", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 1, 2, [], [], "Note"))
 
     model = build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
     opt.solve(model)
+    path = os.path.join('log', str(datetime.today().strftime('Resolution_%d-%m-%y_%H-%M-%S.log')))
+    opt.solve(model, logfile=path)
     print_results(model, exams, data_inizio, data_fine)
 
 

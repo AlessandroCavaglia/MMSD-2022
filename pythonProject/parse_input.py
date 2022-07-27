@@ -13,7 +13,7 @@ import costants
 import create_output
 import holidays
 
-from model_building import *
+from model_building2 import *
 import pyomo.environ as pyo
 
 sessioni = []
