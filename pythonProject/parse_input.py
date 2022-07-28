@@ -351,7 +351,6 @@ def main():
     data_fine = sessioni[1][1]  # Data fine sessione estiva
     model = build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
-    opt.options['mip_tolerances_absmipgap'] = 5
     path=os.path.join('log', str(datetime.today().strftime('Resolution_%d-%m-%y_%H-%M-%S.log')))
     opt.solve(model,logfile=path)
     print_results(model, exams, data_inizio, data_fine)
