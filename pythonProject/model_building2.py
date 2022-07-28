@@ -54,8 +54,7 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
         return sum(model.x[esame,giorno]*model.preferenze_professori[esame][giorno] for giorno in model.days for esame in model.exams) + (model.dummy_primo_anno *COSTANTE_IMPORTANZA_PRIMO_ANNO ) #+ model.dummy_secondo_anno*COSTANTE_IMPORTANZA_SECONDO_ANNO
     model.obj = Objective(expr=obj_rule,sense=maximize)
 
-
-    #Vincoli
+    # Vincoli
     model.correct_exam_days = ConstraintList()  # Assegniamo esattamente il numero di giorni richiesto da un esame
     for i in model.exams:
         model.correct_exam_days.add(
@@ -87,7 +86,7 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
             )
 
             model.min_distance_appelli.add(
-                # Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarata
+                # Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarat
                 ((model.x[esame, giorno] * exams[esame].numero_giorni_durata) - ((model.x[esame, giorno + 1])) * exams[esame].numero_giorni_durata) +
                 (model.x[esame, giorno + 1]) * days +
                 (1 - model.x[esame, giorno]) * days >=
@@ -95,7 +94,7 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
 
         if exams[esame].numero_giorni_durata > 1:
             model.min_distance_appelli.add(
-                # Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarata
+                # Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarat
                 (model.x[esame, days - 1]) * exams[esame].numero_giorni_durata +
                 (1 - model.x[esame, days - 1]) * days >=
                 sum(model.x[esame, giorno_2] for giorno_2 in range(days - 1, days - 1 - MIN_DISTANCE_APPELLI, -1))
@@ -184,13 +183,13 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
 
 
     model.esami_primo_anno_diversi = ConstraintList()
-    esami_primo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    esami_primo_anno_primo_semestre = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
     for esame in model.exams:
         if exams[esame].anno == 1:
-            esami_primo_anno.append(esame)
-    if len(esami_primo_anno) > 1:
-        for esame1 in esami_primo_anno:
-            for esame2 in esami_primo_anno:
+            esami_primo_anno_primo_semestre.append(esame)
+    if len(esami_primo_anno_primo_semestre) > 1:
+        for esame1 in esami_primo_anno_primo_semestre:
+            for esame2 in esami_primo_anno_primo_semestre:
                 for giorno1 in model.days:
                     for giorno2 in model.days:
                         if esame1 != esame2 and esame1 > esame2: #Aumento efficenza
@@ -199,27 +198,24 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
                                 ((1-model.x[esame1,giorno1])*days + (1-model.x[esame2,giorno2])*days) >= model.dummy_primo_anno
                             )
 
-    model.esami_secondo_anno_diversi = ConstraintList()  # Provo a non assegnare due esami del secondo anno lo stesso giorno
 
-
-    esami_secondo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    model.esami_secondo_anno_diversi = ConstraintList()
+    esami_secondo_anno_primo_semestre = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
     for esame in model.exams:
         if exams[esame].anno == 2:
-            esami_secondo_anno.append(esame)
-    if len(esami_secondo_anno) > 1:
-        for esame1 in esami_secondo_anno:
-            for esame2 in esami_secondo_anno:
+            esami_secondo_anno_primo_semestre.append(esame)
+    if len(esami_secondo_anno_primo_semestre) > 1:
+        for esame1 in esami_secondo_anno_primo_semestre:
+            for esame2 in esami_secondo_anno_primo_semestre:
                 for giorno1 in model.days:
                     for giorno2 in model.days:
-                        if esame1 != esame2 and esame1 > esame2:    #Aumento efficenza
-                            model.esami_primo_anno_diversi.add(
-                                (model.x[esame1, giorno1] * (abs(giorno1 - giorno2) / 2) + model.x[esame2, giorno2] * ( abs(giorno1 - giorno2) / 2)) +
-                                ((1-model.x[esame1,giorno1])*days + (1-model.x[esame2,giorno2])*days) >= model.dummy_primo_anno
+                        if esame1 != esame2 and esame1 > esame2:  # Aumento efficenza
+                            model.esami_secondo_anno_diversi.add(
+                                (model.x[esame1, giorno1] * (abs(giorno1 - giorno2) / 2) + model.x[esame2, giorno2] * (
+                                            abs(giorno1 - giorno2) / 2)) +
+                                ((1 - model.x[esame1, giorno1]) * days + (
+                                            1 - model.x[esame2, giorno2]) * days) >= model.dummy_primo_anno
                             )
-    else:
-        model.esami_primo_anno_diversi.add(model.dummy_secondo_anno <= 0)
-
-
 
 
     '''
