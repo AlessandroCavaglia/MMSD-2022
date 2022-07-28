@@ -26,13 +26,16 @@ def main():
 
     exams = list()
     exams.append(
-        Exam("CMRO", "Scritto", "Insegnante1, Insegnante 2", [1], 2, 2, 1, [], 0, [0, 1], 3, 2, [], [], "Note"))
+        Exam("CMRO", "Scritto", "Insegnante1, Insegnante 2", ['1'], 2, 2, 1, [], 0, [0, 1], 3, 4, [], [], "Note"))
     exams.append(
-        Exam("CMRO2", "Scritto", "Insegnante1, Insegnante 2", [1], 2, 2, 1, [], 0, [0, 1], 1, 2, [], [], "Note"))
+        Exam("CMRO2", "Scritto", "Insegnante1, Insegnante 2", ['1'], 2, 2, 1, [], 0, [0, 1], 1, 3, [], [], "Note"))
     exams.append(
-        Exam("CMRO", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 3, 2, [], [], "Note"))
+        Exam("CMRO3", "Scritto", "Insegnante1, Insegnante 2", ['1'], 2, 2, 1, [], 0, [0, 1], 1, 2, [], [], "Note"))
     exams.append(
-        Exam("CMRO2", "Scritto", "Insegnante1, Insegnante 2", [1], 1, 2, 1, [], 0, [0, 1], 1, 2, [], [], "Note"))
+        Exam("CMRO3", "Scritto", "Insegnante1, Insegnante 2", ['1'], 2, 2, 1, [], 0, [0, 1], 1, 3, [], [], "Note"))
+    exams.append(
+        Exam("CMRO3", "Scritto", "Insegnante1, Insegnante 2", ['1'], 2, 2, 1, [], 0, [0, 1], 1, 2, [], [], "Note"))
+
 
     model = build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')

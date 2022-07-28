@@ -1,10 +1,12 @@
 import pandas as pd
 from datetime import datetime, timedelta
+from calendar_view import *
 import numpy as np
 import classes
 import xlsxwriter
 import costants
 import holidays
+import calendar
 
 
 def build_exams_output(esami_anno, nome_foglio, laboratori, aule, model_sessione_invernale, model_sessione_estiva,
@@ -30,11 +32,13 @@ def build_exams_output(esami_anno, nome_foglio, laboratori, aule, model_sessione
         semestri = semestri.replace("'", "")
         semestri_esami.append(semestri)
     esami_df.insert(3, "Semestre", semestri_esami, True)
-    '''appelli_invernali=[]
-    #TODO CALCOLARE APPELLI INVERNALI
-    esami_df.insert(4, "Date appelli invernali", appelli_invernali, True)'''
     appelli_estivi1 = []
     appelli_estivi2 = []
+
+
+
+
+
     for esame in esami_anno:
         index = exams.index(esame)
         date_esitive_esame = []
@@ -46,14 +50,16 @@ def build_exams_output(esami_anno, nome_foglio, laboratori, aule, model_sessione
         date_esitive_esame1=""
         for i in range(esame.numero_giorni_durata):
             date_esitive_esame1 +=" "+ date_esitive_esame[i]
+
         date_esitive_esame1 = date_esitive_esame1.replace("[", "")
         date_esitive_esame1 = date_esitive_esame1.replace("]", "")
         date_esitive_esame1 = date_esitive_esame1.replace("'", "")
         date_esitive_esame1 = date_esitive_esame1.replace("00:00:00", "")
         appelli_estivi1.append(date_esitive_esame1)
+
         if(len(date_esitive_esame)>esame.numero_giorni_durata):
             date_esitive_esame2=""
-            for i in range(0, esame.numero_giorni_durata):
+            for i in range(esame.numero_giorni_durata):
                 date_esitive_esame2 +=" "+ date_esitive_esame[esame.numero_giorni_durata + i]
             date_esitive_esame2 = date_esitive_esame2.replace("[", "")
             date_esitive_esame2 = date_esitive_esame2.replace("]", "")
@@ -66,9 +72,7 @@ def build_exams_output(esami_anno, nome_foglio, laboratori, aule, model_sessione
 
     esami_df.insert(4, "Date appelli estivi primo appello", appelli_estivi1, True)
     esami_df.insert(5, "Date appelli estivi secondo appello", appelli_estivi2, True)
-    '''appelli_settembre= []
-    # TODO CALCOLARE APPELLI SETTEMBRE
-    esami_df.insert(6, "Date appelli settembre", appelli_settembre, True)'''
+
     esami_df.to_excel(writer, sheet_name=nome_foglio, index=False)
 
     # set formatting
@@ -78,7 +82,7 @@ def build_exams_output(esami_anno, nome_foglio, laboratori, aule, model_sessione
     worksheet.set_column("A:A", 150)
     worksheet.set_column("B:C", 50)
     worksheet.set_column("D:D", 15, workbook.add_format({"align": "center"}))
-    worksheet.set_column("E:E", 50)
+    worksheet.set_column("E:F", 50)
     worksheet.set_row(1, 12)
 
     header_format = workbook.add_format({
