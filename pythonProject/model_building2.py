@@ -12,8 +12,10 @@ MIN_DISTANCE_APPELLI = 10
 SLOT_AULE = 2
 SLOT_LABORATORI = 3
 GUADAGNO_GIORNI_PREFERITI = 2
-COSTANTE_IMPORTANZA_PRIMO_ANNO = 1
-COSTANTE_IMPORTANZA_SECONDO_ANNO = 1
+COSTANTE_IMPORTANZA_PRIMO_ANNO = 10
+COSTANTE_IMPORTANZA_SECONDO_ANNO = 4
+COSTANTE_IMPORTANZA_TERZO_ANNO = 1
+
 
 def get_non_working_days(data_inizio, data_fine):
 
@@ -49,25 +51,45 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
     model.dummy_primo_anno = Var(within=pyo.NonNegativeIntegers)
     model.dummy_secondo_anno = Var(within=pyo.NonNegativeIntegers)
 
-    #Funzione obiettivo
-    def obj_rule(model):
-        return sum(model.x[esame,giorno]*model.preferenze_professori[esame][giorno] for giorno in model.days for esame in model.exams) + (model.dummy_primo_anno *COSTANTE_IMPORTANZA_PRIMO_ANNO ) #+ model.dummy_secondo_anno*COSTANTE_IMPORTANZA_SECONDO_ANNO
-    model.obj = Objective(expr=obj_rule,sense=maximize)
+    # Funzione obiettivo
+    def obj_rule(model, exams):
+        esami_primo_anno = []
+        esami_secondo_anno = []
+        esami_terzo_anno = []
+        for index, esame in enumerate(exams):
+            if (esame.anno == 1):
+                esami_primo_anno.append(index)
+            if (esame.anno == 2):
+                esami_secondo_anno.append(index)
+            if (esame.anno == 3):
+                esami_terzo_anno.append(index)
+        return (sum(
+            model.x[esame, giorno] * model.preferenze_professori[esame][giorno] for giorno in model.days for esame in
+            esami_primo_anno) * COSTANTE_IMPORTANZA_PRIMO_ANNO +
+                sum(model.x[esame, giorno] * model.preferenze_professori[esame][giorno] for giorno in model.days for
+                    esame in esami_secondo_anno) * COSTANTE_IMPORTANZA_SECONDO_ANNO +
+                sum(model.x[esame, giorno] * model.preferenze_professori[esame][giorno] for giorno in model.days for
+                    esame in esami_terzo_anno) * COSTANTE_IMPORTANZA_TERZO_ANNO -
+                (
+                            model.dummy_primo_anno * COSTANTE_IMPORTANZA_PRIMO_ANNO + model.dummy_secondo_anno * COSTANTE_IMPORTANZA_SECONDO_ANNO))
+        # return sum(model.x[esame,giorno]*model.preferenze_professori[esame][giorno] for giorno in model.days for esame in model.exams) - (model.dummy_primo_anno * COSTANTE_IMPORTANZA_PRIMO_ANNO + model.dummy_secondo_anno*COSTANTE_IMPORTANZA_SECONDO_ANNO)
+
+    model.obj = Objective(expr=obj_rule(model, exams), sense=maximize)
 
     # Vincoli
     model.correct_exam_days = ConstraintList()  # Assegniamo esattamente il numero di giorni richiesto da un esame
     for i in model.exams:
         model.correct_exam_days.add(
             sum(model.x[i, j] for j in model.days) >= (
-                    exams[i].numero_appelli_sessione_full * exams[i].numero_giorni_durata))
+                    exams[i].numero_appelli * exams[i].numero_giorni_durata))
         model.correct_exam_days.add(
             sum(model.x[i, j] for j in model.days) <= (
-                    exams[i].numero_appelli_sessione_full * exams[i].numero_giorni_durata))
+                    exams[i].numero_appelli * exams[i].numero_giorni_durata))
 
     model.correct_exam_place_session = ConstraintList() # Per ogni esame verifico che il primo appello sia nella prima metà della sessione, vincolo implicito che il secondo sia nella seconda metà
     middle_session = int(len(model.days) / 2) #TODO da modellare in base alle indicazioni del prof
     for i in model.exams:
-        if(exams[i].numero_appelli_sessione_full>1):    #Metto il vincolo solo se modelliamo un solo appello TODO distinguere sessioni full da sessioni small
+        if(exams[i].numero_appelli>1):    #Metto il vincolo solo se modelliamo un solo appello TODO distinguere sessioni full da sessioni small
             model.correct_exam_place_session.add(
                 sum(model.x[i, j] for j in range(0,middle_session)) == exams[i].numero_giorni_durata)
 

@@ -9,8 +9,7 @@ import holidays
 import calendar
 
 
-def build_exams_output(esami_anno, nome_foglio, laboratori, aule, model_sessione_invernale, model_sessione_estiva,
-                       model_sessione_settembre, writer, exams, sessione):
+def build_exams_output(esami_anno, nome_foglio, laboratori, aule, model, writer, exams, sessione):
     esami_df = pd.DataFrame({})
     nomi_esami = []
     for esame in esami_anno:
@@ -42,10 +41,10 @@ def build_exams_output(esami_anno, nome_foglio, laboratori, aule, model_sessione
     for esame in esami_anno:
         index = exams.index(esame)
         date_esitive_esame = []
-        durata_sessione = abs(sessione[1][1] - sessione[1][0])
+        durata_sessione = abs(sessione[0][1] - sessione[0][0])
         for i in range(durata_sessione.days + 1):
-            if model_sessione_estiva.x[index, i].value == 1:
-                data = sessione[1][0] + timedelta(days=i)
+            if model.x[index, i].value == 1:
+                data = sessione[0][0] + timedelta(days=i)
                 date_esitive_esame.append(str(data))
         date_esitive_esame1=""
         for i in range(esame.numero_giorni_durata):
@@ -97,8 +96,7 @@ def build_exams_output(esami_anno, nome_foglio, laboratori, aule, model_sessione
     for col_num, value in enumerate(esami_df.columns.values):  # setting header formatting only for the first row
             worksheet.write(0, col_num, value, header_format)
 
-def build_exams_output_riassunto(esami_anno, nome_foglio, laboratori, aule, model_sessione_invernale, model_sessione_estiva,
-                       model_sessione_settembre, writer, exams, sessione):
+def build_exams_output_riassunto(esami_anno, nome_foglio, laboratori, aule, model, writer, exams, sessione):
     esami_df = pd.DataFrame({})
     nomi_esami = []
     for esame in esami_anno:
@@ -109,10 +107,10 @@ def build_exams_output_riassunto(esami_anno, nome_foglio, laboratori, aule, mode
     for esame in esami_anno:
         index = exams.index(esame)
         date_esitive_esame = []
-        durata_sessione = abs(sessione[1][1] - sessione[1][0])
+        durata_sessione = abs(sessione[0][1] - sessione[0][0])
         for i in range(durata_sessione.days + 1):
-            if model_sessione_estiva.x[index, i].value == 1:
-                data = sessione[1][0] + timedelta(days=i)
+            if model.x[index, i].value == 1:
+                data = sessione[0][0] + timedelta(days=i)
                 date_esitive_esame.append(str(data))
         date_esitive_esame1 = ""
         for i in range(esame.numero_giorni_durata):
@@ -166,8 +164,7 @@ def build_exams_output_riassunto(esami_anno, nome_foglio, laboratori, aule, mode
 
 
 
-def build_output(exams, laboratori, aule, model_sessione_invernale, model_sessione_estiva, model_sessione_settembre,
-                 sessioni):
+def build_output(exams, laboratori, aule, model, sessioni):
     # Move the general input page to the new document
     sessioni_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name='Input generali')
     writer = pd.ExcelWriter('output/' + costants.OUTPUT_FILE_NAME, engine='xlsxwriter')
@@ -215,17 +212,17 @@ def build_output(exams, laboratori, aule, model_sessione_invernale, model_sessio
             esami_secondo_anno.append(esame)
         if (esame.anno == 3):
             esami_terzo_anno.append(esame)
-    build_exams_output(esami_primo_anno, "esami primo anno", laboratori, aule, model_sessione_invernale,
-                       model_sessione_estiva, model_sessione_settembre, writer, exams, sessioni)
-    build_exams_output_riassunto(esami_primo_anno, "esami primo anno riassunto", laboratori, aule, model_sessione_invernale,
-                       model_sessione_estiva, model_sessione_settembre, writer, exams, sessioni)
-    build_exams_output(esami_secondo_anno, "esami secondo anno", laboratori, aule, model_sessione_invernale,
-                       model_sessione_estiva, model_sessione_settembre, writer, exams, sessioni)
-    build_exams_output_riassunto(esami_secondo_anno, "esami secondo anno riassunto", laboratori, aule, model_sessione_invernale,
-                       model_sessione_estiva, model_sessione_settembre, writer, exams, sessioni)
-    build_exams_output(esami_terzo_anno, "esami terzo anno", laboratori, aule, model_sessione_invernale,
-                       model_sessione_estiva, model_sessione_settembre, writer, exams, sessioni)
-    build_exams_output_riassunto(esami_terzo_anno, "esami terzo anno riassunto", laboratori, aule, model_sessione_invernale,
-                       model_sessione_estiva, model_sessione_settembre, writer, exams, sessioni)
+    build_exams_output(esami_primo_anno, "esami primo anno", laboratori, aule,
+                       model, writer, exams, sessioni)
+    build_exams_output_riassunto(esami_primo_anno, "esami primo anno riassunto", laboratori, aule,
+                                 model, writer, exams, sessioni)
+    build_exams_output(esami_secondo_anno, "esami secondo anno", laboratori, aule,
+                       model, writer, exams, sessioni)
+    build_exams_output_riassunto(esami_secondo_anno, "esami secondo anno riassunto", laboratori, aule,
+                                 model, writer, exams, sessioni)
+    build_exams_output(esami_terzo_anno, "esami terzo anno", laboratori, aule,
+                       model, writer, exams, sessioni)
+    build_exams_output_riassunto(esami_terzo_anno, "esami terzo anno riassunto", laboratori, aule,
+                                 model, writer, exams, sessioni)
 
     writer.save()

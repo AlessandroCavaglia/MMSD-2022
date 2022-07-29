@@ -13,21 +13,30 @@ import costants
 import create_output
 import holidays
 
-from model_building2 import *
+import model_building as building
 import pyomo.environ as pyo
 
-sessioni = []
+sessioni = []   #Managed as an array but in reality it contains only one session, so we use the positions sessioni[0][0] e sessioni[0][1]
 laboratori = []
 aule = []
 exams = []
 ERRORE = ""
 
+def printParametri():
+    print("Distanza minima appelli: "+str(building.MIN_DISTANCE_APPELLI))
+    print("Slot giornalieri aule: "+str(building.SLOT_AULE))
+    print("Slot giornalieri laboratorio: "+str(building.SLOT_LABORATORI))
+    print("Guadagno giorni preferiti: "+str(building.GUADAGNO_GIORNI_PREFERITI))
+    print("Importanza primo anno: "+str(building.COSTANTE_IMPORTANZA_PRIMO_ANNO))
+    print("Importanza secondo anno: "+str(building.COSTANTE_IMPORTANZA_SECONDO_ANNO))
+    print("Importanza terzo anno: "+str(building.COSTANTE_IMPORTANZA_TERZO_ANNO))
 
 def printLaboratori():
     print("LABORATORI:")
     for lab in laboratori:
         print(lab.nome)
         print(lab.indisponibilita)
+
 
 
 def printAule():
@@ -56,10 +65,8 @@ def printCorsi():
         print(corso.lista_semestri)
         print("Anno")
         print(corso.anno)
-        print("Numero appelli sessione full")
-        print(corso.numero_appelli_sessione_full)
-        print("Numero appelli sessione small")
-        print(corso.numero_appelli_sessione_small)
+        print("Numero appelli sessione")
+        print(corso.numero_appelli)
         print("Aule richieste")
         print(corso.aule_richieste)
         print("Slot aule")
@@ -92,6 +99,7 @@ def get_non_working_days(data_inizio, data_fine):
 
 
 def load_date():  # Errori gestiti da testare a fondo
+
     sessioni_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
                                 usecols=costants.COLONNE_SESSIONI)
     for index, row in sessioni_df.iterrows():
@@ -182,6 +190,79 @@ def load_aule():  # Errori gestiti da testare a fondo
             aule.append(classes.ExamRoom(row[0], dateindisp))
     return True
 
+def load_parametri():  # Errori gestiti da testare a fondo
+    aule_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
+                            usecols=costants.COLONNE_PARAMETRI)
+    for index, row in aule_df.iterrows():
+        # row[0] -> Nome parametro -> String
+        # row[1] -> Value -> int
+        if not pd.isnull(row[0]):
+            if(row[0]=="Distanza appelli"):
+                val=row[1]
+                try:
+                    int_val=int(val)
+                    building.MIN_DISTANCE_APPELLI=int_val
+                except:
+                    print("Dato non valido per Distanza appelli: "+str(row[1]))
+                    return False
+            else:
+                if(row[0]=="Slot giornalieri aule"):
+                    val=row[1]
+                    try:
+                        int_val=int(val)
+                        building.SLOT_AULE=int_val
+                    except:
+                        print("Dato non valido per Slot giornalieri aule: "+str(row[1]))
+                        return False
+                else:
+                    if (row[0] == "Slot giornalieri laboratori"):
+                        val = row[1]
+                        try:
+                            int_val = int(val)
+                            building.SLOT_LABORATORI = int_val
+                        except:
+                            print("Dato non valido per Slot giornalieri laboratori: " + str(row[1]))
+                            return False
+                    else:
+                        if (row[0] == "Guadagno giorni preferiti"):
+                            val = row[1]
+                            try:
+                                int_val = int(val)
+                                building.GUADAGNO_GIORNI_PREFERITI = int_val
+                            except:
+                                print("Dato non valido per Guadagno giorni preferiti: " + str(row[1]))
+                                return False
+                        else:
+                            if (row[0] == "Importanza primo anno"):
+                                val = row[1]
+                                try:
+                                    int_val = int(val)
+                                    building.COSTANTE_IMPORTANZA_PRIMO_ANNO = int_val
+                                except:
+                                    print("Dato non valido per Importanza primo anno: " + str(row[1]))
+                                    return False
+                            else:
+                                if (row[0] == "Importanza secondo anno"):
+                                    val = row[1]
+                                    try:
+                                        int_val = int(val)
+                                        building.COSTANTE_IMPORTANZA_SECONDO_ANNO = int_val
+                                    except:
+                                        print("Dato non valido per Importanza secondo anno: " + str(row[1]))
+                                        return False
+                                else:
+                                    if (row[0] == "Importanza terzo anno"):
+                                        val = row[1]
+                                        try:
+                                            int_val = int(val)
+                                            building.COSTANTE_IMPORTANZA_TERZO_ANNO = int_val
+                                        except:
+                                            print("Dato non valido per Importanza terzo anno: " + str(row[1]))
+                                            return False
+                                    else:
+                                        print("Tipologia del parametro non comprensibile")
+                                        return False
+    return True
 
 def load_exams(nome_foglio, anno):
     aule_richieste = []
@@ -195,16 +276,15 @@ def load_exams(nome_foglio, anno):
         # row[1] -> Tipologia -> String
         # row[2] -> Docenti -> String
         # row[3] -> Semestri Corso -> String {1,2}
-        # row[4] -> Numero appelli sessioni estiva/invernali -> int
-        # row[5] -> Numero appelli sessioni di settembre -> int
-        # row[6] -> Aule Richieste -> String {Aula1,...,AulaN}
-        # row[7] -> Slot orari richiesti per le aule -> int >= 1 && <= 2
-        # row[8] -> Laboratori richiesti -> String {Laboratorio1,...,LaboratorioN}
-        # row[9] -> Slot orari richiesti per i laboratori -> int >= 1 && <= 3
-        # row[10] -> Giorni di durata dell'esame -> int
-        # row[11] -> Date di preferenza dei professori -> String {Data1,...,DataN}
-        # row[12] -> Date di indisponibilità dei professori -> String {Data1,...,DataN}
-        # row[13] -> Note -> String
+        # row[4] -> Numero appelli sessioni  -> int
+        # row[5] -> Aule Richieste -> String {Aula1,...,AulaN}
+        # row[6] -> Slot orari richiesti per le aule -> int >= 1 && <= 2
+        # row[7] -> Laboratori richiesti -> String {Laboratorio1,...,LaboratorioN}
+        # row[8] -> Slot orari richiesti per i laboratori -> int >= 1 && <= 3
+        # row[9] -> Giorni di durata dell'esame -> int
+        # row[10] -> Date di preferenza dei professori -> String {Data1,...,DataN}
+        # row[11] -> Date di indisponibilità dei professori -> String {Data1,...,DataN}
+        # row[12] -> Note -> String
         semestri = str(row[3]).replace('.0', '')
         semestri = parse_list(semestri, '.')
         for semestre in semestri:
@@ -212,8 +292,8 @@ def load_exams(nome_foglio, anno):
                 print(" Formato dei semestri errato " + str(row[3]))
                 return False
 
-        if not pd.isnull(row[6]):  # Controllo che gli esami abbiano aule esistenti inseriti in input generali
-            aule_richieste = parse_list(row[6])
+        if not pd.isnull(row[5]):  # Controllo che gli esami abbiano aule esistenti inseriti in input generali
+            aule_richieste = parse_list(row[5])
             for index_aule_richieste in range(len(aule_richieste)):
                 for index, aula in enumerate(aule):
                     if not check_exist(aule, str(aule_richieste[index_aule_richieste]).strip()):
@@ -221,18 +301,18 @@ def load_exams(nome_foglio, anno):
                             aule_richieste[index_aule_richieste]).strip() + " mancante")
                         return False
 
-        if not pd.isnull(row[6]):  # Parsifico le aule e inserisco l'indice associato ad esse
-            aule_richieste = parse_list(row[6])
+        if not pd.isnull(row[5]):  # Parsifico le aule e inserisco l'indice associato ad esse
+            aule_richieste = parse_list(row[5])
             for index_aule_richieste in range(len(aule_richieste)):
                 for index, aula in enumerate(aule):
                     if str(aula.nome).strip() == str(aule_richieste[index_aule_richieste]).strip():
                         aule_richieste[index_aule_richieste] = index
 
-        if pd.isnull(row[7]):
-            row[7] = 0
+        if pd.isnull(row[6]):
+            row[6] = 0
 
-        if not pd.isnull(row[8]):  # Controllo che gli esami abbiano laboratori esistenti inseriti in input generali
-            laboratori_richiesti = parse_list(row[8])
+        if not pd.isnull(row[7]):  # Controllo che gli esami abbiano laboratori esistenti inseriti in input generali
+            laboratori_richiesti = parse_list(row[7])
             for index_laboratori_richieste in range(len(laboratori_richiesti)):
                 if laboratori_richiesti[index_laboratori_richieste] != '' and laboratori_richiesti[index_laboratori_richieste]!=' ':
                     for index, lab in enumerate(laboratori):
@@ -241,67 +321,67 @@ def load_exams(nome_foglio, anno):
                                 laboratori_richiesti[index_laboratori_richieste]).strip() + " mancante")
                             return False
 
-        if not pd.isnull(row[8]):  # Parsifico i laboratori e inserisco gli indici associati ad essi
-            laboratori_richiesti = parse_list(row[8])
+        if not pd.isnull(row[7]):  # Parsifico i laboratori e inserisco gli indici associati ad essi
+            laboratori_richiesti = parse_list(row[7])
             for index_laboratori_richieste in range(len(laboratori_richiesti)):
                 if laboratori_richiesti[index_laboratori_richieste] != '' and laboratori_richiesti[index_laboratori_richieste] != ' ':
                     for index, lab in enumerate(laboratori):
                         if str(lab.nome).strip() == str(laboratori_richiesti[index_laboratori_richieste]).strip():
                             laboratori_richiesti[index_laboratori_richieste] = index
 
-        if pd.isnull(row[9]):
-            row[9] = 0
-        if not pd.isnull(row[13]):
-            note = row[13]
-        if not pd.isnull(row[11]):
-            date_preferenza = parse_list(row[11])
+        if pd.isnull(row[8]):
+            row[8] = 0
+        if not pd.isnull(row[12]):
+            note = row[12]
+        if not pd.isnull(row[10]):
+            date_preferenza = parse_list(row[10])
             for index_preferenza in range(len(date_preferenza)):
                 if '00:00:00' in date_preferenza[index_preferenza]:
                     date = datetime.strptime(
                         date_preferenza[index_preferenza], '%Y-%m-%d %H:%M:%S')
-                    if date < sessioni[1][0] or date > sessioni[1][1]: # TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
+                    if date < sessioni[0][0] or date > sessioni[0][1]: # TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
                         print("Date di preferenza errate, non comprese nella sessione Inizio(" + str(
-                            sessioni[1][0]) + "-" + str(sessioni[1][1]) + ") inserito: " + str(date))
+                            sessioni[0][0]) + "-" + str(sessioni[0][1]) + ") inserito: " + str(date))
                         return False
                     date_preferenza[index_preferenza] = date
                 else:
                     date = datetime.strptime(
                         date_preferenza[index_preferenza].strip(), '%d/%m/%Y')
-                    if date < sessioni[1][0] or date > sessioni[1][1]: #TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
+                    if date < sessioni[0][0] or date > sessioni[0][1]: #TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
                         print("Date di preferenza errate, non comprese nella sessione Inizio(" + str(
-                            sessioni[1][0]) + "-" + str(sessioni[1][1]) + ") inserito: " + str(date))
+                            sessioni[0][0]) + "-" + str(sessioni[0][1]) + ") inserito: " + str(date))
                         return False
                     date_preferenza[index_preferenza] = date
 
 
-        if not pd.isnull(row[12]):
-            date_indisponibilita = parse_list(row[12])
+        if not pd.isnull(row[11]):
+            date_indisponibilita = parse_list(row[11])
             for index_indisponibilita in range(len(date_indisponibilita)):
                 if '00:00:00' in date_indisponibilita[index_indisponibilita]:
                     date = datetime.strptime(
                         date_indisponibilita[index_indisponibilita], '%Y-%m-%d %H:%M:%S')
-                    if date < sessioni[1][0] or date > sessioni[1][1]: #TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
+                    if date < sessioni[0][0] or date > sessioni[0][1]: #TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
                         print("Date di indisponibilità errate, non comprese nella sessione Inizio(" + str(
-                            sessioni[1][0]) + "-" + str(sessioni[1][1]) + ") inserito: " + str(date))
+                            sessioni[0][0]) + "-" + str(sessioni[0][1]) + ") inserito: " + str(date))
                         return False
                     date_indisponibilita[index_indisponibilita] = date
                 else:
                     date = datetime.strptime(
                         date_indisponibilita[index_indisponibilita].strip(), '%d/%m/%Y')
-                    if date < sessioni[1][0] or date > sessioni[1][1]: #TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
+                    if date < sessioni[0][0] or date > sessioni[0][1]: #TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
                         print("Date di indisponibilità errate, non comprese nella sessione: Inizio(" + str(
-                            sessioni[1][0]) + "-" + str(sessioni[1][1]) + ") inserito: " + str(date))
+                            sessioni[0][0]) + "-" + str(sessioni[0][1]) + ") inserito: " + str(date))
                         print(ERRORE)
                         return False
                     date_indisponibilita[index_indisponibilita] = date
 
-        giorni_indisponibili = get_non_working_days(sessioni[1][0], sessioni[1][
+        giorni_indisponibili = get_non_working_days(sessioni[0][0], sessioni[0][
             1])  # UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
         date_indisponibilita = [*date_indisponibilita, *giorni_indisponibili]
 
         exams.append(
-            classes.Exam(row[0], row[1], row[2], semestri, anno, int(row[4]), int(row[5]), aule_richieste, int(row[7]),
-                         laboratori_richiesti, int(row[9]), int(row[10]), date_preferenza, date_indisponibilita, note))
+            classes.Exam(row[0], row[1], row[2], semestri, anno, int(row[4]), aule_richieste, int(row[6]),
+                         laboratori_richiesti, int(row[8]), int(row[9]), date_preferenza, date_indisponibilita, note))
 
     return True
 
@@ -321,40 +401,36 @@ def parse_list(input, delimiter=','):
 
 def main():
     if not load_date():
-        print("Errore durante il caricamento delle sessioni: " + ERRORE)
         return
     printSessioni()
+    if not load_parametri():
+        return
+    printParametri()
     if not load_laboratori():
-        print("Errore durante il caricamento dei laboratori: " + ERRORE)
         return
     printLaboratori()
-    print(check_exist(laboratori, "Laboratorio Dijkstra"))
     if not load_aule():
-        print("Errore durante il caricamento delle aule: " + ERRORE)
         return
     printAule()
     if not load_exams('Corsi I anno triennale', 1):
-        print("Errore durante il caricamento dei corsi del primo anno: " + ERRORE)
         return
     if not load_exams('Corsi II anno triennale', 2):
-        print("Errore durante il caricamento dei corsi del secondo anno: " + ERRORE)
         return
     if not load_exams('Corsi III anno triennale', 3):
-        print("Errore durante il caricamento dei corsi del terzo anno: " + ERRORE)
         return
     printCorsi()
     printCorsi()
 
 
     # Test del modello
-    data_inizio = sessioni[1][0]  # Data inizio sessione estiva
-    data_fine = sessioni[1][1]  # Data fine sessione estiva
-    model = build_model(aule, laboratori, data_inizio, data_fine, exams)
+    data_inizio = sessioni[0][0]  # Data inizio sessione estiva
+    data_fine = sessioni[0][1]  # Data fine sessione estiva
+    model = building.build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
     path=os.path.join('log', str(datetime.today().strftime('Resolution_%d-%m-%y_%H-%M-%S.log')))
     opt.solve(model,logfile=path)
-    print_results(model, exams, data_inizio, data_fine)
-    create_output.build_output(exams, laboratori, aule, "",model,"",sessioni)
+    building.print_results(model, exams, data_inizio, data_fine)
+    create_output.build_output(exams, laboratori, aule, model,sessioni)
 
 if __name__ == '__main__':
     main()
