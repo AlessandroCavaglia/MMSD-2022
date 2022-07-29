@@ -68,9 +68,8 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
                 sum(model.x[esame, giorno] * model.preferenze_professori[esame][giorno] for giorno in model.days for
                     esame in esami_secondo_anno) * COSTANTE_IMPORTANZA_SECONDO_ANNO +
                 sum(model.x[esame, giorno] * model.preferenze_professori[esame][giorno] for giorno in model.days for
-                    esame in esami_terzo_anno) * COSTANTE_IMPORTANZA_TERZO_ANNO -
-                (
-                            model.dummy_primo_anno * COSTANTE_IMPORTANZA_PRIMO_ANNO + model.dummy_secondo_anno * COSTANTE_IMPORTANZA_SECONDO_ANNO))
+                    esame in esami_terzo_anno) * COSTANTE_IMPORTANZA_TERZO_ANNO +
+                (model.dummy_primo_anno * COSTANTE_IMPORTANZA_PRIMO_ANNO))
         # return sum(model.x[esame,giorno]*model.preferenze_professori[esame][giorno] for giorno in model.days for esame in model.exams) - (model.dummy_primo_anno * COSTANTE_IMPORTANZA_PRIMO_ANNO + model.dummy_secondo_anno*COSTANTE_IMPORTANZA_SECONDO_ANNO)
 
     model.obj = Objective(expr=obj_rule(model, exams), sense=maximize)

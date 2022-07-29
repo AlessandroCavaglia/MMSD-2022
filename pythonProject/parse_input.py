@@ -13,7 +13,7 @@ import costants
 import create_output
 import holidays
 
-import model_building as building
+import model_building2 as building
 import pyomo.environ as pyo
 
 sessioni = []   #Managed as an array but in reality it contains only one session, so we use the positions sessioni[0][0] e sessioni[0][1]

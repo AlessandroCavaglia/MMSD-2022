@@ -69,9 +69,8 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
                 sum(model.x[esame, giorno] * model.preferenze_professori[esame][giorno] for giorno in model.days for
                     esame in esami_secondo_anno) * COSTANTE_IMPORTANZA_SECONDO_ANNO +
                 sum(model.x[esame, giorno] * model.preferenze_professori[esame][giorno] for giorno in model.days for
-                    esame in esami_terzo_anno) * COSTANTE_IMPORTANZA_TERZO_ANNO -
-                (
-                            model.dummy_primo_anno * COSTANTE_IMPORTANZA_PRIMO_ANNO + model.dummy_secondo_anno * COSTANTE_IMPORTANZA_SECONDO_ANNO))
+                    esame in esami_terzo_anno) * COSTANTE_IMPORTANZA_TERZO_ANNO +
+                (model.dummy_primo_anno * COSTANTE_IMPORTANZA_PRIMO_ANNO))
         # return sum(model.x[esame,giorno]*model.preferenze_professori[esame][giorno] for giorno in model.days for esame in model.exams) - (model.dummy_primo_anno * COSTANTE_IMPORTANZA_PRIMO_ANNO + model.dummy_secondo_anno*COSTANTE_IMPORTANZA_SECONDO_ANNO)
 
     model.obj = Objective(expr=obj_rule(model, exams), sense=maximize)
@@ -205,13 +204,13 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
 
 
     model.esami_primo_anno_diversi = ConstraintList()
-    esami_primo_anno_primo_semestre = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    esami_primo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
     for esame in model.exams:
         if exams[esame].anno == 1:
-            esami_primo_anno_primo_semestre.append(esame)
-    if len(esami_primo_anno_primo_semestre) > 1:
-        for esame1 in esami_primo_anno_primo_semestre:
-            for esame2 in esami_primo_anno_primo_semestre:
+            esami_primo_anno.append(esame)
+    if len(esami_primo_anno) > 1:
+        for esame1 in esami_primo_anno:
+            for esame2 in esami_primo_anno:
                 for giorno1 in model.days:
                     for giorno2 in model.days:
                         if esame1 != esame2 and esame1 > esame2: #Aumento efficenza
@@ -222,13 +221,13 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
 
 
     model.esami_secondo_anno_diversi = ConstraintList()
-    esami_secondo_anno_primo_semestre = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    esami_secondo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
     for esame in model.exams:
         if exams[esame].anno == 2:
-            esami_secondo_anno_primo_semestre.append(esame)
-    if len(esami_secondo_anno_primo_semestre) > 1:
-        for esame1 in esami_secondo_anno_primo_semestre:
-            for esame2 in esami_secondo_anno_primo_semestre:
+            esami_secondo_anno.append(esame)
+    if len(esami_secondo_anno) > 1:
+        for esame1 in esami_secondo_anno:
+            for esame2 in esami_secondo_anno:
                 for giorno1 in model.days:
                     for giorno2 in model.days:
                         if esame1 != esame2 and esame1 > esame2:  # Aumento efficenza
