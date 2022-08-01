@@ -6,7 +6,9 @@ import pyomo.environ as pyo
 import holidays
 
 
-#MODEL USED TO TEST THINGS
+#--------------------------------------
+#VARIAZIONE CON DUMMY UNICO E LAVORO SU DISTANZE NEGLI ANNI SOLO PRIMO E SECONDO ANNO
+#--------------------------------------
 
 MIN_DISTANCE_APPELLI = 10
 SLOT_AULE = 2
@@ -338,7 +340,6 @@ def print_results(model, exams, data_inizio, data_fine):
             print('\033[0m', end="")
 
         print("]")
-    print("Dummy primo anno: ", '\033[92m', model.dummy_primo_anno.value, '\033[0m')
-    print("Dummy secondo anno: ", '\033[92m', model.dummy_secondo_anno.value, '\033[0m')
+    print("Dummy: ", '\033[92m', model.dummy_primo_anno.value, '\033[0m')
 
 

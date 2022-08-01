@@ -7,13 +7,13 @@ import os.path
 
 import pandas as pd
 from datetime import datetime, timedelta
-import numpy as np
 import classes
 import costants
 import create_output
 import holidays
+import statistics_model
 
-import model_building2 as building
+import model_building3 as building
 import pyomo.environ as pyo
 
 sessioni = []   #Managed as an array but in reality it contains only one session, so we use the positions sessioni[0][0] e sessioni[0][1]
@@ -375,13 +375,13 @@ def load_exams(nome_foglio, anno):
                         return False
                     date_indisponibilita[index_indisponibilita] = date
 
-        giorni_indisponibili = get_non_working_days(sessioni[0][0], sessioni[0][
-            1])  # UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
+        giorni_indisponibili = get_non_working_days(sessioni[0][0], sessioni[0][1])
         date_indisponibilita = [*date_indisponibilita, *giorni_indisponibili]
 
         exams.append(
             classes.Exam(row[0], row[1], row[2], semestri, anno, int(row[4]), aule_richieste, int(row[6]),
                          laboratori_richiesti, int(row[8]), int(row[9]), date_preferenza, date_indisponibilita, note))
+        date_indisponibilita=[]
 
     return True
 
@@ -431,6 +431,9 @@ def main():
     opt.solve(model,logfile=path)
     building.print_results(model, exams, data_inizio, data_fine)
     create_output.build_output(exams, laboratori, aule, model,sessioni)
+    statistics_model.generate_statistics(model,exams,sessioni[0][0],sessioni[0][1])
+
+
 
 if __name__ == '__main__':
     main()
