@@ -13,7 +13,7 @@ import create_output
 import holidays
 import statistics_model
 
-import model_building4 as building
+import model_building3 as building
 import pyomo.environ as pyo
 
 sessioni = []   #Managed as an array but in reality it contains only one session, so we use the positions sessioni[0][0] e sessioni[0][1]
@@ -401,22 +401,29 @@ def parse_list(input, delimiter=','):
 
 def main():
     if not load_date():
+        print("Errore durante il caricamento delle sessioni: " + ERRORE)
         return
     printSessioni()
     if not load_parametri():
         return
     printParametri()
     if not load_laboratori():
+        print("Errore durante il caricamento dei laboratori: " + ERRORE)
         return
     printLaboratori()
+    print(check_exist(laboratori, "Laboratorio Dijkstra"))
     if not load_aule():
+        print("Errore durante il caricamento delle aule: " + ERRORE)
         return
     printAule()
     if not load_exams('Corsi I anno triennale', 1):
+        print("Errore durante il caricamento dei corsi del primo anno: " + ERRORE)
         return
     if not load_exams('Corsi II anno triennale', 2):
+        print("Errore durante il caricamento dei corsi del secondo anno: " + ERRORE)
         return
     if not load_exams('Corsi III anno triennale', 3):
+        print("Errore durante il caricamento dei corsi del terzo anno: " + ERRORE)
         return
     printCorsi()
     printCorsi()

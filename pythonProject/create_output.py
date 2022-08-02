@@ -278,7 +278,9 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
     worksheet.set_column("A:A", 40)
     worksheet.set_column("B:B", 40)
     worksheet.set_column("C:C", 50)
-    worksheet.set_column("D:D", 50)
+    worksheet.set_column("D:D", 200)
+
+
 
     header_format = workbook.add_format({
         "bg_color": "#ededed",
@@ -287,10 +289,46 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
         "bold": True,
         "font_size": 12
     })
+    format_primo_anno_primo_semestre = workbook.add_format({
+        "bg_color": "#c0a162",
+    })
+    format_primo_anno_secondo_semestre = workbook.add_format({
+        "bg_color": "#62c099",
+    })
+    format_secondo_anno_primo_semestre = workbook.add_format({
+        "bg_color": "#e2f451",
+    })
+    format_secondo_anno_secondo_semestre = workbook.add_format({
+        "bg_color": "#f45a63",
+    })
+    format_terzo_anno_primo_semestre = workbook.add_format({
+        "bg_color": "#afdcdd",
+    })
+    format_terzo_anno_secondo_semestre = workbook.add_format({
+        "bg_color": "9be873",
+    })
+
 
 
     for col_num, value in enumerate(esami_df.columns.values):  # setting header formatting only for the first row
             worksheet.write(0, col_num, value, header_format)
+
+
+    for row_num, val in esami_df.iterrows():
+        print(val.values)
+        for col_num in range(0,4):
+            if row_num >= 0 and row_num <= 3:
+                worksheet.write(row_num + 1, col_num, val.values[col_num], format_primo_anno_primo_semestre)
+            if row_num >= 4 and row_num <= 7:
+                worksheet.write(row_num + 1, col_num, val.values[col_num], format_primo_anno_secondo_semestre)
+            if row_num >= 8 and row_num <= 10:
+                worksheet.write(row_num + 1, col_num, val.values[col_num], format_secondo_anno_primo_semestre)
+            if row_num >= 11 and row_num <= 15:
+                worksheet.write(row_num + 1, col_num, val.values[col_num], format_secondo_anno_secondo_semestre)
+            if row_num >= 16 and row_num <= 24:
+                worksheet.write(row_num + 1, col_num, val.values[col_num], format_terzo_anno_primo_semestre)
+            if row_num >= 25 and row_num <= 31:
+                worksheet.write(row_num + 1, col_num, val.values[col_num], format_terzo_anno_secondo_semestre)
 
 
 

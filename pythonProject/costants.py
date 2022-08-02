@@ -4,8 +4,8 @@ COLONNE_SESSIONI = [1, 2]
 COLONNE_PARAMETRI = [10,11]
 #INPUT_FILE_NAME="input modello.xlsx"
 #INPUT_FILE_NAME="Input modello sessione estiva.xlsx"
-#INPUT_FILE_NAME="Input modello sessione invernale.xlsx"
-INPUT_FILE_NAME="Input modello sessione settembre.xlsx"
+INPUT_FILE_NAME="Input modello sessione invernale.xlsx"
+#INPUT_FILE_NAME="Input modello sessione settembre.xlsx"
 OUTPUT_FILE_NAME="output modello.xlsx"
 
 #Model
