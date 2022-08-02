@@ -104,10 +104,27 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
     esami_primo_anno.sort(key=lambda esame:esame.lista_semestri[0])
     esami_secondo_anno.sort(key=lambda esame:esame.lista_semestri[0])
     esami_terzo_anno.sort(key=lambda esame:esame.lista_semestri[0])
-
+    nomi_esami.append("")
+    prev='1'
+    esami_primo_anno_primo_semestre=1
+    esami_primo_anno_secondo_semestre=1
     for esame in esami_primo_anno:
+        if(esame.lista_semestri[0]!=prev):
+            nomi_esami.append("")
+            prev='2'
+        if esame.lista_semestri[0] == '1':
+            esami_primo_anno_primo_semestre+=1
+        else:
+            esami_primo_anno_secondo_semestre+=1
         nomi_esami.append(esame.nome)
+    prev = '1'
+    appelli_estivi1.append("Esami primo anno primo semestre")
+    appelli_estivi2.append("")
     for esame in esami_primo_anno:
+        if (esame.lista_semestri[0] != prev):
+            appelli_estivi1.append("Esami primo anno secondo semestre")
+            appelli_estivi2.append("")
+            prev = '2'
         index = exams.index(esame)
         date_esitive_esame = []
         durata_sessione = abs(sessione[0][1] - sessione[0][0])
@@ -134,7 +151,13 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
             appelli_estivi2.append(date_esitive_esame2)
         else:
             appelli_estivi2.append('')
+
+    prev='1'
+    aule_lab.append("")
     for esame in esami_primo_anno:
+        if (esame.lista_semestri[0] != prev):
+            aule_lab.append("")
+            prev = '2'
         exams_request=""
         for aula_richiesta in esame.aule_richieste:
             exams_request+=" "+aule[aula_richiesta].nome+","
@@ -157,10 +180,27 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
         exams_request=exams_request.replace("conferenze","conf.")
         aule_lab.append(exams_request)
 
-
+    nomi_esami.append("")
+    prev = '1'
+    esami_secondo_anno_primo_semestre = 1
+    esami_secondo_anno_secondo_semestre = 1
     for esame in esami_secondo_anno:
+        if (esame.lista_semestri[0] != prev):
+            nomi_esami.append("")
+            prev = '2'
+        if(esame.lista_semestri[0]=='1'):
+            esami_secondo_anno_primo_semestre+=1
+        else:
+            esami_secondo_anno_secondo_semestre+=1
         nomi_esami.append(esame.nome)
+    prev = '1'
+    appelli_estivi1.append("Esami secondo anno primo semestre")
+    appelli_estivi2.append("")
     for esame in esami_secondo_anno:
+        if (esame.lista_semestri[0] != prev):
+            appelli_estivi1.append("Esami secondo anno secondo semestre")
+            appelli_estivi2.append("")
+            prev = '2'
         index = exams.index(esame)
         date_esitive_esame = []
         durata_sessione = abs(sessione[0][1] - sessione[0][0])
@@ -187,7 +227,12 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
             appelli_estivi2.append(date_esitive_esame2)
         else:
             appelli_estivi2.append('')
+    prev = '1'
+    aule_lab.append("")
     for esame in esami_secondo_anno:
+        if (esame.lista_semestri[0] != prev):
+            aule_lab.append("")
+            prev = '2'
         exams_request = ""
         for aula_richiesta in esame.aule_richieste:
             exams_request += " " + aule[aula_richiesta].nome+","
@@ -210,9 +255,27 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
         exams_request = exams_request.replace("conferenze", "conf.")
         aule_lab.append(exams_request)
 
+    nomi_esami.append("")
+    prev = '1'
+    esami_terzo_anno_primo_semestre = 1
+    esami_terzo_anno_secondo_semestre = 1
     for esame in esami_terzo_anno:
+        if (esame.lista_semestri[0] != prev):
+            nomi_esami.append("")
+            prev = '2'
+        if(esame.lista_semestri[0]=='1'):
+            esami_terzo_anno_primo_semestre+=1
+        else:
+            esami_terzo_anno_secondo_semestre+=1
         nomi_esami.append(esame.nome)
+    prev = '1'
+    appelli_estivi1.append("Esami terzo anno primo semestre")
+    appelli_estivi2.append("")
     for esame in esami_terzo_anno:
+        if (esame.lista_semestri[0] != prev):
+            appelli_estivi1.append("Esami terzo anno secondo semestre")
+            appelli_estivi2.append("")
+            prev = '2'
         index = exams.index(esame)
         date_esitive_esame = []
         durata_sessione = abs(sessione[0][1] - sessione[0][0])
@@ -239,7 +302,12 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
             appelli_estivi2.append(date_esitive_esame2)
         else:
             appelli_estivi2.append('')
+    prev = '1'
+    aule_lab.append("")
     for esame in esami_terzo_anno:
+        if (esame.lista_semestri[0] != prev):
+            aule_lab.append("")
+            prev = '2'
         exams_request = ""
         for aula_richiesta in esame.aule_richieste:
             exams_request += " " + aule[aula_richiesta].nome+","
@@ -313,21 +381,20 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
     for col_num, value in enumerate(esami_df.columns.values):  # setting header formatting only for the first row
             worksheet.write(0, col_num, value, header_format)
 
-
     for row_num, val in esami_df.iterrows():
         print(val.values)
         for col_num in range(0,4):
-            if row_num >= 0 and row_num <= 3:
+            if row_num >= 0 and row_num <= esami_primo_anno_primo_semestre+1:
                 worksheet.write(row_num + 1, col_num, val.values[col_num], format_primo_anno_primo_semestre)
-            if row_num >= 4 and row_num <= 7:
+            if row_num >= esami_primo_anno_primo_semestre and row_num <= (esami_primo_anno_primo_semestre + esami_primo_anno_secondo_semestre):
                 worksheet.write(row_num + 1, col_num, val.values[col_num], format_primo_anno_secondo_semestre)
-            if row_num >= 8 and row_num <= 10:
+            if row_num >= (esami_primo_anno_primo_semestre + esami_primo_anno_secondo_semestre) and row_num <= (esami_primo_anno_primo_semestre + esami_primo_anno_secondo_semestre+esami_secondo_anno_primo_semestre):
                 worksheet.write(row_num + 1, col_num, val.values[col_num], format_secondo_anno_primo_semestre)
-            if row_num >= 11 and row_num <= 15:
+            if row_num >= (esami_primo_anno_primo_semestre + esami_primo_anno_secondo_semestre+esami_secondo_anno_primo_semestre) and row_num <= (esami_primo_anno_primo_semestre + esami_primo_anno_secondo_semestre+esami_secondo_anno_primo_semestre+esami_secondo_anno_secondo_semestre):
                 worksheet.write(row_num + 1, col_num, val.values[col_num], format_secondo_anno_secondo_semestre)
-            if row_num >= 16 and row_num <= 24:
+            if row_num >= (esami_primo_anno_primo_semestre + esami_primo_anno_secondo_semestre+esami_secondo_anno_primo_semestre+esami_secondo_anno_secondo_semestre) and row_num <= (esami_primo_anno_primo_semestre + esami_primo_anno_secondo_semestre+esami_secondo_anno_primo_semestre+esami_secondo_anno_secondo_semestre+esami_terzo_anno_primo_semestre):
                 worksheet.write(row_num + 1, col_num, val.values[col_num], format_terzo_anno_primo_semestre)
-            if row_num >= 25 and row_num <= 31:
+            if row_num >= (esami_primo_anno_primo_semestre + esami_primo_anno_secondo_semestre+esami_secondo_anno_primo_semestre+esami_secondo_anno_secondo_semestre+esami_terzo_anno_primo_semestre) and row_num <= (esami_primo_anno_primo_semestre + esami_primo_anno_secondo_semestre+esami_secondo_anno_primo_semestre+esami_secondo_anno_secondo_semestre+esami_terzo_anno_primo_semestre+esami_terzo_anno_secondo_semestre):
                 worksheet.write(row_num + 1, col_num, val.values[col_num], format_terzo_anno_secondo_semestre)
 
 
