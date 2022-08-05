@@ -660,6 +660,9 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
         "bold": True,
         "font_size": 12
     })
+    blank = workbook.add_format({
+        "bg_color": "#ffffff",
+    })
     format_primo_anno_primo_semestre = workbook.add_format({
         "bg_color": "#c0a162",
     })
@@ -701,12 +704,26 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
                 worksheet.write(row_num , col_num, val.values[col_num], format_terzo_anno_primo_semestre)
             if findExam(esami_terzo_anno, val.values[3], "2"):
                 worksheet.write(row_num , col_num, val.values[col_num], format_terzo_anno_secondo_semestre)
+
+        if val.values[0] == "Esami primo anno primo semestre":
+            worksheet.write(row_num, 0, ' ',blank)
+            worksheet.write(row_num + 1, 0, val.values[0], format_primo_anno_primo_semestre)
+        if val.values[0] == "Esami primo anno secondo semestre":
+            worksheet.write(row_num+ 1, 0, val.values[0], format_primo_anno_secondo_semestre)
+        if val.values[0] == "Esami secondo anno primo semestre":
+            worksheet.write(row_num+ 1, 0, val.values[0], format_secondo_anno_primo_semestre)
+        if val.values[0] == "Esami secondo anno secondo semestre":
+            worksheet.write(row_num+ 1, 0, val.values[0], format_secondo_anno_secondo_semestre)
+        if val.values[0] == "Esami terzo anno primo semestre":
+            worksheet.write(row_num + 1, 0, val.values[0], format_terzo_anno_primo_semestre)
+        if val.values[0] == "Esami terzo anno secondo semestre":
+            worksheet.write(row_num + 1, 0, val.values[0], format_terzo_anno_secondo_semestre)
         row_num += 1
 
 
 def findExam(df,exam,sem):
     for esame in df:
-        if esame.nome == exam and sem in esame.lista_semestri:
+        if esame.nome == exam and sem == esame.lista_semestri[0]:
             return True
 
 def build_output(exams, laboratori, aule, model, sessioni):
