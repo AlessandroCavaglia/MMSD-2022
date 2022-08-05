@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 import classes
 import costants
 import create_output
+#import create_calendar
 import holidays
 import statistics_model
 
@@ -431,6 +432,7 @@ def main():
     opt.solve(model,logfile=path)
     building.print_results(model, exams, data_inizio, data_fine)
     create_output.build_output(exams, laboratori, aule, model,sessioni)
+    #create_calendar.build_calendar(exams, laboratori, aule, model,sessioni)
     statistics_model.generate_statistics(model,exams,sessioni[0][0],sessioni[0][1])
 
 
