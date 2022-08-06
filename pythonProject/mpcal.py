@@ -61,12 +61,16 @@ class MplCalendar(object):
                             str(self.cal[week][week_day]),
                             verticalalignment='top',
                             horizontalalignment='left')
-                contents = "\n".join(self.events[week][week_day])
-                ax.text(.03, .85, contents,
-                        verticalalignment='top',
-                        horizontalalignment='left',
-                        fontsize=9,
-                        color='r')
+                contents = self.events[week][week_day]
+                print(contents)
+                for index,content in enumerate(contents):
+                    text = ax.text(.03, .85-(0.185*index), content,
+                                   verticalalignment='top',
+                                   horizontalalignment='left',
+                                   fontsize=9
+                                   # color='b'
+                                   )
+                    text.set_bbox(dict(facecolor='red', alpha=0.5, edgecolor='black'))
 
         # use the titles of the first row as the weekdays
         for n, day in enumerate(w_days):
