@@ -768,6 +768,7 @@ def build_output(exams, laboratori, aule, model, sessioni):
     esami_secondo_anno = []
     esami_terzo_anno = []
     for esame in exams:
+        print(esame.nome,esame.short_name)
         if (esame.anno == 1):
             esami_primo_anno.append(esame)
         if (esame.anno == 2):
@@ -785,5 +786,7 @@ def build_output(exams, laboratori, aule, model, sessioni):
     build_exams_output_riassunto_2(esami_primo_anno, esami_secondo_anno, esami_terzo_anno, "risultati riassunti 2",
                                  laboratori, aule,
                                  model, writer, exams, sessioni)
+
+
 
     writer.save()

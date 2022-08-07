@@ -1,8 +1,13 @@
+from pythonProject.costants import NOME_CORSO, NOME_CORSO_STRONG
+
+
 class Exam:
     def __init__(self, nome, tipo, insegnanti, lista_semestri, anno, numero_appelli_sessione_full,
                  aule_richieste, numero_aule_slot, laboratori_richiesti,
                  numero_lab_slot, numero_giorni_durata, date_preferenza, date_indisponibilita, note):
         self.nome = nome
+        #self.short_name = NOME_CORSO[str.replace(str.replace(nome, '\n', ''),' ', '')]
+        self.short_name = getShortName(str(nome))
         self.tipo = tipo
         self.insegnanti = insegnanti
         self.lista_semestri = lista_semestri
@@ -18,7 +23,12 @@ class Exam:
         self.note = note
 
 
+def getShortName(nome):
+    for key in NOME_CORSO_STRONG:
+        if key in nome :
+            return NOME_CORSO_STRONG[key]
 
+    return "undefined"
 
 class ExamRoom:
     def __init__(self, nome, indisponibilita):
