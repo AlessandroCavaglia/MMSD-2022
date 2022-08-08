@@ -17,7 +17,7 @@ GUADAGNO_GIORNI_PREFERITI = 2
 COSTANTE_IMPORTANZA_PRIMO_ANNO = 4
 COSTANTE_IMPORTANZA_SECONDO_ANNO = 4
 
-ANNI_SEMESTRI_COLORI = ['#c0a162','#62c099','#e2f451','#f45a63','#afdcdd','#9be873']
+ANNI_SEMESTRI_COLORI = ['#c0a162', '#62c099', '#e2f451', '#f45a63', '#afdcdd', '#9be873']
 
 # Mapping
 NOME_CORSO = {
@@ -68,10 +68,10 @@ NOME_CORSO_STRONG = {
     "Linguaggi Formali e Traduttori": "LFT",
     "Algoritmi e strutture Dati": "ALG STRUT. DATI",
     "Basi dati": "BASI DATI",
-    "PARTE DIE CONOMIA": "EGI",
+    "PARTE DI ECONOMIA": "EGI",
     "PARTE DI DIRITTO": "PRIVACY",
     "Fisica": "FISICA",
-    "ECONOMIA E GESTIONE dell'innovazione": "EGIN",
+    "ECONOMIA E GESTIONEdell'innovazione": "EGIN",
     "MFN0608": "T.WEB(IUM)",
     "MFN1353": "IUM",
     "Sistemi Informativi": "SIS. INF.",
@@ -89,3 +89,37 @@ NOME_CORSO_STRONG = {
     "Sviluppo delle applicazioni software": "SVIL. APP SOFT."
 }
 
+NOME_CORSO_CODE = {
+    "MFN0588": "CMRO",
+    "INF0290": "MATE DISC",
+    "MFN0984": "LOG",
+    "MFN0582": "PROG I",
+    "MFN0570": "ANALISI",
+    "MFN0586": "ARCH. ELAB",
+    "MFN0585": "PROG I",
+    "MFN0590": "ING 1",
+    "MFN0600": "ELEM. PROB.",
+    "MFN0601": "SIS. OPERATIVI",
+    "MFN0603": "LFT",
+    "MFN0597": "ALG STRUT. DATI",
+    "MFN0602": "BASI DATI",
+    "Mfn0604": "EGI",
+    "Mfn0604": "PRIVACY",
+    "MFN0598": "FISICA",
+    "mfn0617": "EGIN",
+    "MFN0608": "T.WEB(IUM)",
+    "MFN1353": "IUM",
+    "MFN0618": "SIS. INF.",
+    "MFN0634": "T.WEB",
+    "MFN0610": "LPP",
+    "MFN0612": "CALC. E COMPL.",
+    "MFN0605": "PROG I",
+    "MFN1362": "RETI",
+    "mfn0633": "METODI FORMALI INF.",
+    "mfn0607": "SIS. INT.",
+    "MFN0636": "SICUREZZA",
+    "mfn0606": "SVIL. APP SOFT.",
+    "INF0003": "LOGICA PER INF.",
+    "INF0004": "STORIA INF.",
+    "MFN0635": "RETI ELAB."
+}

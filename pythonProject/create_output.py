@@ -722,7 +722,7 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
 
 def findExam(df,exam,sem):
     for esame in df:
-        if esame.nome == exam and sem == esame.lista_semestri[0]:
+        if (esame.nome == exam or esame.short_name == exam) and sem == esame.lista_semestri[0]:
             return True
 
 def build_output(exams, laboratori, aule, model, sessioni):
@@ -767,7 +767,7 @@ def build_output(exams, laboratori, aule, model, sessioni):
     esami_secondo_anno = []
     esami_terzo_anno = []
     for esame in exams:
-        #print(esame.nome,esame.short_name)
+        print(esame.nome[esame.nome.lower().find('mfn'):esame.nome.lower().find('mfn')+7],esame.short_name)
         if (esame.anno == 1):
             esami_primo_anno.append(esame)
         if (esame.anno == 2):

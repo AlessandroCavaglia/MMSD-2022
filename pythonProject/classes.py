@@ -1,4 +1,4 @@
-from costants import NOME_CORSO, NOME_CORSO_STRONG
+from costants import NOME_CORSO, NOME_CORSO_STRONG, NOME_CORSO_CODE
 
 
 class Exam:
@@ -25,8 +25,15 @@ class Exam:
 
 def getShortName(nome):
     for key in NOME_CORSO_STRONG:
-        if key in nome :
+        if key.lower() in nome.lower() :
             return NOME_CORSO_STRONG[key]
+
+    return getShortNameCode(nome)
+
+def getShortNameCode(nome):
+    for key in NOME_CORSO_CODE:
+        if key.lower() in nome.lower() :
+            return NOME_CORSO_CODE[key]
 
     return nome
 

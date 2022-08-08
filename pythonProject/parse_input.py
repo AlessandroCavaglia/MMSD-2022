@@ -14,7 +14,7 @@ import create_calendar
 import holidays
 import statistics_model
 
-import model_building as building
+import model_building1 as building
 import pyomo.environ as pyo
 
 sessioni = []   #Managed as an array but in reality it contains only one session, so we use the positions sessioni[0][0] e sessioni[0][1]
