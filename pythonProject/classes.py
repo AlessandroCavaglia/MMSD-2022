@@ -1,4 +1,4 @@
-from pythonProject.costants import NOME_CORSO, NOME_CORSO_STRONG
+from costants import NOME_CORSO, NOME_CORSO_STRONG
 
 
 class Exam:
@@ -28,7 +28,7 @@ def getShortName(nome):
         if key in nome :
             return NOME_CORSO_STRONG[key]
 
-    return "undefined"
+    return nome
 
 class ExamRoom:
     def __init__(self, nome, indisponibilita):

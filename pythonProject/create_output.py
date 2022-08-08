@@ -114,7 +114,7 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
             esami_primo_anno_primo_semestre+=1
         else:
             esami_primo_anno_secondo_semestre+=1
-        nomi_esami.append(esame.nome)
+        nomi_esami.append(esame.short_name)
     prev = '1'
     appelli_estivi1.append("Esami primo anno primo semestre")
     appelli_estivi2.append("")
@@ -190,7 +190,7 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
             esami_secondo_anno_primo_semestre+=1
         else:
             esami_secondo_anno_secondo_semestre+=1
-        nomi_esami.append(esame.nome)
+        nomi_esami.append(esame.short_name)
     prev = '1'
     appelli_estivi1.append("Esami secondo anno primo semestre")
     appelli_estivi2.append("")
@@ -265,7 +265,7 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
             esami_terzo_anno_primo_semestre+=1
         else:
             esami_terzo_anno_secondo_semestre+=1
-        nomi_esami.append(esame.nome)
+        nomi_esami.append(esame.short_name)
     prev = '1'
     appelli_estivi1.append("Esami terzo anno primo semestre")
     appelli_estivi2.append("")
@@ -356,22 +356,22 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
         "font_size": 12
     })
     format_primo_anno_primo_semestre = workbook.add_format({
-        "bg_color": "#c0a162",
+        "bg_color": costants.ANNI_SEMESTRI_COLORI[0],
     })
     format_primo_anno_secondo_semestre = workbook.add_format({
-        "bg_color": "#62c099",
+        "bg_color": costants.ANNI_SEMESTRI_COLORI[1],
     })
     format_secondo_anno_primo_semestre = workbook.add_format({
-        "bg_color": "#e2f451",
+        "bg_color": costants.ANNI_SEMESTRI_COLORI[2],
     })
     format_secondo_anno_secondo_semestre = workbook.add_format({
-        "bg_color": "#f45a63",
+        "bg_color": costants.ANNI_SEMESTRI_COLORI[3],
     })
     format_terzo_anno_primo_semestre = workbook.add_format({
-        "bg_color": "#afdcdd",
+        "bg_color": costants.ANNI_SEMESTRI_COLORI[4],
     })
     format_terzo_anno_secondo_semestre = workbook.add_format({
-        "bg_color": "9be873",
+        "bg_color": costants.ANNI_SEMESTRI_COLORI[5],
     })
 
 
@@ -417,7 +417,7 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
             esami_primo_anno_primo_semestre+=1
         else:
             esami_primo_anno_secondo_semestre+=1
-        nomi_esami.append(esame.nome)
+        nomi_esami.append(esame.short_name)
     prev = '1'
     appelli_estivi1.append("Esami primo anno primo semestre")
     appelli_estivi2.append("")
@@ -493,7 +493,7 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
             esami_secondo_anno_primo_semestre+=1
         else:
             esami_secondo_anno_secondo_semestre+=1
-        nomi_esami.append(esame.nome)
+        nomi_esami.append(esame.short_name)
     prev = '1'
     appelli_estivi1.append("Esami secondo anno primo semestre")
     appelli_estivi2.append("")
@@ -568,7 +568,7 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
             esami_terzo_anno_primo_semestre+=1
         else:
             esami_terzo_anno_secondo_semestre+=1
-        nomi_esami.append(esame.nome)
+        nomi_esami.append(esame.short_name)
     prev = '1'
     appelli_estivi1.append("Esami terzo anno primo semestre")
     appelli_estivi2.append("")
@@ -638,7 +638,7 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
     esami_df.insert(3, "Nome corso", nomi_esami, True)
 
     sorted_df = esami_df.sort_values(by="Primo appello")
-    print(sorted_df)
+    #print(sorted_df)
 
     sorted_df.to_excel(writer, sheet_name=nome_foglio, index=False)
 
@@ -664,22 +664,22 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
         "bg_color": "#ffffff",
     })
     format_primo_anno_primo_semestre = workbook.add_format({
-        "bg_color": "#c0a162",
+        "bg_color": costants.ANNI_SEMESTRI_COLORI[0],
     })
     format_primo_anno_secondo_semestre = workbook.add_format({
-        "bg_color": "#62c099",
+        "bg_color": costants.ANNI_SEMESTRI_COLORI[1],
     })
     format_secondo_anno_primo_semestre = workbook.add_format({
-        "bg_color": "#e2f451",
+        "bg_color": costants.ANNI_SEMESTRI_COLORI[2],
     })
     format_secondo_anno_secondo_semestre = workbook.add_format({
-        "bg_color": "#f45a63",
+        "bg_color": costants.ANNI_SEMESTRI_COLORI[3],
     })
     format_terzo_anno_primo_semestre = workbook.add_format({
-        "bg_color": "#afdcdd",
+        "bg_color": costants.ANNI_SEMESTRI_COLORI[4],
     })
     format_terzo_anno_secondo_semestre = workbook.add_format({
-        "bg_color": "9be873",
+        "bg_color": costants.ANNI_SEMESTRI_COLORI[5],
     })
 
 
@@ -687,11 +687,10 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
     for col_num, value in enumerate(sorted_df.columns.values):  # setting header formatting only for the first row
             worksheet.write(0, col_num, value, header_format)
 
-    print(esami_primo_anno)
+
     row_num = 1
     for indice, val in sorted_df.sort_values(by="Primo appello").iterrows():
         for col_num in range(0,4):
-            print("riga ", row_num," colonna ",col_num, " valore ", val.values[col_num])
             if findExam(esami_primo_anno,val.values[3],"1"):
                 worksheet.write(row_num , col_num, val.values[col_num], format_primo_anno_primo_semestre)
             if findExam(esami_primo_anno, val.values[3], "2"):
@@ -768,7 +767,7 @@ def build_output(exams, laboratori, aule, model, sessioni):
     esami_secondo_anno = []
     esami_terzo_anno = []
     for esame in exams:
-        print(esame.nome,esame.short_name)
+        #print(esame.nome,esame.short_name)
         if (esame.anno == 1):
             esami_primo_anno.append(esame)
         if (esame.anno == 2):
@@ -781,9 +780,9 @@ def build_output(exams, laboratori, aule, model, sessioni):
                        model, writer, exams, sessioni)
     build_exams_output(esami_terzo_anno, "esami terzo anno", laboratori, aule,
                        model, writer, exams, sessioni)
-    build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo_anno, "risultati riassunti", laboratori, aule,
+    build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo_anno, "Risultati riassunti per anno", laboratori, aule,
                                  model, writer, exams, sessioni)
-    build_exams_output_riassunto_2(esami_primo_anno, esami_secondo_anno, esami_terzo_anno, "risultati riassunti 2",
+    build_exams_output_riassunto_2(esami_primo_anno, esami_secondo_anno, esami_terzo_anno, "Risultati riassunti per data",
                                  laboratori, aule,
                                  model, writer, exams, sessioni)
 

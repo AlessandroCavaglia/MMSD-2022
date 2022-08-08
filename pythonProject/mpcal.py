@@ -1,15 +1,14 @@
 import calendar
+import os
+
 import matplotlib.pyplot as plt
 
-calendar.setfirstweekday(6) # Sunday is 1st day in US
-w_days = 'Sun Mon Tue Wed Thu Fri Sat'.split()
+calendar.setfirstweekday(0) # Sunday is 1st day in US
+w_days = 'Lun Mar Mer Gio Ven Sab Dom'.split()
 m_names = '''
-January February March April
-May June July August
-September October November December'''.split()
+Gennaio Febbraio Marzo Aprile Maggio Giugno Luglio Agosto Settembre Ottobre Novembre Dicembre'''.split()
 
-class DayNotInMonthError(ValueError):
-    pass
+
 
 class MplCalendar(object):
     def __init__(self, year, month):
@@ -22,10 +21,6 @@ class MplCalendar(object):
         self.events = [[[] for day in week] for week in self.cal]
 
     def _monthday_to_index(self, day):
-        '''The 2-d index of the day in the list of lists.
-        If the day is not in the month raise a DayNotInMonthError,
-        which is a subclass of ValueError.
-        '''
         for week_n, week in enumerate(self.cal):
             try:
                 i = week.index(day)
@@ -34,24 +29,26 @@ class MplCalendar(object):
                 pass
          # couldn't find the day
 
-    def add_event(self, day, event_str):
-        'Add an event string for the specified day'
+    def add_event(self, day, event_str,color='white'):
         week, w_day = self._monthday_to_index(day)
-        self.events[week][w_day].append(event_str)
+        self.events[week][w_day].append((event_str,color))
 
-    def _render(self, **kwargs):
+    def _render(self, nome):
         'create the calendar figure'
         plot_defaults = dict(
             sharex=True,
             sharey=True,
-            figsize=(11, 8.5),
-            dpi=80,
+            figsize=(11, 15),
+            dpi=200,
+
         )
-        plot_defaults.update(kwargs)
+        plot_defaults.update()
         f, axs = plt.subplots(
             len(self.cal), 7,
             **plot_defaults
         )
+        f.subplots_adjust(left=0.01, bottom=0.01, right=0.99, top=0.92, wspace=0, hspace=0)
+
         for week, ax_row in enumerate(axs):
             for week_day, ax in enumerate(ax_row):
                 ax.set_xticks([])
@@ -62,15 +59,13 @@ class MplCalendar(object):
                             verticalalignment='top',
                             horizontalalignment='left')
                 contents = self.events[week][week_day]
-                print(contents)
                 for index,content in enumerate(contents):
-                    text = ax.text(.03, .85-(0.185*index), content,
+                    text = ax.text(.04, .87-(0.135*index), content[0],
                                    verticalalignment='top',
                                    horizontalalignment='left',
                                    fontsize=9
-                                   # color='b'
                                    )
-                    text.set_bbox(dict(facecolor='red', alpha=0.5, edgecolor='black'))
+                    text.set_bbox(dict(facecolor=content[1], alpha=0.5, edgecolor='black'))
 
         # use the titles of the first row as the weekdays
         for n, day in enumerate(w_days):
@@ -79,13 +74,13 @@ class MplCalendar(object):
         # Place subplots in a close grid
         f.subplots_adjust(hspace=0)
         f.subplots_adjust(wspace=0)
-        f.suptitle(m_names[self.month-1] + ' ' + str(self.year),
+        f.suptitle(nome.replace(".jpg","") + ' ' + str(self.year),
                    fontsize=20, fontweight='bold')
 
-    def show(self, **kwargs):
-        'display the calendar'
-        self._render(**kwargs)
-        plt.savefig("output/output.jpg")
+    def show(self,nome):
+        self._render(nome)
+        path = os.path.join('output', nome)
+        plt.savefig(path)
         #plt.show()
 
 

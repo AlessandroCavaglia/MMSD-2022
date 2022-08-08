@@ -17,6 +17,8 @@ GUADAGNO_GIORNI_PREFERITI = 2
 COSTANTE_IMPORTANZA_PRIMO_ANNO = 4
 COSTANTE_IMPORTANZA_SECONDO_ANNO = 4
 
+ANNI_SEMESTRI_COLORI = ['#c0a162','#62c099','#e2f451','#f45a63','#afdcdd','#9be873']
+
 # Mapping
 NOME_CORSO = {
     "CalcoloMatricialeeRicercaOperativaMFN0588-corsoA-B-CinsiemeFIGLI:VALEANCHEPERRICERCAOPERATIVAII8036EPERISTITUZIONIDICALCOLOMATRICIALEERICERCAOPERATIVA[MFN1473]": "CMRO",
@@ -54,36 +56,36 @@ NOME_CORSO = {
 }
 NOME_CORSO_STRONG = {
     "Calcolo Matriciale e Ricerca Operativa": "CMRO",
-    "Matematica Discreta": "MD",
-    "Logica": "L",
-    "Programmazione I": "PROGI",
-    "Lingua Inglese I": "ING1",
-    "ANALISI MATEMATICA": "ANM",
-    "Architettura degli Elaboratori": "ARCELAB",
-    "Programmazione II": "PROGII",
-    "Elementi di probabilità e statistica": "ESP",
-    "Sistemi Operativi": "SO",
+    "Matematica Discreta": "MATE DISC",
+    "Logica": "LOG",
+    "Programmazione I": "PROG I",
+    "Lingua Inglese I": "ING 1",
+    "ANALISI MATEMATICA": "ANALISI",
+    "Architettura degli Elaboratori": "ARCH. ELAB",
+    "Programmazione II": "PROG II",
+    "Elementi di probabilità e statistica": "ELEM. PROB.",
+    "Sistemi Operativi": "SIS. OPERATIVI",
     "Linguaggi Formali e Traduttori": "LFT",
-    "Algoritmi e strutture Dati": "ASD",
-    "Basi dati": "DB",
+    "Algoritmi e strutture Dati": "ALG STRUT. DATI",
+    "Basi dati": "BASI DATI",
     "PARTE DIE CONOMIA": "EGI",
-    "PARTE DI DIRITTO": "Privacy",
-    "Fisica": "Fisica",
+    "PARTE DI DIRITTO": "PRIVACY",
+    "Fisica": "FISICA",
     "ECONOMIA E GESTIONE dell'innovazione": "EGIN",
-    "MFN0608": "TWEB(IUM)",
+    "MFN0608": "T.WEB(IUM)",
     "MFN1353": "IUM",
-    "Sistemi Informativi": "SISINF",
-    "MFN0634": "TWEB",
+    "Sistemi Informativi": "SIS. INF.",
+    "MFN0634": "T.WEB",
     "Linguaggi e Paradigmi di Programmazione": "LPP",
-    "Calcolabilità e complessita": "CEC",
-    "ProgrammazioneIII": "PROGIII",
+    "Calcolabilità e complessita": "CALC. E COMPL.",
+    "ProgrammazioneIII": "PROG III",
     "MFN1362": "RETI",
-    "Metodi formali dell'informatica": "MDF",
-    "LOGICA PER L'INFORMATICA": "LPF",
-    "Storia dell'informatica": "SDI",
-    "RETI DI ELABORATORI": "RDELAB",
-    "SISTEMI INTELLIGENTI": "SISINT",
-    "Sicurezza": "SIC",
-    "Sviluppo delle applicazioni software": "SAS"
+    "Metodi formali dell'informatica": "METODI FORMALI INF.",
+    "LOGICA PER L'INFORMATICA": "LOGICA PER INF.",
+    "Storia dell'informatica": "STORIA INF.",
+    "RETI DI ELABORATORI": "RETI ELAB.",
+    "SISTEMI INTELLIGENTI": "SIS. INT.",
+    "Sicurezza": "SICUREZZA",
+    "Sviluppo delle applicazioni software": "SVIL. APP SOFT."
 }
 
