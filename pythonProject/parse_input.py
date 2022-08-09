@@ -14,7 +14,7 @@ import create_calendar
 import holidays
 import statistics_model
 
-import model_building1 as building
+import model_building4 as building
 import pyomo.environ as pyo
 
 sessioni = []   #Managed as an array but in reality it contains only one session, so we use the positions sessioni[0][0] e sessioni[0][1]
@@ -382,7 +382,10 @@ def load_exams(nome_foglio, anno):
         exams.append(
             classes.Exam(row[0], row[1], row[2], semestri, anno, int(row[4]), aule_richieste, int(row[6]),
                          laboratori_richiesti, int(row[8]), int(row[9]), date_preferenza, date_indisponibilita, note))
-        date_indisponibilita=[]
+        aule_richieste = []
+        laboratori_richiesti = []
+        date_indisponibilita = []
+        date_preferenza = []
 
     return True
 

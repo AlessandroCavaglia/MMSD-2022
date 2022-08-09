@@ -648,8 +648,8 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
     worksheet.set_zoom(140)
     worksheet.set_column("A:A", 40)
     worksheet.set_column("B:B", 40)
-    worksheet.set_column("C:C", 50)
-    worksheet.set_column("D:D", 200)
+    worksheet.set_column("C:C", 30)
+    worksheet.set_column("D:D", 30)
 
 
 
@@ -767,7 +767,7 @@ def build_output(exams, laboratori, aule, model, sessioni):
     esami_secondo_anno = []
     esami_terzo_anno = []
     for esame in exams:
-        print(esame.nome[esame.nome.lower().find('mfn'):esame.nome.lower().find('mfn')+7],esame.short_name)
+       # print(esame.nome[esame.nome.lower().find('mfn'):esame.nome.lower().find('mfn')+7],esame.short_name)
         if (esame.anno == 1):
             esami_primo_anno.append(esame)
         if (esame.anno == 2):
