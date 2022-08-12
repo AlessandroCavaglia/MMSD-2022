@@ -5,6 +5,9 @@
 # ESAME(
 import os.path
 
+import PySimpleGUI as sg
+print = sg.Print
+
 import pandas as pd
 from datetime import datetime, timedelta
 import classes
@@ -99,9 +102,13 @@ def get_non_working_days(data_inizio, data_fine):
     return weekend
 
 
-def load_date():  # Errori gestiti da testare a fondo
-
-    sessioni_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
+def load_date(input):  # Errori gestiti da testare a fondo
+    print(input)
+    if input != '':
+        sessioni_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
+                                    usecols=costants.COLONNE_SESSIONI)
+    else:
+        sessioni_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
                                 usecols=costants.COLONNE_SESSIONI)
     for index, row in sessioni_df.iterrows():
         # row[0] -> Data  Inizio -> Date
@@ -122,9 +129,14 @@ def load_date():  # Errori gestiti da testare a fondo
     return True
 
 
-def load_laboratori():  # Errori gestiti da testare a fondo
-    laboratorii_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
-                                   usecols=costants.COLONNE_LABORATORI)
+def load_laboratori(input):  # Errori gestiti da testare a fondo
+    print(input)
+    if input != '':
+        laboratorii_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
+                                    usecols=costants.COLONNE_LABORATORI)
+    else:
+        laboratorii_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
+                                    usecols=costants.COLONNE_LABORATORI)
     for index, row in laboratorii_df.iterrows():
         # row[0] -> Nome Laboratorio -> String
         # row[1] -> Indisponibilità -> String {Data1,...,DataN}
@@ -157,9 +169,14 @@ def load_laboratori():  # Errori gestiti da testare a fondo
     return True
 
 
-def load_aule():  # Errori gestiti da testare a fondo
-    aule_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
-                            usecols=costants.COLONNE_AULE)
+def load_aule(input):  # Errori gestiti da testare a fondo
+    print(input)
+    if input != '':
+        aule_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
+                                       usecols=costants.COLONNE_AULE)
+    else:
+        aule_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
+                                       usecols=costants.COLONNE_AULE)
     for index, row in aule_df.iterrows():
         # row[0] -> Nome Aula -> String
         # row[1] -> Indisponibilità -> String {Data1,...,DataN}
@@ -191,9 +208,14 @@ def load_aule():  # Errori gestiti da testare a fondo
             aule.append(classes.ExamRoom(row[0], dateindisp))
     return True
 
-def load_parametri():  # Errori gestiti da testare a fondo
-    aule_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
-                            usecols=costants.COLONNE_PARAMETRI)
+def load_parametri(input):  # Errori gestiti da testare a fondo
+    print(input)
+    if input != '':
+        aule_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
+                                usecols=costants.COLONNE_PARAMETRI)
+    else:
+        aule_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
+                                usecols=costants.COLONNE_PARAMETRI)
     for index, row in aule_df.iterrows():
         # row[0] -> Nome parametro -> String
         # row[1] -> Value -> int
@@ -265,13 +287,17 @@ def load_parametri():  # Errori gestiti da testare a fondo
                                         return False
     return True
 
-def load_exams(nome_foglio, anno):
+def load_exams(input,nome_foglio, anno):
     aule_richieste = []
     laboratori_richiesti = []
     date_indisponibilita = []
     date_preferenza = []
     note = ""
-    exams_df = pd.read_excel('input/'+costants.INPUT_FILE_NAME, sheet_name=nome_foglio)
+    print(input)
+    if input != '':
+        exams_df = pd.read_excel(input, sheet_name=nome_foglio)
+    else:
+        exams_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name=nome_foglio)
     for index, row in exams_df.iterrows():
         # row[0] -> Nome Corso -> String
         # row[1] -> Tipologia -> String
@@ -404,23 +430,24 @@ def parse_list(input, delimiter=','):
 
 
 def main():
-    if not load_date():
+
+    if not load_date(''):
         return
     printSessioni()
-    if not load_parametri():
+    if not load_parametri(''):
         return
     printParametri()
-    if not load_laboratori():
+    if not load_laboratori(''):
         return
     printLaboratori()
-    if not load_aule():
+    if not load_aule(''):
         return
     printAule()
-    if not load_exams('Corsi I anno triennale', 1):
+    if not load_exams('','Corsi I anno triennale', 1):
         return
-    if not load_exams('Corsi II anno triennale', 2):
+    if not load_exams('','Corsi II anno triennale', 2):
         return
-    if not load_exams('Corsi III anno triennale', 3):
+    if not load_exams('','Corsi III anno triennale', 3):
         return
     printCorsi()
     printCorsi()
@@ -432,17 +459,50 @@ def main():
     model = building.build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
     path=os.path.join('log', str(datetime.today().strftime('Resolution_%d-%m-%y_%H-%M-%S.log')))
-    #opt.options['mip tolerances integrality'] = 0
-    #opt.options['emphasis mip'] = 2
-    #opt.options['barrier algorithm'] = 3
+    opt.solve(model,logfile=path)
+    building.print_results(model, exams, data_inizio, data_fine)
+    create_output.build_output('','',exams, laboratori, aule, model,sessioni)
+    create_calendar.build_calendar(exams, model,sessioni)
+    statistics_model.generate_statistics(model,exams,sessioni[0][0],sessioni[0][1])
 
+
+def runModel(input,output,progressbar):
+    if not load_date(input):
+        return
+    printSessioni()
+    progressbar.UpdateBar(100)
+    if not load_parametri(input):
+        return
+    printParametri()
+    progressbar.UpdateBar(200)
+    if not load_laboratori(input):
+        return
+    printLaboratori()
+    progressbar.UpdateBar(250)
+    if not load_aule(input):
+        return
+    printAule()
+    if not load_exams(input,'Corsi I anno triennale', 1):
+        return
+    if not load_exams(input,'Corsi II anno triennale', 2):
+        return
+    if not load_exams(input,'Corsi III anno triennale', 3):
+        return
+    printCorsi()
+
+    progressbar.UpdateBar(500)
+    # Test del modello
+    data_inizio = sessioni[0][0]  # Data inizio sessione estiva
+    data_fine = sessioni[0][1]  # Data fine sessione estiva
+    model = building.build_model(aule, laboratori, data_inizio, data_fine, exams)
+    opt = pyo.SolverFactory('cplex')
     opt.options['preprocessing presolve'] = 'n'
     opt.options['mip tolerances mipgap'] = 0.20
     opt.options['mip tolerances absmipgap'] = 0.20
-
+    path=os.path.join('log', str(datetime.today().strftime('Resolution_%d-%m-%y_%H-%M-%S.log')))
     opt.solve(model,logfile=path)
     building.print_results(model, exams, data_inizio, data_fine)
-    create_output.build_output(exams, laboratori, aule, model,sessioni)
+    create_output.build_output(input,output,exams, laboratori, aule, model,sessioni)
     create_calendar.build_calendar(exams, model,sessioni)
     statistics_model.generate_statistics(model,exams,sessioni[0][0],sessioni[0][1])
 
