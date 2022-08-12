@@ -123,3 +123,4 @@ NOME_CORSO_CODE = {
     "INF0004": "STORIA INF.",
     "MFN0635": "RETI ELAB."
 }
+

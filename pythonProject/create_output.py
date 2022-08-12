@@ -655,10 +655,16 @@ def findExam(df,exam,sem):
         if (esame.nome == exam or esame.short_name == exam) and sem == esame.lista_semestri[0]:
             return True
 
-def build_output(exams, laboratori, aule, model, sessioni):
+def build_output(input,output,exams, laboratori, aule, model, sessioni):
     # Move the general input page to the new document
-    sessioni_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name='Input generali')
-    writer = pd.ExcelWriter('output/' + costants.OUTPUT_FILE_NAME, engine='xlsxwriter')
+
+    if(output != '' and input != ''):
+        sessioni_df = pd.read_excel(input, sheet_name='Input generali')
+        print(output + '/' + costants.OUTPUT_FILE_NAME)
+        writer = pd.ExcelWriter(output + '/' + costants.OUTPUT_FILE_NAME, engine='xlsxwriter')
+    else:
+        sessioni_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name='Input generali')
+        writer = pd.ExcelWriter('output/' + costants.OUTPUT_FILE_NAME, engine='xlsxwriter')
     for column in sessioni_df.columns:
         if ('Unnamed' in column):
             sessioni_df.rename(columns={column: ''}, inplace=True)
