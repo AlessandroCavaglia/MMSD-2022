@@ -7,67 +7,83 @@ import costants
 import holidays
 import calendar
 
-def build_exams_output(esami_anno, nome_foglio, laboratori, aule, model, writer, exams, sessione):
-    esami_df = pd.DataFrame({})
-    nomi_esami = []
-    for esame in esami_anno:
-        nomi_esami.append(esame.nome)
-    esami_df.insert(0, "Nome corso", nomi_esami, True)
-    tipologia_esami = []
-    for esame in esami_anno:
-        tipologia_esami.append(esame.tipo)
-    esami_df.insert(1, "Tipologia", tipologia_esami, True)
-    docenti_esami = []
-    for esame in esami_anno:
-        docenti_esami.append(esame.insegnanti)
-    esami_df.insert(2, "Docenti", docenti_esami, True)
-    semestri_esami = []
-    for esame in esami_anno:
+def extract_exams_names(exams):
+    data = []
+    for esame in exams:
+        data.append(esame.nome)
+    return data
+
+def extract_exams_type(exams):
+    data = []
+    for esame in exams:
+        data.append(esame.tipo)
+    return data
+
+def extract_exams_teachers(exams):
+    data = []
+    for esame in exams:
+        data.append(esame.insegnanti)
+    return data
+
+def extract_exams_semestre(exams):
+    data = []
+    for esame in exams:
         semestri = str(esame.lista_semestri)
         semestri = semestri.replace("[", "")
         semestri = semestri.replace("]", "")
         semestri = semestri.replace("'", "")
-        semestri_esami.append(semestri)
-    esami_df.insert(3, "Semestre", semestri_esami, True)
-    appelli_estivi1 = []
-    appelli_estivi2 = []
+        data.append(semestri)
+    return data
 
-
-
-    for esame in esami_anno:
+def extract_appelli(exams,model,sessione):
+    appello_1 = []
+    appello_2 = []
+    for esame in exams:
         index = exams.index(esame)
-        date_esitive_esame = []
+        date_esame = []
         durata_sessione = abs(sessione[0][1] - sessione[0][0])
         for i in range(durata_sessione.days + 1):
             if model.x[index, i].value == 1:
                 data = sessione[0][0] + timedelta(days=i)
-                date_esitive_esame.append(str(data))
-        date_esitive_esame1=""
+                date_esame.append(str(data))
+        data_esame_1=""
         for i in range(esame.numero_giorni_durata):
-            date_esitive_esame1 +=" "+ date_esitive_esame[i]
+            data_esame_1 +=" "+ date_esame[i]
 
-        date_esitive_esame1 = date_esitive_esame1.replace("[", "")
-        date_esitive_esame1 = date_esitive_esame1.replace("]", "")
-        date_esitive_esame1 = date_esitive_esame1.replace("'", "")
-        date_esitive_esame1 = date_esitive_esame1.replace("00:00:00", "")
-        appelli_estivi1.append(date_esitive_esame1)
+        data_esame_1 = data_esame_1.replace("[", "")
+        data_esame_1 = data_esame_1.replace("]", "")
+        data_esame_1 = data_esame_1.replace("'", "")
+        data_esame_1 = data_esame_1.replace("00:00:00", "")
+        appello_1.append(data_esame_1)
 
-        if(len(date_esitive_esame)>esame.numero_giorni_durata):
-            date_esitive_esame2=""
+        if(len(date_esame)>esame.numero_giorni_durata):
             for i in range(esame.numero_giorni_durata):
-                date_esitive_esame2 +=" "+ date_esitive_esame[esame.numero_giorni_durata + i]
-            date_esitive_esame2 = date_esitive_esame2.replace("[", "")
-            date_esitive_esame2 = date_esitive_esame2.replace("]", "")
-            date_esitive_esame2 = date_esitive_esame2.replace("'", "")
-            date_esitive_esame2 = date_esitive_esame2.replace("00:00:00", "")
-            appelli_estivi2.append(date_esitive_esame2)
+                data_esame_2=""
+                if (esame.numero_giorni_durata + i >= len(date_esame)):
+                    print("POSSIBILE ERRORE IN ASSEGNAMENTO DATE")
+                    data_esame_2 += " "
+                else:
+                    data_esame_2 +=" "+ date_esame[esame.numero_giorni_durata + i]
+            data_esame_2 = data_esame_2.replace("[", "")
+            data_esame_2 = data_esame_2.replace("]", "")
+            data_esame_2 = data_esame_2.replace("'", "")
+            data_esame_2 = data_esame_2.replace("00:00:00", "")
+            appello_2.append(data_esame_2)
         else:
-            appelli_estivi2.append('')
+            appello_2.append('')
+    return (appello_1,appello_2)
 
 
-    esami_df.insert(4, "Primo appello", appelli_estivi1, True)
-    esami_df.insert(5, "Secondo appello", appelli_estivi2, True)
 
+def build_exams_output(esami_anno, nome_foglio, laboratori, aule, model, writer, exams, sessione):
+    esami_df = pd.DataFrame({})
+    esami_df.insert(0, "Nome corso",  extract_exams_names(esami_anno), True)
+    esami_df.insert(1, "Tipologia", extract_exams_type(esami_anno), True)
+    esami_df.insert(2, "Docenti", extract_exams_teachers(esami_anno), True)
+    esami_df.insert(3, "Semestre", extract_exams_semestre(esami_anno), True)
+    (primi_appelli,secondi_appelli)=extract_appelli(esami_anno,model,sessione)
+    esami_df.insert(4, "Primo appello", primi_appelli, True)
+    esami_df.insert(5, "Secondo appello", secondi_appelli, True)
     esami_df.to_excel(writer, sheet_name=nome_foglio, index=False)
 
     # set formatting
@@ -90,254 +106,156 @@ def build_exams_output(esami_anno, nome_foglio, laboratori, aule, model, writer,
 
 
     for col_num, value in enumerate(esami_df.columns.values):  # setting header formatting only for the first row
-            worksheet.write(0, col_num, value, header_format)
+           worksheet.write(0, col_num, value, header_format)
+
+
+def extract_short_names_riassunto(esami):
+    prev = '1'
+    nomi_esami=[]
+    primo_semestre = 1
+    secondo_semestre = 1
+    nomi_esami.append("")
+    for esame in esami:
+        if (esame.lista_semestri[0] != prev):
+            nomi_esami.append("")
+            prev = '2'
+        if esame.lista_semestri[0] == '1':
+            primo_semestre += 1
+        else:
+            secondo_semestre += 1
+        nomi_esami.append(esame.short_name)
+    return (nomi_esami,primo_semestre,secondo_semestre)
+
+def extract_date_appelli_riassunto(esami,label_primo_semestre,label_secondo_semestre,exams,sessione,model):
+    appelli_1=[]
+    appelli_2=[]
+    prev = '1'
+    appelli_1.append(label_primo_semestre)
+    appelli_2.append("")
+    for esame in esami:
+        if (esame.lista_semestri[0] != prev):
+            appelli_1.append(label_secondo_semestre)
+            appelli_2.append("")
+            prev = '2'
+        index = exams.index(esame)
+        date_esame = []
+        durata_sessione = abs(sessione[0][1] - sessione[0][0])
+        for i in range(durata_sessione.days + 1):
+            if model.x[index, i].value == 1:
+                data = sessione[0][0] + timedelta(days=i)
+                date_esame.append(str(data))
+        data_1 = ""
+        for i in range(esame.numero_giorni_durata):
+            data_1 += " " + date_esame[i]
+        data_1 = data_1.replace("[", "")
+        data_1 = data_1.replace("]", "")
+        data_1 = data_1.replace("'", "")
+        data_1 = data_1.replace("00:00:00", "")
+        appelli_1.append(data_1)
+        if (len(date_esame) > esame.numero_giorni_durata):
+            date_2 = ""
+            for i in range(esame.numero_giorni_durata):
+                if(esame.numero_giorni_durata + i>=len(date_esame)):
+                    print("POSSIBILE ERRORE IN ASSEGNAMENTO DATE")
+                    date_2 += " "
+                else:
+                    date_2 += " " + date_esame[esame.numero_giorni_durata + i]
+            date_2 = date_2.replace("[", "")
+            date_2 = date_2.replace("]", "")
+            date_2 = date_2.replace("'", "")
+            date_2 = date_2.replace("00:00:00", "")
+            appelli_2.append(date_2)
+        else:
+            appelli_2.append('')
+    return (appelli_1,appelli_2)
+
+def fix_aula_lab(exams_request):
+    exams_request = exams_request[0:-1]
+    exams_request = exams_request.replace("Laboratorio", "Lab.")
+    exams_request = exams_request.replace("laboratorio", "lab.")
+    exams_request = exams_request.replace("Dijkstra", "Dij.")
+    exams_request = exams_request.replace("dijkstra", "dij.")
+    exams_request = exams_request.replace("Turing", "Tur.")
+    exams_request = exams_request.replace("turing", "tur.")
+    exams_request = exams_request.replace("Vonneumann", "Von.")
+    exams_request = exams_request.replace("vonneumann", "von.")
+    exams_request = exams_request.replace("Babbage", "Bab.")
+    exams_request = exams_request.replace("Babbage", "bab.")
+    exams_request = exams_request.replace("postel", "pos.")
+    exams_request = exams_request.replace("Postel", "Pos.")
+    exams_request = exams_request.replace("Conferenze", "Conf.")
+    exams_request = exams_request.replace("conferenze", "conf.")
+    return exams_request
+
+def extract_aule_lab_riassunto(esami,aule,laboratori,exams):
+    aule_lab=[]
+    prev = '1'
+    aule_lab.append("")
+    for esame in esami:
+        if (esame.lista_semestri[0] != prev):
+            aule_lab.append("")
+            prev = '2'
+        exams_request = ""
+        for aula_richiesta in esame.aule_richieste:
+            exams_request += " " + aule[aula_richiesta].nome + ","
+        for lab_richiesto in esame.laboratori_richiesti:
+            exams_request += " " + laboratori[lab_richiesto].nome + ","
+        exams_request=fix_aula_lab(exams_request)
+        aule_lab.append(exams_request)
+
+    return aule_lab
+
 
 def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo_anno, nome_foglio, laboratori, aule, model, writer, exams, sessione):
     esami_df = pd.DataFrame({})
     nomi_esami = []
-    appelli_estivi1 = []
-    appelli_estivi2 = []
+    appelli_1 = []
+    appelli_2 = []
     aule_lab=[]
 
     esami_primo_anno.sort(key=lambda esame:esame.lista_semestri[0])
     esami_secondo_anno.sort(key=lambda esame:esame.lista_semestri[0])
     esami_terzo_anno.sort(key=lambda esame:esame.lista_semestri[0])
-    nomi_esami.append("")
-    prev='1'
-    esami_primo_anno_primo_semestre=1
-    esami_primo_anno_secondo_semestre=1
-    for esame in esami_primo_anno:
-        if(esame.lista_semestri[0]!=prev):
-            nomi_esami.append("")
-            prev='2'
-        if esame.lista_semestri[0] == '1':
-            esami_primo_anno_primo_semestre+=1
-        else:
-            esami_primo_anno_secondo_semestre+=1
-        nomi_esami.append(esame.short_name)
-    prev = '1'
-    appelli_estivi1.append("Esami primo anno primo semestre")
-    appelli_estivi2.append("")
-    for esame in esami_primo_anno:
-        if (esame.lista_semestri[0] != prev):
-            appelli_estivi1.append("Esami primo anno secondo semestre")
-            appelli_estivi2.append("")
-            prev = '2'
-        index = exams.index(esame)
-        date_esitive_esame = []
-        durata_sessione = abs(sessione[0][1] - sessione[0][0])
-        for i in range(durata_sessione.days + 1):
-            if model.x[index, i].value == 1:
-                data = sessione[0][0] + timedelta(days=i)
-                date_esitive_esame.append(str(data))
-        date_esitive_esame1 = ""
-        for i in range(esame.numero_giorni_durata):
-            date_esitive_esame1 += " " + date_esitive_esame[i]
-        date_esitive_esame1 = date_esitive_esame1.replace("[", "")
-        date_esitive_esame1 = date_esitive_esame1.replace("]", "")
-        date_esitive_esame1 = date_esitive_esame1.replace("'", "")
-        date_esitive_esame1 = date_esitive_esame1.replace("00:00:00", "")
-        appelli_estivi1.append(date_esitive_esame1)
-        if (len(date_esitive_esame) > esame.numero_giorni_durata):
-            date_esitive_esame2 = ""
-            for i in range(0, esame.numero_giorni_durata):
-                date_esitive_esame2 += " " + date_esitive_esame[esame.numero_giorni_durata + i]
-            date_esitive_esame2 = date_esitive_esame2.replace("[", "")
-            date_esitive_esame2 = date_esitive_esame2.replace("]", "")
-            date_esitive_esame2 = date_esitive_esame2.replace("'", "")
-            date_esitive_esame2 = date_esitive_esame2.replace("00:00:00", "")
-            appelli_estivi2.append(date_esitive_esame2)
-        else:
-            appelli_estivi2.append('')
 
-    prev='1'
-    aule_lab.append("")
-    for esame in esami_primo_anno:
-        if (esame.lista_semestri[0] != prev):
-            aule_lab.append("")
-            prev = '2'
-        exams_request=""
-        for aula_richiesta in esame.aule_richieste:
-            exams_request+=" "+aule[aula_richiesta].nome+","
-        for lab_richiesto in esame.laboratori_richiesti:
-            exams_request+=" "+laboratori[lab_richiesto].nome+","
-        exams_request=exams_request[0:-1]
-        exams_request=exams_request.replace("Laboratorio","Lab.")
-        exams_request=exams_request.replace("laboratorio","lab.")
-        exams_request=exams_request.replace("Dijkstra","Dij.")
-        exams_request=exams_request.replace("dijkstra","dij.")
-        exams_request=exams_request.replace("Turing","Tur.")
-        exams_request=exams_request.replace("turing","tur.")
-        exams_request=exams_request.replace("Vonneumann","Von.")
-        exams_request=exams_request.replace("vonneumann","von.")
-        exams_request=exams_request.replace("Babbage","Bab.")
-        exams_request=exams_request.replace("Babbage","bab.")
-        exams_request=exams_request.replace("postel","pos.")
-        exams_request=exams_request.replace("Postel","Pos.")
-        exams_request=exams_request.replace("Conferenze","Conf.")
-        exams_request=exams_request.replace("conferenze","conf.")
-        aule_lab.append(exams_request)
+    #Esami del primo anno
+    (nomi_primo_anno,esami_primo_anno_primo_semestre,esami_primo_anno_secondo_semestre)=extract_short_names_riassunto(esami_primo_anno)
+    nomi_esami=nomi_esami+nomi_primo_anno
+    (appelli_primo_anno_1,appelli_primo_anno_2)=extract_date_appelli_riassunto(esami_primo_anno,"Esami primo anno primo semestre","Esami primo anno secondo semestre",exams,sessione,model)
+    appelli_1=appelli_1+appelli_primo_anno_1
+    appelli_2=appelli_2+appelli_primo_anno_2
+    aule_lab_primo_anno=extract_aule_lab_riassunto(esami_primo_anno,aule,laboratori,exams)
+    aule_lab=aule_lab+aule_lab_primo_anno
 
-    nomi_esami.append("")
-    prev = '1'
-    esami_secondo_anno_primo_semestre = 1
-    esami_secondo_anno_secondo_semestre = 1
-    for esame in esami_secondo_anno:
-        if (esame.lista_semestri[0] != prev):
-            nomi_esami.append("")
-            prev = '2'
-        if(esame.lista_semestri[0]=='1'):
-            esami_secondo_anno_primo_semestre+=1
-        else:
-            esami_secondo_anno_secondo_semestre+=1
-        nomi_esami.append(esame.short_name)
-    prev = '1'
-    appelli_estivi1.append("Esami secondo anno primo semestre")
-    appelli_estivi2.append("")
-    for esame in esami_secondo_anno:
-        if (esame.lista_semestri[0] != prev):
-            appelli_estivi1.append("Esami secondo anno secondo semestre")
-            appelli_estivi2.append("")
-            prev = '2'
-        index = exams.index(esame)
-        date_esitive_esame = []
-        durata_sessione = abs(sessione[0][1] - sessione[0][0])
-        for i in range(durata_sessione.days + 1):
-            if model.x[index, i].value == 1:
-                data = sessione[0][0] + timedelta(days=i)
-                date_esitive_esame.append(str(data))
-        date_esitive_esame1 = ""
-        for i in range(esame.numero_giorni_durata):
-            date_esitive_esame1 += " " + date_esitive_esame[i]
-        date_esitive_esame1 = date_esitive_esame1.replace("[", "")
-        date_esitive_esame1 = date_esitive_esame1.replace("]", "")
-        date_esitive_esame1 = date_esitive_esame1.replace("'", "")
-        date_esitive_esame1 = date_esitive_esame1.replace("00:00:00", "")
-        appelli_estivi1.append(date_esitive_esame1)
-        if (len(date_esitive_esame) > esame.numero_giorni_durata):
-            date_esitive_esame2 = ""
-            for i in range(0, esame.numero_giorni_durata):
-                date_esitive_esame2 += " " + date_esitive_esame[esame.numero_giorni_durata + i]
-            date_esitive_esame2 = date_esitive_esame2.replace("[", "")
-            date_esitive_esame2 = date_esitive_esame2.replace("]", "")
-            date_esitive_esame2 = date_esitive_esame2.replace("'", "")
-            date_esitive_esame2 = date_esitive_esame2.replace("00:00:00", "")
-            appelli_estivi2.append(date_esitive_esame2)
-        else:
-            appelli_estivi2.append('')
-    prev = '1'
-    aule_lab.append("")
-    for esame in esami_secondo_anno:
-        if (esame.lista_semestri[0] != prev):
-            aule_lab.append("")
-            prev = '2'
-        exams_request = ""
-        for aula_richiesta in esame.aule_richieste:
-            exams_request += " " + aule[aula_richiesta].nome+","
-        for lab_richiesto in esame.laboratori_richiesti:
-            exams_request += " " + laboratori[lab_richiesto].nome +","
-        exams_request = exams_request[0:-1]
-        exams_request = exams_request.replace("Laboratorio", "Lab.")
-        exams_request = exams_request.replace("laboratorio", "lab.")
-        exams_request = exams_request.replace("Dijkstra", "Dij.")
-        exams_request = exams_request.replace("dijkstra", "dij.")
-        exams_request = exams_request.replace("Turing", "Tur.")
-        exams_request = exams_request.replace("turing", "tur.")
-        exams_request = exams_request.replace("Vonneumann", "Von.")
-        exams_request = exams_request.replace("vonneumann", "von.")
-        exams_request = exams_request.replace("Babbage", "Bab.")
-        exams_request = exams_request.replace("Babbage", "bab.")
-        exams_request = exams_request.replace("postel", "pos.")
-        exams_request = exams_request.replace("Postel", "Pos.")
-        exams_request = exams_request.replace("Conferenze", "Conf.")
-        exams_request = exams_request.replace("conferenze", "conf.")
-        aule_lab.append(exams_request)
+    # Esami del secondo anno
+    (nomi_secondo_anno, esami_secondo_anno_primo_semestre,
+     esami_secondo_anno_secondo_semestre) = extract_short_names_riassunto(esami_secondo_anno)
+    nomi_esami = nomi_esami + nomi_secondo_anno
+    (appelli_secondo_anno_1, appelli_secondo_anno_2) = extract_date_appelli_riassunto(esami_secondo_anno,"Esami secondo anno primo semestre","Esami secondo anno secondo semestre",exams, sessione, model)
+    appelli_1 = appelli_1 + appelli_secondo_anno_1
+    appelli_2 = appelli_2 + appelli_secondo_anno_2
+    aule_lab_secondo_anno = extract_aule_lab_riassunto(esami_secondo_anno, aule, laboratori, exams)
+    aule_lab = aule_lab + aule_lab_secondo_anno
 
-    nomi_esami.append("")
-    prev = '1'
-    esami_terzo_anno_primo_semestre = 1
-    esami_terzo_anno_secondo_semestre = 1
-    for esame in esami_terzo_anno:
-        if (esame.lista_semestri[0] != prev):
-            nomi_esami.append("")
-            prev = '2'
-        if(esame.lista_semestri[0]=='1'):
-            esami_terzo_anno_primo_semestre+=1
-        else:
-            esami_terzo_anno_secondo_semestre+=1
-        nomi_esami.append(esame.short_name)
-    prev = '1'
-    appelli_estivi1.append("Esami terzo anno primo semestre")
-    appelli_estivi2.append("")
-    for esame in esami_terzo_anno:
-        if (esame.lista_semestri[0] != prev):
-            appelli_estivi1.append("Esami terzo anno secondo semestre")
-            appelli_estivi2.append("")
-            prev = '2'
-        index = exams.index(esame)
-        date_esitive_esame = []
-        durata_sessione = abs(sessione[0][1] - sessione[0][0])
-        for i in range(durata_sessione.days + 1):
-            if model.x[index, i].value == 1:
-                data = sessione[0][0] + timedelta(days=i)
-                date_esitive_esame.append(str(data))
-        date_esitive_esame1 = ""
-        for i in range(esame.numero_giorni_durata):
-            date_esitive_esame1 += " " + date_esitive_esame[i]
-        date_esitive_esame1 = date_esitive_esame1.replace("[", "")
-        date_esitive_esame1 = date_esitive_esame1.replace("]", "")
-        date_esitive_esame1 = date_esitive_esame1.replace("'", "")
-        date_esitive_esame1 = date_esitive_esame1.replace("00:00:00", "")
-        appelli_estivi1.append(date_esitive_esame1)
-        if (len(date_esitive_esame) > esame.numero_giorni_durata):
-            date_esitive_esame2 = ""
-            for i in range(0, esame.numero_giorni_durata):
-                date_esitive_esame2 += " " + date_esitive_esame[esame.numero_giorni_durata + i]
-            date_esitive_esame2 = date_esitive_esame2.replace("[", "")
-            date_esitive_esame2 = date_esitive_esame2.replace("]", "")
-            date_esitive_esame2 = date_esitive_esame2.replace("'", "")
-            date_esitive_esame2 = date_esitive_esame2.replace("00:00:00", "")
-            appelli_estivi2.append(date_esitive_esame2)
-        else:
-            appelli_estivi2.append('')
-    prev = '1'
-    aule_lab.append("")
-    for esame in esami_terzo_anno:
-        if (esame.lista_semestri[0] != prev):
-            aule_lab.append("")
-            prev = '2'
-        exams_request = ""
-        for aula_richiesta in esame.aule_richieste:
-            exams_request += " " + aule[aula_richiesta].nome+","
-        for lab_richiesto in esame.laboratori_richiesti:
-            exams_request += " " + laboratori[lab_richiesto].nome+","
-        exams_request = exams_request[0:-1]
-        exams_request = exams_request.replace("Laboratorio", "Lab.")
-        exams_request = exams_request.replace("laboratorio", "lab.")
-        exams_request = exams_request.replace("Dijkstra", "Dij.")
-        exams_request = exams_request.replace("dijkstra", "dij.")
-        exams_request = exams_request.replace("Turing", "Tur.")
-        exams_request = exams_request.replace("turing", "tur.")
-        exams_request = exams_request.replace("Vonneumann", "Von.")
-        exams_request = exams_request.replace("vonneumann", "von.")
-        exams_request = exams_request.replace("Babbage", "Bab.")
-        exams_request = exams_request.replace("Babbage", "bab.")
-        exams_request = exams_request.replace("postel", "pos.")
-        exams_request = exams_request.replace("Postel", "Pos.")
-        exams_request = exams_request.replace("Conferenze", "Conf.")
-        exams_request = exams_request.replace("conferenze", "conf.")
-        aule_lab.append(exams_request)
+    # Esami del terzo anno
+    (nomi_terzo_anno, esami_terzo_anno_primo_semestre,esami_terzo_anno_secondo_semestre) = extract_short_names_riassunto(esami_terzo_anno)
+    nomi_esami = nomi_esami + nomi_terzo_anno
+    (appelli_terzo_anno_1, appelli_terzo_anno_2) = extract_date_appelli_riassunto(esami_terzo_anno,"Esami terzo anno primo semestre","Esami terzo anno secondo semestre",exams, sessione, model)
+    appelli_1 = appelli_1 + appelli_terzo_anno_1
+    appelli_2 = appelli_2 + appelli_terzo_anno_2
+    aule_lab_terzo_anno = extract_aule_lab_riassunto(esami_terzo_anno, aule, laboratori, exams)
+    aule_lab = aule_lab + aule_lab_terzo_anno
 
 
-    esami_df.insert(0, "Primo appello", appelli_estivi1, True)
-    esami_df.insert(1, "Secondo appello", appelli_estivi2, True)
+
+    esami_df.insert(0, "Primo appello", appelli_1, True)
+    esami_df.insert(1, "Secondo appello", appelli_2, True)
     esami_df.insert(2, "Aule e laboratori richiesti", aule_lab, True)
-    esami_df.insert(3, "Nome corso", nomi_esami, True)
+    esami_df.insert(3, "Nome corto del corso ", nomi_esami, True)
 
 
     esami_df.to_excel(writer, sheet_name=nome_foglio, index=False)
 
-    # set formatting
+    # FORMATTING
     workbook = writer.book
     worksheet = writer.sheets[nome_foglio]
     worksheet.set_zoom(140)
@@ -444,7 +362,11 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
         if (len(date_esitive_esame) > esame.numero_giorni_durata):
             date_esitive_esame2 = ""
             for i in range(0, esame.numero_giorni_durata):
-                date_esitive_esame2 += " " + date_esitive_esame[esame.numero_giorni_durata + i]
+                if (esame.numero_giorni_durata + i >= len(date_esitive_esame)):
+                    print("POSSIBILE ERRORE IN ASSEGNAMENTO DATE")
+                    date_esitive_esame2 += " "
+                else:
+                    date_esitive_esame2 += " " + date_esitive_esame[esame.numero_giorni_durata + i]
             date_esitive_esame2 = date_esitive_esame2.replace("[", "")
             date_esitive_esame2 = date_esitive_esame2.replace("]", "")
             date_esitive_esame2 = date_esitive_esame2.replace("'", "")
@@ -520,7 +442,11 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
         if (len(date_esitive_esame) > esame.numero_giorni_durata):
             date_esitive_esame2 = ""
             for i in range(0, esame.numero_giorni_durata):
-                date_esitive_esame2 += " " + date_esitive_esame[esame.numero_giorni_durata + i]
+                if (esame.numero_giorni_durata + i >= len(date_esitive_esame)):
+                    print("POSSIBILE ERRORE IN ASSEGNAMENTO DATE")
+                    date_esitive_esame2 += " "
+                else:
+                    date_esitive_esame2 += " " + date_esitive_esame[esame.numero_giorni_durata + i]
             date_esitive_esame2 = date_esitive_esame2.replace("[", "")
             date_esitive_esame2 = date_esitive_esame2.replace("]", "")
             date_esitive_esame2 = date_esitive_esame2.replace("'", "")
@@ -595,7 +521,11 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
         if (len(date_esitive_esame) > esame.numero_giorni_durata):
             date_esitive_esame2 = ""
             for i in range(0, esame.numero_giorni_durata):
-                date_esitive_esame2 += " " + date_esitive_esame[esame.numero_giorni_durata + i]
+                if (esame.numero_giorni_durata + i >= len(date_esitive_esame)):
+                    print("POSSIBILE ERRORE IN ASSEGNAMENTO DATE")
+                    date_esitive_esame2 += " "
+                else:
+                    date_esitive_esame2 += " " + date_esitive_esame[esame.numero_giorni_durata + i]
             date_esitive_esame2 = date_esitive_esame2.replace("[", "")
             date_esitive_esame2 = date_esitive_esame2.replace("]", "")
             date_esitive_esame2 = date_esitive_esame2.replace("'", "")

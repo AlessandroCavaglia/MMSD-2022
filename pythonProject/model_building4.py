@@ -256,20 +256,6 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
                                 ((1 - model.x[esame1, giorno1]) * days + (
                                         1 - model.x[esame2, giorno2]) * days) >= model.dummy_primo_anno
                             )
-
-
-    '''
-    model.esami_secondo_anno_diversi = ConstraintList()  # Provo a non assegnare due esami del secondo anno lo stesso giorno
-    esami_secondo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
-    for esame in model.exams:
-        if exams[esame].anno == 2:
-            esami_secondo_anno.append(esame)
-    if len(esami_secondo_anno) > 1:
-        for giorno in model.days:
-            model.esami_stesso_semestre_diversi.add(
-                sum(model.x[esame1, giorno] for esame1 in esami_secondo_anno) <= 1 + model.dummy_secondo_anno)
-                '''
-
     return model
 
 
