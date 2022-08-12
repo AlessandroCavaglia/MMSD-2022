@@ -1,4 +1,4 @@
-from costants import NOME_CORSO, NOME_CORSO_STRONG, NOME_CORSO_CODE
+from costants import NOME_CORSO_STRONG, NOME_CORSO_CODE
 
 
 class Exam:

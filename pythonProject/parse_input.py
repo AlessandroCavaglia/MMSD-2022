@@ -287,7 +287,7 @@ def load_parametri(input,building):  # Errori gestiti da testare a fondo
                                         return False
     return True
 
-def load_exams(input,nome_foglio, anno,building):
+def load_exams(input,nome_foglio, anno, building):
     aule_richieste = []
     laboratori_richiesti = []
     date_indisponibilita = []
@@ -466,8 +466,9 @@ def main():
     statistics_model.generate_statistics(model,exams,sessioni[0][0],sessioni[0][1])
 
 
-def runModel(input,output,progressbar,model):
+def runModel(input,output,progressbar,model, time_limit_input):
     building = __import__(model)
+    print('Modello utilizzato: ',model)
     if not load_date(input,building):
         return
     printSessioni()

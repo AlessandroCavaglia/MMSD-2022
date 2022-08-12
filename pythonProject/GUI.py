@@ -3,26 +3,35 @@ from pathlib import Path
 from parse_input import runModel
 import os
 
-from pythonProject.costants import MODEL, MODEL_MAPPING
+import output
+
+from pythonProject.costants import MODEL, MODEL_MAPPING, ADVANCED_SETTINGS
 
 print = sg.Print
 
+
 def main():
-
-
+    advanced_settings = ADVANCED_SETTINGS
     sg.theme("DarkBlue3")
     sg.set_options(font=("Microsoft JhengHei", 16))
     font_title = ("Microsoft JhengHei", 25, 'bold')
     layout = [
         [
-            [sg.Text('Modello di ottimizzazione calendario Esami',font=font_title)],
-            [sg.T('Model Input     '),sg.Input(key='-INPUT-'),
-            sg.FileBrowse(file_types=(("Excel", "*.xlsx"), ("ALL Files", "*.*")))],
-            [sg.T('Output folder  '),sg.Input(key='-OUTPUT-'),
-            sg.FolderBrowse()],
-            [sg.T('Choose Model'),sg.Combo(MODEL,default_value='Default Model', readonly=True,key='_MODEL_')],
-            [sg.Button("Run Model"), sg.Button('Exit'),sg.T('', text_color='#de335e' , visible=False, key='ErrGUI'),sg.T('', text_color='#caf17c', visible=False, key='SuccGUI')],
-            [sg.T('Progress...   ', visible=False, key='progresstext'),sg.ProgressBar(1000, orientation='h', size=(20, 20), key='progressbar', visible=False)]
+            [sg.Text('Modello di ottimizzazione calendario Esami', font=font_title)],
+            [sg.T('Model Input     '), sg.Input(key='-INPUT-'),
+             sg.FileBrowse(file_types=(("Excel", "*.xlsx"), ("ALL Files", "*.*")))],
+            [sg.T('Output folder  '), sg.Input(key='-OUTPUT-'),
+             sg.FolderBrowse()],
+            [sg.T('Choose Model'), sg.Combo(MODEL, size=20, default_value='Default Model', readonly=True, key='_MODEL_'),
+             sg.Button("Advanced settings",key='advanced_settings'),sg.Button("Close Advanced settings", key='close_advanced_settings', visible=False)],
+            [sg.T('Time limit (s)    ', key='time_limit_text', visible=False),
+             sg.Input(key='time_limit_input', size=20, default_text=ADVANCED_SETTINGS['time_limit'], visible=False)],
+            [sg.T('Output folder  ', visible=False), sg.Input(key='-OUTPUT-', visible=False)],
+            [sg.Text(' ')],
+            [sg.Button("Run Model"), sg.Button('Exit'), sg.T('', text_color='#de335e', visible=False, key='ErrGUI'),
+             sg.T('', text_color='#caf17c', visible=False, key='SuccGUI')],
+            [sg.T('Progress...   ', visible=False, key='progresstext'),
+             sg.ProgressBar(1000, orientation='h', size=(20, 20), key='progressbar', visible=False)]
         ]
     ]
 
@@ -31,6 +40,10 @@ def main():
     progress_text = window['progresstext']
     error_message_gui = window['ErrGUI']
     succ_message_gui = window['SuccGUI']
+    time_limit_text = window['time_limit_text']
+    time_limit_input = window['time_limit_input']
+    advanced_settings_btn = window['advanced_settings']
+    close_advanced_settings = window['close_advanced_settings']
     while True:
         event, values = window.read()
         if event == sg.WINDOW_CLOSED or event == 'Exit':
@@ -41,24 +54,37 @@ def main():
 
             model = MODEL_MAPPING[values['_MODEL_']]
 
+            advanced_settings['time_limit'] = values['time_limit_input']
+
             if os.path.isfile(filenameInput) and os.path.isdir(filenameOutput):
                 error_message_gui.update(visible=False)
                 try:
-                    sg.Print('This is a normal print that has been re-routed.')
                     progress_text.update(visible=True)
                     progress_bar.update(visible=True)
-                    runModel(Path(filenameInput),filenameOutput,progress_bar,model)
+                    runModel(Path(filenameInput), filenameOutput, progress_bar, model, time_limit_input)
                     progress_bar.UpdateBar(1000)
                     succ_message_gui.update(visible=True)
                     succ_message_gui.update(value='Esecuzione Completata')
                 except Exception as e:
-                    print("Error: ", e)
+                    sg.Print("Error: ", e)
             else:
                 error_message_gui.update(visible=True)
                 error_message_gui.update(value='Input non valido')
+        elif event == 'advanced_settings':
+            time_limit_text.update(visible=True)
+            time_limit_input.update(visible=True)
+            advanced_settings.update(visible=False)
+            close_advanced_settings.update(visible=True)
 
+        elif event == 'close_advanced_settings':
+
+            time_limit_text.update(visible=False)
+            time_limit_input.update(visible=False)
+            advanced_settings_btn.update(visible=True)
+            close_advanced_settings.update(visible=False)
 
     window.close()
+
 
 if __name__ == '__main__':
     main()
