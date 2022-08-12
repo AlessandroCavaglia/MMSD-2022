@@ -77,9 +77,11 @@ class MplCalendar(object):
         f.suptitle(nome.replace(".jpg","") + ' ' + str(self.year),
                    fontsize=20, fontweight='bold')
 
-    def show(self,nome):
+    def show(self,nome,output):
+        if output == '':
+            output = 'output'
         self._render(nome)
-        path = os.path.join('output', nome)
+        path = os.path.join(output, nome)
         plt.savefig(path)
         #plt.show()
 

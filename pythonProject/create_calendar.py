@@ -8,7 +8,7 @@ import mpcal
 
 
 
-def build_calendar(exams, model, sessioni):
+def build_calendar(exams, model, sessioni,output):
     data_inizio=sessioni[0][0]
     data_fine=sessioni[0][1]
     esami_primo_anno = []
@@ -23,28 +23,28 @@ def build_calendar(exams, model, sessioni):
         if (esame.anno == 3):
             esami_terzo_anno.append(esame)
     if(data_inizio.month==data_fine.month):
-        create_calendar(exams,exams,model,data_inizio.year,data_inizio.month,data_inizio,"Calendario Generale.jpg", abs(data_fine - data_inizio))
-        create_calendar(esami_primo_anno,exams,model,data_inizio.year,data_inizio.month,data_inizio,"Calendario Primo Anno.jpg", abs(data_fine - data_inizio))
-        create_calendar(esami_secondo_anno,exams,model,data_inizio.year,data_inizio.month,data_inizio,"Calendario Secondo Anno.jpg", abs(data_fine - data_inizio))
-        create_calendar(esami_terzo_anno,exams,model,data_inizio.year,data_inizio.month,data_inizio,"Calendario Terzo Anno.jpg", abs(data_fine - data_inizio))
+        create_calendar(exams,exams,model,data_inizio.year,data_inizio.month,data_inizio,"Calendario Generale.jpg", abs(data_fine - data_inizio),output)
+        create_calendar(esami_primo_anno,exams,model,data_inizio.year,data_inizio.month,data_inizio,"Calendario Primo Anno.jpg", abs(data_fine - data_inizio),output)
+        create_calendar(esami_secondo_anno,exams,model,data_inizio.year,data_inizio.month,data_inizio,"Calendario Secondo Anno.jpg", abs(data_fine - data_inizio),output)
+        create_calendar(esami_terzo_anno,exams,model,data_inizio.year,data_inizio.month,data_inizio,"Calendario Terzo Anno.jpg", abs(data_fine - data_inizio),output)
     else:
-        create_calendar(exams,exams,model,data_inizio.year,data_inizio.month,data_inizio,"Calendario Generale "+mpcal.m_names[data_inizio.month-1]+".jpg", abs(data_fine - data_inizio))
-        create_calendar(exams,exams,model,data_fine.year,data_fine.month,data_inizio,"Calendario Generale "+mpcal.m_names[data_fine.month-1]+".jpg", abs(data_fine - data_inizio))
+        create_calendar(exams,exams,model,data_inizio.year,data_inizio.month,data_inizio,"Calendario Generale "+mpcal.m_names[data_inizio.month-1]+".jpg", abs(data_fine - data_inizio),output)
+        create_calendar(exams,exams,model,data_fine.year,data_fine.month,data_inizio,"Calendario Generale "+mpcal.m_names[data_fine.month-1]+".jpg", abs(data_fine - data_inizio),output)
 
-        create_calendar(esami_primo_anno, exams, model, data_inizio.year, data_inizio.month, data_inizio, "Calendario Primo Anno "+mpcal.m_names[data_inizio.month-1]+".jpg", abs(data_fine - data_inizio))
-        create_calendar(esami_primo_anno, exams, model, data_fine.year, data_fine.month, data_inizio, "Calendario Primo Anno "+mpcal.m_names[data_fine.month-1]+".jpg", abs(data_fine - data_inizio))
+        create_calendar(esami_primo_anno, exams, model, data_inizio.year, data_inizio.month, data_inizio, "Calendario Primo Anno "+mpcal.m_names[data_inizio.month-1]+".jpg", abs(data_fine - data_inizio), output)
+        create_calendar(esami_primo_anno, exams, model, data_fine.year, data_fine.month, data_inizio, "Calendario Primo Anno "+mpcal.m_names[data_fine.month-1]+".jpg", abs(data_fine - data_inizio), output)
 
-        create_calendar(esami_secondo_anno, exams, model, data_inizio.year, data_inizio.month, data_inizio, "Calendario Secondo Anno "+mpcal.m_names[data_inizio.month-1]+".jpg", abs(data_fine - data_inizio))
-        create_calendar(esami_secondo_anno, exams, model, data_fine.year, data_fine.month, data_inizio, "Calendario Secondo Anno "+mpcal.m_names[data_fine.month-1]+".jpg",abs(data_fine - data_inizio))
+        create_calendar(esami_secondo_anno, exams, model, data_inizio.year, data_inizio.month, data_inizio, "Calendario Secondo Anno "+mpcal.m_names[data_inizio.month-1]+".jpg", abs(data_fine - data_inizio), output)
+        create_calendar(esami_secondo_anno, exams, model, data_fine.year, data_fine.month, data_inizio, "Calendario Secondo Anno "+mpcal.m_names[data_fine.month-1]+".jpg",abs(data_fine - data_inizio), output)
 
-        create_calendar(esami_terzo_anno, exams, model, data_inizio.year, data_inizio.month, data_inizio, "Calendario Terzo Anno "+mpcal.m_names[data_inizio.month-1]+".jpg", abs(data_fine - data_inizio))
-        create_calendar(esami_terzo_anno, exams, model, data_fine.year, data_fine.month, data_inizio, "Calendario Terzo Anno "+mpcal.m_names[data_fine.month-1]+".jpg", abs(data_fine - data_inizio))
+        create_calendar(esami_terzo_anno, exams, model, data_inizio.year, data_inizio.month, data_inizio, "Calendario Terzo Anno "+mpcal.m_names[data_inizio.month-1]+".jpg", abs(data_fine - data_inizio), output)
+        create_calendar(esami_terzo_anno, exams, model, data_fine.year, data_fine.month, data_inizio, "Calendario Terzo Anno "+mpcal.m_names[data_fine.month-1]+".jpg", abs(data_fine - data_inizio), output)
 
 
     return
 
 
-def create_calendar(esami,exams,model,anno_sessione,mese_sessione,data_inizio_sessione,nome_calendario,durata_sessione):
+def create_calendar(esami,exams,model,anno_sessione,mese_sessione,data_inizio_sessione,nome_calendario,durata_sessione,output):
     cal = MplCalendar(anno_sessione, mese_sessione)
     for esame in esami:
         index = exams.index(esame)
@@ -55,7 +55,7 @@ def create_calendar(esami,exams,model,anno_sessione,mese_sessione,data_inizio_se
                     cal.add_event(data.day,esame.short_name,pick_color_for_exam(esame))
 
 
-    cal.show(nome_calendario)
+    cal.show(nome_calendario,output)
     return
 
 def test_system():
@@ -63,7 +63,7 @@ def test_system():
     feb.add_event(1, '1st day of February', 'red')
     feb.add_event(5, '         1         2         3         4         5         6', 'blue')
     feb.add_event(5, '123456789012345678901234567890123456789012345678901234567890', 'red')
-    feb.show("out.jpg")
+    feb.show("out.jpg",'')
     return
 
 

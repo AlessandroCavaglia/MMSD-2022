@@ -123,4 +123,11 @@ NOME_CORSO_CODE = {
     "INF0004": "STORIA INF.",
     "MFN0635": "RETI ELAB."
 }
+MODEL = ['Default Model', 'Variation Model 1', 'Variation Model 2', 'Variation Model 3']
 
+MODEL_MAPPING = {
+    'Default Model':'model_building',
+    'Variation Model 1':'model_building1',
+    'Variation Model 2':'model_building2',
+    'Variation Model 3':'model_building3'
+}

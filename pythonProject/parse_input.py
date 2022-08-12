@@ -6,7 +6,7 @@
 import os.path
 
 import PySimpleGUI as sg
-print = sg.Print
+print = sg.Print #TODO modificare in base a che output vogliamo
 
 import pandas as pd
 from datetime import datetime, timedelta
@@ -26,7 +26,7 @@ aule = []
 exams = []
 ERRORE = ""
 
-def printParametri():
+def printParametri(building):
     print("Distanza minima appelli: "+str(building.MIN_DISTANCE_APPELLI))
     print("Slot giornalieri aule: "+str(building.SLOT_AULE))
     print("Slot giornalieri laboratorio: "+str(building.SLOT_LABORATORI))
@@ -102,7 +102,7 @@ def get_non_working_days(data_inizio, data_fine):
     return weekend
 
 
-def load_date(input):  # Errori gestiti da testare a fondo
+def load_date(input,building):  # Errori gestiti da testare a fondo
     print(input)
     if input != '':
         sessioni_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
@@ -129,7 +129,7 @@ def load_date(input):  # Errori gestiti da testare a fondo
     return True
 
 
-def load_laboratori(input):  # Errori gestiti da testare a fondo
+def load_laboratori(input,building):  # Errori gestiti da testare a fondo
     print(input)
     if input != '':
         laboratorii_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
@@ -169,7 +169,7 @@ def load_laboratori(input):  # Errori gestiti da testare a fondo
     return True
 
 
-def load_aule(input):  # Errori gestiti da testare a fondo
+def load_aule(input,building):  # Errori gestiti da testare a fondo
     print(input)
     if input != '':
         aule_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
@@ -208,7 +208,7 @@ def load_aule(input):  # Errori gestiti da testare a fondo
             aule.append(classes.ExamRoom(row[0], dateindisp))
     return True
 
-def load_parametri(input):  # Errori gestiti da testare a fondo
+def load_parametri(input,building):  # Errori gestiti da testare a fondo
     print(input)
     if input != '':
         aule_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
@@ -287,7 +287,7 @@ def load_parametri(input):  # Errori gestiti da testare a fondo
                                         return False
     return True
 
-def load_exams(input,nome_foglio, anno):
+def load_exams(input,nome_foglio, anno,building):
     aule_richieste = []
     laboratori_richiesti = []
     date_indisponibilita = []
@@ -430,24 +430,24 @@ def parse_list(input, delimiter=','):
 
 
 def main():
-
-    if not load_date(''):
+    building = __import__("model_building1")
+    if not load_date('',building):
         return
     printSessioni()
-    if not load_parametri(''):
+    if not load_parametri('',building):
         return
-    printParametri()
-    if not load_laboratori(''):
+    printParametri(building)
+    if not load_laboratori('',building):
         return
     printLaboratori()
-    if not load_aule(''):
+    if not load_aule('',building):
         return
     printAule()
-    if not load_exams('','Corsi I anno triennale', 1):
+    if not load_exams('','Corsi I anno triennale', 1,building):
         return
-    if not load_exams('','Corsi II anno triennale', 2):
+    if not load_exams('','Corsi II anno triennale', 2,building):
         return
-    if not load_exams('','Corsi III anno triennale', 3):
+    if not load_exams('','Corsi III anno triennale', 3,building):
         return
     printCorsi()
     printCorsi()
@@ -462,31 +462,32 @@ def main():
     opt.solve(model,logfile=path)
     building.print_results(model, exams, data_inizio, data_fine)
     create_output.build_output('','',exams, laboratori, aule, model,sessioni)
-    create_calendar.build_calendar(exams, model,sessioni)
+    create_calendar.build_calendar(exams, model,sessioni,'')
     statistics_model.generate_statistics(model,exams,sessioni[0][0],sessioni[0][1])
 
 
-def runModel(input,output,progressbar):
-    if not load_date(input):
+def runModel(input,output,progressbar,model):
+    building = __import__(model)
+    if not load_date(input,building):
         return
     printSessioni()
     progressbar.UpdateBar(100)
-    if not load_parametri(input):
+    if not load_parametri(input,building):
         return
-    printParametri()
+    printParametri(building)
     progressbar.UpdateBar(200)
-    if not load_laboratori(input):
+    if not load_laboratori(input,building):
         return
     printLaboratori()
     progressbar.UpdateBar(250)
-    if not load_aule(input):
+    if not load_aule(input,building):
         return
     printAule()
-    if not load_exams(input,'Corsi I anno triennale', 1):
+    if not load_exams(input,'Corsi I anno triennale', 1,building):
         return
-    if not load_exams(input,'Corsi II anno triennale', 2):
+    if not load_exams(input,'Corsi II anno triennale', 2,building):
         return
-    if not load_exams(input,'Corsi III anno triennale', 3):
+    if not load_exams(input,'Corsi III anno triennale', 3,building):
         return
     printCorsi()
 
@@ -503,7 +504,7 @@ def runModel(input,output,progressbar):
     opt.solve(model,logfile=path)
     building.print_results(model, exams, data_inizio, data_fine)
     create_output.build_output(input,output,exams, laboratori, aule, model,sessioni)
-    create_calendar.build_calendar(exams, model,sessioni)
+    create_calendar.build_calendar(exams, model,sessioni,output)
     statistics_model.generate_statistics(model,exams,sessioni[0][0],sessioni[0][1])
 
 
