@@ -68,10 +68,13 @@ def main():
                 try:
                     progress_text.update(visible=True)
                     progress_bar.update(visible=True)
-                    runModel(Path(filenameInput), filenameOutput, progress_bar, model,advanced_settings)
-                    progress_bar.UpdateBar(1000)
-                    succ_message_gui.update(visible=True)
-                    succ_message_gui.update(value='Esecuzione Completata')
+                    if runModel(Path(filenameInput), filenameOutput, progress_bar,error_message_gui, model,advanced_settings) :
+                        progress_bar.UpdateBar(1000)
+                        succ_message_gui.update(visible=True)
+                        succ_message_gui.update(value='Esecuzione Completata')
+                    else:
+                        progress_text.update(visible=False)
+                        progress_bar.update(visible=False)
                 except Exception as e:
                     sg.Print("Error: ", e)
             else:
@@ -87,6 +90,8 @@ def main():
 
         elif event == 'close_advanced_settings':
 
+            gap_tollerance_text.update(visible=False)
+            gap_tollerance_input.update(visible=False)
             time_limit_text.update(visible=False)
             time_limit_input.update(visible=False)
             advanced_settings_btn.update(visible=True)
