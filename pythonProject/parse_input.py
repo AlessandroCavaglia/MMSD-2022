@@ -17,7 +17,7 @@ import create_calendar
 import holidays
 import statistics_model
 
-import model_building3 as building
+import model_building as building
 import pyomo.environ as pyo
 
 sessioni = []   #Managed as an array but in reality it contains only one session, so we use the positions sessioni[0][0] e sessioni[0][1]
@@ -458,12 +458,14 @@ def main():
     data_fine = sessioni[0][1]  # Data fine sessione estiva
     model = building.build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
+    opt.options['preprocessing presolve'] = 'n'
+    opt.options['mip tolerances mipgap'] = 0.1
+    opt.options['mip tolerances absmipgap'] = 0.1
     path=os.path.join('log', str(datetime.today().strftime('Resolution_%d-%m-%y_%H-%M-%S.log')))
     opt.solve(model,logfile=path)
     building.print_results(model, exams, data_inizio, data_fine)
     create_output.build_output('','',exams, laboratori, aule, model,sessioni)
     create_calendar.build_calendar(exams, model,sessioni,'')
-    statistics_model.generate_statistics(model,exams,sessioni[0][0],sessioni[0][1])
 
 
 def runModel(input,output,progressbar,model, time_limit_input):
@@ -506,7 +508,6 @@ def runModel(input,output,progressbar,model, time_limit_input):
     building.print_results(model, exams, data_inizio, data_fine)
     create_output.build_output(input,output,exams, laboratori, aule, model,sessioni)
     create_calendar.build_calendar(exams, model,sessioni,output)
-    statistics_model.generate_statistics(model,exams,sessioni[0][0],sessioni[0][1])
 
 
 

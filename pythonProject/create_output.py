@@ -448,6 +448,149 @@ def build_exams_output_riassunto_2(esami_primo_anno,esami_secondo_anno,esami_ter
             worksheet.write(row_num + 1, 0, val.values[0], format_terzo_anno_secondo_semestre)
         row_num += 1
 
+def get_esami_semestri(exams):
+    esami_primo_anno_primo_semestre = []
+    esami_primo_anno_secondo_semestre = []
+    esami_secondo_anno_primo_semestre = []
+    esami_secondo_anno_secondo_semestre = []
+    esami_terzo_anno_primo_semestre = []
+    esami_terzo_anno_secondo_semestre = []
+    for esame in exams:
+        if (esame.anno == 1):
+            if '1' == esame.lista_semestri[0]:
+                esami_primo_anno_primo_semestre.append(esame)
+            else:
+                esami_primo_anno_secondo_semestre.append(esame)
+        if (esame.anno == 2):
+            if '1' == esame.lista_semestri[0]:
+                esami_secondo_anno_primo_semestre.append(esame)
+            else:
+                esami_secondo_anno_secondo_semestre.append(esame)
+        if (esame.anno == 3):
+            if '1' == esame.lista_semestri[0]:
+                esami_terzo_anno_primo_semestre.append(esame)
+            else:
+                esami_terzo_anno_secondo_semestre.append(esame)
+    return(esami_primo_anno_primo_semestre,esami_primo_anno_secondo_semestre,esami_secondo_anno_primo_semestre,esami_secondo_anno_secondo_semestre,esami_terzo_anno_primo_semestre,esami_terzo_anno_secondo_semestre)
+
+def get_date_esami(esame,model,durata_sessione,data_inizio,exams):
+    date=[]
+    for esame in esame:
+        index = exams.index(esame)
+        date_esame=[]
+        for i in range(durata_sessione.days + 1):
+            if model.x[index, i].value == 1:
+                data = data_inizio + timedelta(days=i)
+                date_esame.append(data)
+        if(len(date_esame)==4):
+            del date_esame[2]
+            del date_esame[0]
+        else:
+            if (len(date_esame) == 1):
+                date_esame.append(date_esame[0])
+        date.append(date_esame)
+    return date
+
+def calculate_distanze(date,esami):
+    distanza_media = 0
+    distanza_minima = 1000000
+    distanza_massima = -1
+    entries = 0
+    for index1, esame1 in enumerate(esami):
+        for index2, esame2 in enumerate(esami):
+            if (esame1 != esame2):
+                distanza_media += abs((date[index1][0] - date[index2][0]).days)
+                if (abs((date[index1][0] - date[index2][0]).days) < distanza_minima):
+                    distanza_minima = abs((date[index1][0] - date[index2][0]).days)
+                if (abs((date[index1][0] - date[index2][0]).days) > distanza_massima):
+                    distanza_massima = abs((date[index1][0] - date[index2][0]).days)
+                distanza_media += abs((date[index1][1] - date[index2][1]).days)
+                if (abs((date[index1][1] - date[index2][1]).days) < distanza_minima):
+                    distanza_minima = abs((date[index1][1] - date[index2][1]).days)
+                if (abs((date[index1][1] - date[index2][1]).days) > distanza_massima):
+                    distanza_massima = abs((date[index1][1] - date[index2][1]).days)
+                entries += 2
+    distanza_media = distanza_media / entries
+    return (round(distanza_media,2),round(distanza_minima,2),round(distanza_massima,2))
+
+
+def build_statistiche(esami_primo_anno,esami_secondo_anno,esami_terzo_anno, nome_foglio, laboratori, aule, model, writer, exams, sessione):
+    nome_stat=['Primo Anno','Primo Anno Primo Semestre','Primo Anno Secondo Semestre','Secondo Anno','Secondo Anno Primo Semestre','Secondo Anno Secondo Semestre','Terzo Anno','Terzo Anno Primo Semestre','Terzo Anno Secondo Semestre']
+
+    distanza_media = []
+    distanza_minima=[]
+    distanza_massima=[]
+
+
+    (esami_primo_anno_primo_semestre, esami_primo_anno_secondo_semestre, esami_secondo_anno_primo_semestre,
+     esami_secondo_anno_secondo_semestre, esami_terzo_anno_primo_semestre, esami_terzo_anno_secondo_semestre)=get_esami_semestri(exams)
+
+    durata_sessione = abs(sessione[0][1] - sessione[0][0])
+
+    date_esami_primo_anno=get_date_esami(esami_primo_anno,model,durata_sessione,sessione[0][0],exams)
+    date_esami_primo_anno_primo_semestre=get_date_esami(esami_primo_anno_primo_semestre,model,durata_sessione,sessione[0][0],exams)
+    date_esami_primo_anno_secondo_semestre=get_date_esami(esami_primo_anno_secondo_semestre,model,durata_sessione,sessione[0][0],exams)
+
+    date_esami_secondo_anno = get_date_esami(esami_secondo_anno, model, durata_sessione, sessione[0][0],exams)
+    date_esami_secondo_anno_primo_semestre = get_date_esami(esami_secondo_anno_primo_semestre, model, durata_sessione,sessione[0][0],exams)
+    date_esami_secondo_anno_secondo_semestre = get_date_esami(esami_secondo_anno_secondo_semestre, model, durata_sessione,sessione[0][0],exams)
+
+    date_esami_terzo_anno = get_date_esami(esami_terzo_anno, model, durata_sessione, sessione[0][0],exams)
+    date_esami_terzo_anno_primo_semestre = get_date_esami(esami_terzo_anno_primo_semestre, model, durata_sessione,sessione[0][0],exams)
+    date_esami_terzo_anno_secondo_semestre = get_date_esami(esami_terzo_anno_secondo_semestre, model, durata_sessione,sessione[0][0],exams)
+
+    (distanza_media_val, distanza_minima_val, distanza_massima_val) = calculate_distanze(date_esami_primo_anno,esami_primo_anno)
+    distanza_minima.append(distanza_minima_val)
+    distanza_massima.append(distanza_massima_val)
+    distanza_media.append(distanza_media_val)
+    (distanza_media_val, distanza_minima_val, distanza_massima_val) = calculate_distanze(date_esami_primo_anno_primo_semestre,esami_primo_anno_primo_semestre)
+    distanza_minima.append(distanza_minima_val)
+    distanza_massima.append(distanza_massima_val)
+    distanza_media.append(distanza_media_val)
+    (distanza_media_val, distanza_minima_val, distanza_massima_val) = calculate_distanze(date_esami_primo_anno_secondo_semestre, esami_primo_anno_secondo_semestre)
+    distanza_minima.append(distanza_minima_val)
+    distanza_massima.append(distanza_massima_val)
+    distanza_media.append(distanza_media_val)
+
+    (distanza_media_val, distanza_minima_val, distanza_massima_val) = calculate_distanze(date_esami_secondo_anno,esami_secondo_anno)
+    distanza_minima.append(distanza_minima_val)
+    distanza_massima.append(distanza_massima_val)
+    distanza_media.append(distanza_media_val)
+    (distanza_media_val, distanza_minima_val, distanza_massima_val) = calculate_distanze(date_esami_secondo_anno_primo_semestre, esami_secondo_anno_primo_semestre)
+    distanza_minima.append(distanza_minima_val)
+    distanza_massima.append(distanza_massima_val)
+    distanza_media.append(distanza_media_val)
+    (distanza_media_val, distanza_minima_val, distanza_massima_val) = calculate_distanze(date_esami_secondo_anno_secondo_semestre, esami_secondo_anno_secondo_semestre)
+    distanza_minima.append(distanza_minima_val)
+    distanza_massima.append(distanza_massima_val)
+    distanza_media.append(distanza_media_val)
+
+    (distanza_media_val, distanza_minima_val, distanza_massima_val) = calculate_distanze(date_esami_terzo_anno,esami_terzo_anno)
+    distanza_minima.append(distanza_minima_val)
+    distanza_massima.append(distanza_massima_val)
+    distanza_media.append(distanza_media_val)
+    (distanza_media_val, distanza_minima_val, distanza_massima_val) = calculate_distanze(date_esami_terzo_anno_primo_semestre, esami_terzo_anno_primo_semestre)
+    distanza_minima.append(distanza_minima_val)
+    distanza_massima.append(distanza_massima_val)
+    distanza_media.append(distanza_media_val)
+    (distanza_media_val, distanza_minima_val, distanza_massima_val) = calculate_distanze(date_esami_terzo_anno_secondo_semestre, esami_terzo_anno_secondo_semestre)
+    distanza_minima.append(distanza_minima_val)
+    distanza_massima.append(distanza_massima_val)
+    distanza_media.append(distanza_media_val)
+
+    statistiche_df = pd.DataFrame({})
+    statistiche_df.insert(0, "Periodo", nome_stat, True)
+    statistiche_df.insert(1, "Distanza media", distanza_media, True)
+    statistiche_df.insert(2, "Distanza minima", distanza_minima, True)
+    statistiche_df.insert(3, "Distanza massima ", distanza_massima, True)
+
+    statistiche_df.to_excel(writer, sheet_name="Statistiche", index=False)
+    workbook = writer.book
+    worksheet = writer.sheets['Statistiche']
+    worksheet.set_zoom(150)
+    worksheet.set_column("A:A", 30)
+    worksheet.set_column("B:D", 20)
+
 
 def findExam(df,exam,sem):
     for esame in df:
@@ -521,6 +664,9 @@ def build_output(input,output,exams, laboratori, aule, model, sessioni):
                                  laboratori, aule,
                                  model, writer, exams, sessioni)
 
-
+    build_statistiche(esami_primo_anno, esami_secondo_anno, esami_terzo_anno,
+                                   "Risultati riassunti per data",
+                                   laboratori, aule,
+                                   model, writer, exams, sessioni)
 
     writer.save()
