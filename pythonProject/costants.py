@@ -92,7 +92,8 @@ NOME_CORSO_CODE = {
 
 # default advanced settings per cplex
 ADVANCED_SETTINGS = {
-    "time_limit": 1000
+    "time_limit": "None",
+    "gap_tollerance": "None"
 }
 
 # Nome dei modelli mostrati nel dropdown all'interno della GUI

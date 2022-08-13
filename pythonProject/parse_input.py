@@ -15,9 +15,8 @@ import costants
 import create_output
 import create_calendar
 import holidays
-import statistics_model
 
-import model_building as building
+import model_building3 as building
 import pyomo.environ as pyo
 
 sessioni = []   #Managed as an array but in reality it contains only one session, so we use the positions sessioni[0][0] e sessioni[0][1]
@@ -461,6 +460,7 @@ def main():
     opt.options['preprocessing presolve'] = 'n'
     opt.options['mip tolerances mipgap'] = 0.1
     opt.options['mip tolerances absmipgap'] = 0.1
+    opt.options['timelimit'] = 1*60
     path=os.path.join('log', str(datetime.today().strftime('Resolution_%d-%m-%y_%H-%M-%S.log')))
     opt.solve(model,logfile=path)
     building.print_results(model, exams, data_inizio, data_fine)
@@ -468,7 +468,7 @@ def main():
     create_calendar.build_calendar(exams, model,sessioni,'')
 
 
-def runModel(input,output,progressbar,model, time_limit_input):
+def runModel(input,output,progressbar,model,advanced_settings):
     building = __import__(model)
     print('Modello utilizzato: ',model)
     if not load_date(input,building):
@@ -501,8 +501,21 @@ def runModel(input,output,progressbar,model, time_limit_input):
     model = building.build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
     opt.options['preprocessing presolve'] = 'n'
-    opt.options['mip tolerances mipgap'] = 0.20
-    opt.options['mip tolerances absmipgap'] = 0.20
+    try:
+        if(advanced_settings['time_limit'] !="None" and int(advanced_settings['time_limit'])>0 ):
+            opt.options['timelimit'] = int(advanced_settings['time_limit']) * 60
+    except ValueError:
+        pass
+
+    try:
+        if(advanced_settings['gap_tollerance'] !="None" and float(advanced_settings['gap_tollerance'])>0 and float(advanced_settings['gap_tollerance'])<1 ):
+            opt.options['mip tolerances mipgap'] = round(float(advanced_settings['gap_tollerance']),2)
+            opt.options['mip tolerances absmipgap'] = round(float(advanced_settings['gap_tollerance']),2)
+    except ValueError:
+        pass
+
+
+
     path=os.path.join('log', str(datetime.today().strftime('Resolution_%d-%m-%y_%H-%M-%S.log')))
     opt.solve(model,logfile=path)
     building.print_results(model, exams, data_inizio, data_fine)

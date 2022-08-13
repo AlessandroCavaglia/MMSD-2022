@@ -24,8 +24,10 @@ def main():
              sg.FolderBrowse()],
             [sg.T('Choose Model'), sg.Combo(MODEL, size=20, default_value='Default Model', readonly=True, key='_MODEL_'),
              sg.Button("Advanced settings",key='advanced_settings'),sg.Button("Close Advanced settings", key='close_advanced_settings', visible=False)],
-            [sg.T('Time limit (s)    ', key='time_limit_text', visible=False),
+            [sg.T('Time limit (M)    ', key='time_limit_text', visible=False),
              sg.Input(key='time_limit_input', size=20, default_text=ADVANCED_SETTINGS['time_limit'], visible=False)],
+            [sg.T('Tolleranza Gap [0,1]    ', key='gap_tollerance_text', visible=False),
+             sg.Input(key='gap_tollerance', size=20, default_text=ADVANCED_SETTINGS['gap_tollerance'], visible=False)],
             [sg.T('Output folder  ', visible=False), sg.Input(key='-OUTPUT-', visible=False)],
             [sg.Text(' ')],
             [sg.Button("Run Model"), sg.Button('Exit'), sg.T('', text_color='#de335e', visible=False, key='ErrGUI'),
@@ -42,6 +44,8 @@ def main():
     succ_message_gui = window['SuccGUI']
     time_limit_text = window['time_limit_text']
     time_limit_input = window['time_limit_input']
+    gap_tollerance_text = window['gap_tollerance_text']
+    gap_tollerance_input = window['gap_tollerance']
     advanced_settings_btn = window['advanced_settings']
     close_advanced_settings = window['close_advanced_settings']
     while True:
@@ -55,13 +59,16 @@ def main():
             model = MODEL_MAPPING[values['_MODEL_']]
 
             advanced_settings['time_limit'] = values['time_limit_input']
+            advanced_settings['gap_tollerance'] = values['gap_tollerance']
+
+            print(values['time_limit_input'])
 
             if os.path.isfile(filenameInput) and os.path.isdir(filenameOutput):
                 error_message_gui.update(visible=False)
                 try:
                     progress_text.update(visible=True)
                     progress_bar.update(visible=True)
-                    runModel(Path(filenameInput), filenameOutput, progress_bar, model, time_limit_input)
+                    runModel(Path(filenameInput), filenameOutput, progress_bar, model,advanced_settings)
                     progress_bar.UpdateBar(1000)
                     succ_message_gui.update(visible=True)
                     succ_message_gui.update(value='Esecuzione Completata')
@@ -73,7 +80,9 @@ def main():
         elif event == 'advanced_settings':
             time_limit_text.update(visible=True)
             time_limit_input.update(visible=True)
-            advanced_settings.update(visible=False)
+            gap_tollerance_text.update(visible=True)
+            gap_tollerance_input.update(visible=True)
+            advanced_settings_btn.update(visible=False)
             close_advanced_settings.update(visible=True)
 
         elif event == 'close_advanced_settings':
