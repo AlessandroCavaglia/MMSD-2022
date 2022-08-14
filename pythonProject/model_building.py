@@ -4,6 +4,9 @@ from datetime import datetime,timedelta
 from pyomo.environ import *
 import pyomo.environ as pyo
 import holidays
+import PySimpleGUI as sg
+
+print = sg.Print  # TODO modificare in base a che output vogliamo
 
 MIN_DISTANCE_APPELLI = 10
 SLOT_AULE = 2

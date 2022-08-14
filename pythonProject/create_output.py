@@ -6,6 +6,9 @@ import xlsxwriter
 import costants
 import holidays
 import calendar
+import PySimpleGUI as sg
+
+print = sg.Print  # TODO modificare in base a che output vogliamo
 
 def extract_exams_names(exams):
     data = []

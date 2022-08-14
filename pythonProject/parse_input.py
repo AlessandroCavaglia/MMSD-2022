@@ -238,12 +238,12 @@ def load_aule(input, error_message_gui):  # Errori gestiti da testare a fondo
 def load_parametri(input, building, error_message_gui):  # Errori gestiti da testare a fondo
     print(input)
     if input != '':
-        aule_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
+        parametri_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
                                 usecols=costants.COLONNE_PARAMETRI)
     else:
-        aule_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
+        parametri_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name='Input generali', skiprows=1,
                                 usecols=costants.COLONNE_PARAMETRI)
-    for index, row in aule_df.iterrows():
+    for index, row in parametri_df.iterrows():
         # row[0] -> Nome parametro -> String
         # row[1] -> Value -> int
         if not pd.isnull(row[0]):
@@ -535,7 +535,10 @@ def main():
 
 def runModel(input, output, progressbar, error_message_gui, model, advanced_settings):
     building = __import__(model)
+
+
     print('Modello utilizzato: ', model)
+    print('Dvanced settings: ', advanced_settings)
     if not load_date(input, error_message_gui):
         return False
     printSessioni()
@@ -585,6 +588,7 @@ def runModel(input, output, progressbar, error_message_gui, model, advanced_sett
     building.print_results(model, exams, data_inizio, data_fine)
     create_output.build_output(input, output, exams, laboratori, aule, model, sessioni)
     create_calendar.build_calendar(exams, model, sessioni, output)
+
 
     return True
 
