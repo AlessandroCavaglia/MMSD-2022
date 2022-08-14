@@ -17,7 +17,7 @@ import create_output
 import create_calendar
 import holidays
 
-import model_building3 as building
+#import model_building3 as building
 import pyomo.environ as pyo
 
 sessioni = []  # Managed as an array but in reality it contains only one session, so we use the positions sessioni[0][0] e sessioni[0][1]
@@ -65,34 +65,20 @@ def printSessioni():
 def printCorsi():
     print("Esami:")
     for corso in exams:
-        print("Nome")
-        print(corso.nome)
-        print("Tipo")
-        print(corso.tipo)
-        print("Insegnanti")
-        print(corso.insegnanti)
-        print("Lista semestri")
-        print(corso.lista_semestri)
-        print("Anno")
-        print(corso.anno)
-        print("Numero appelli sessione")
-        print(corso.numero_appelli)
-        print("Aule richieste")
-        print(corso.aule_richieste)
-        print("Slot aule")
-        print(corso.numero_aule_slot)
-        print("Laboratori richiesti")
-        print(corso.laboratori_richiesti)
-        print("Slot laboratori")
-        print(corso.numero_lab_slot)
-        print("Durata giorni")
-        print(corso.numero_giorni_durata)
-        print("Date di preferenza")
-        print(corso.date_preferenza)
-        print("Date di indisponibilità")
-        print(corso.date_indisponibilita)
-        print("Note")
-        print(corso.note)
+        print("Nome: " + str(corso.nome))
+        print("Tipo: "+str(corso.tipo))
+        print("Insegnanti: "+str(corso.insegnanti))
+        print("Lista semestri: "+str(corso.lista_semestri))
+        print("Anno: "+str(corso.anno))
+        print("Numero appelli sessione: "+str(corso.numero_appelli))
+        print("Aule richieste: "+str(corso.aule_richieste))
+        print("Slot aule: "+str(corso.numero_aule_slot))
+        print("Laboratori richiesti: "+str(corso.laboratori_richiesti))
+        print("Slot laboratori: "+str(corso.numero_lab_slot))
+        print("Durata giorni: "+str(corso.numero_giorni_durata))
+        print("Date di preferenza: "+str(corso.date_preferenza))
+        print("Date di indisponibilità: "+str(corso.date_indisponibilita))
+        print("Note: "+str(corso.note))
 
 
 def get_non_working_days(data_inizio, data_fine):
@@ -109,7 +95,6 @@ def get_non_working_days(data_inizio, data_fine):
 
 
 def load_date(input, error_message_gui):  # Errori gestiti da testare a fondo
-    print(input)
     if input != '':
         sessioni_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
                                     usecols=costants.COLONNE_SESSIONI)
@@ -138,7 +123,6 @@ def load_date(input, error_message_gui):  # Errori gestiti da testare a fondo
 
 
 def load_laboratori(input, error_message_gui):  # Errori gestiti da testare a fondo
-    print(input)
     if input != '':
         laboratorii_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
                                        usecols=costants.COLONNE_LABORATORI)
@@ -187,7 +171,6 @@ def load_laboratori(input, error_message_gui):  # Errori gestiti da testare a fo
 
 
 def load_aule(input, error_message_gui):  # Errori gestiti da testare a fondo
-    print(input)
     if input != '':
         aule_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
                                 usecols=costants.COLONNE_AULE)
@@ -236,7 +219,6 @@ def load_aule(input, error_message_gui):  # Errori gestiti da testare a fondo
 
 
 def load_parametri(input, building, error_message_gui):  # Errori gestiti da testare a fondo
-    print(input)
     if input != '':
         parametri_df = pd.read_excel(input, sheet_name='Input generali', skiprows=1,
                                 usecols=costants.COLONNE_PARAMETRI)
@@ -362,8 +344,22 @@ def load_exams(input, nome_foglio, anno, error_message_gui):
             if semestre != "1" and semestre != "2":
                 print("Formato dei semestri errato " + str(row[3]))
                 print_GUI_error(error_message_gui,
-                                "[Errore caricamento esami "+str(anno)+" anno] \nFormato dei semestri errato " + str(row[3]))
+                                "[Errore caricamento esami "+str(anno)+" anno riga "+str(index+2)+"] \nFormato dei semestri errato " + str(row[3]))
                 return False
+        try:
+            if int(row[4])<=0:
+                print("Formato del numero appelli errato " + str(row[4]))
+                print_GUI_error(error_message_gui,
+                                "[Errore caricamento esami " + str(anno) + " anno riga " + str(
+                                    index + 2) + "] \nFormato del numero appelli errato: " + str(row[4]))
+                return False
+        except ValueError:
+            print("Formato del numero appelli errato " + str(row[4]))
+            print_GUI_error(error_message_gui,
+                            "[Errore caricamento esami " + str(anno) + " anno riga " + str(
+                                index + 2) + "] \nFormato del numero appelli errato: " + str(row[4]))
+            return False
+
 
         if not pd.isnull(row[5]):  # Controllo che gli esami abbiano aule esistenti inseriti in input generali
             aule_richieste = parse_list(row[5])
@@ -373,7 +369,7 @@ def load_exams(input, nome_foglio, anno, error_message_gui):
                         print("Errore nel caricamento del flusso " + str(
                             aule_richieste[index_aule_richieste]).strip() + " mancante")
                         print_GUI_error(error_message_gui,
-                                        "[Errore caricamento esami "+str(anno)+" anno] \n L'aula '" + str(
+                                        "[Errore caricamento esami "+str(anno)+" anno riga "+str(index+2)+"] \n L'aula '" + str(
                                             aule_richieste[index_aule_richieste]).strip() + "' inserita non è valida.")
                         return False
 
@@ -386,6 +382,19 @@ def load_exams(input, nome_foglio, anno, error_message_gui):
 
         if pd.isnull(row[6]):
             row[6] = 0
+        try:
+            if int( row[6]) < 0:
+                print("Formato degli slot orari richiesti per le aule errato" + str(row[6]))
+                print_GUI_error(error_message_gui,
+                                "[Errore caricamento esami " + str(anno) + " anno riga " + str(
+                                    index + 2) + "] \nFormato degli slot orari richiesti per le aule errato" + str(row[6]))
+                return False
+        except ValueError:
+            print("Formato degli slot orari richiesti per le aule errato" + str(row[6]))
+            print_GUI_error(error_message_gui,
+                            "[Errore caricamento esami " + str(anno) + " anno riga " + str(
+                                index + 2) + "] \nFormato degli slot orari richiesti per le aule errato" + str(row[6]))
+            return False
 
         if not pd.isnull(row[7]):  # Controllo che gli esami abbiano laboratori esistenti inseriti in input generali
             laboratori_richiesti = parse_list(row[7])
@@ -396,7 +405,7 @@ def load_exams(input, nome_foglio, anno, error_message_gui):
                         if not check_exist(laboratori, str(laboratori_richiesti[index_laboratori_richieste]).strip()):
                             print("Errore nel caricamento del flusso " + str(
                                 laboratori_richiesti[index_laboratori_richieste]).strip() + " mancante")
-                            print_GUI_error(error_message_gui, "[Errore caricamento esami "+str(anno)+" anno] \nIl laboratorio '" + str(
+                            print_GUI_error(error_message_gui, "[Errore caricamento esami "+str(anno)+" anno riga "+str(index+2)+"] \nIl laboratorio '" + str(
                                             laboratori_richiesti[index_laboratori_richieste]).strip() + "' inserito non è valido.")
                             return False
 
@@ -411,6 +420,36 @@ def load_exams(input, nome_foglio, anno, error_message_gui):
 
         if pd.isnull(row[8]):
             row[8] = 0
+        try:
+            if int( row[8]) < 0:
+                print("Formato degli slot orari richiesti per i laboratori errato" + str(row[8]))
+                print_GUI_error(error_message_gui,
+                                "[Errore caricamento esami " + str(anno) + " anno riga " + str(
+                                    index + 2) + "] \nFormato degli slot orari richiesti per i laboratori errato: " + str(row[8]))
+                return False
+        except ValueError:
+            print("Formato degli slot orari richiesti per i laboratori errato" + str(row[8]))
+            print_GUI_error(error_message_gui,
+                            "[Errore caricamento esami " + str(anno) + " anno riga " + str(
+                                index + 2) + "] \nFormato degli slot orari richiesti per i laboratori errato: " + str(row[8]))
+            return False
+
+        if pd.isnull(row[9]):
+            row[9] = 0
+        try:
+            if int( row[9]) <= 0:
+                print("Formato dei giorni durata esame errato" + str(row[9]))
+                print_GUI_error(error_message_gui,
+                                "[Errore caricamento esami " + str(anno) + " anno riga " + str(
+                                    index + 2) + "] \nFormato dei giorni durata esame errato: " + str(row[9]))
+                return False
+        except ValueError:
+            print("Formato dei giorni durata esame errato" + str(row[9]))
+            print_GUI_error(error_message_gui,
+                            "[Errore caricamento esami " + str(anno) + " anno riga " + str(
+                                index + 2) + "] \nFormato dei giorni durata esame errato: " + str(row[9]))
+            return False
+
         if not pd.isnull(row[12]):
             note = row[12]
         if not pd.isnull(row[10]):
@@ -420,7 +459,7 @@ def load_exams(input, nome_foglio, anno, error_message_gui):
                     date = datetime.strptime(
                         date_preferenza[index_preferenza], '%Y-%m-%d %H:%M:%S')
                     if date < sessioni[0][0] or date > sessioni[0][
-                        1]:  # TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
+                        1]:
                         print("Date di preferenza errate, non comprese nella sessione Inizio(" + str(
                             sessioni[0][0]) + "-" + str(sessioni[0][1]) + ") inserito: " + str(date))
                         print_GUI_error(error_message_gui, "[Errore caricamento esami "+str(anno)+" anno] \nDate di preferenza errate, non comprese nella sessione "
@@ -431,7 +470,7 @@ def load_exams(input, nome_foglio, anno, error_message_gui):
                     date = datetime.strptime(
                         date_preferenza[index_preferenza].strip(), '%d/%m/%Y')
                     if date < sessioni[0][0] or date > sessioni[0][
-                        1]:  # TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
+                        1]:
                         print("Date di preferenza errate, non comprese nella sessione Inizio(" + str(
                             sessioni[0][0]) + "-" + str(sessioni[0][1]) + ") inserito: " + str(date))
                         print_GUI_error(error_message_gui, "[Errore caricamento esami "+str(anno)+" anno] \nDate di preferenza errate, non comprese nella sessione \nInizio(" + str(
@@ -446,7 +485,7 @@ def load_exams(input, nome_foglio, anno, error_message_gui):
                     date = datetime.strptime(
                         date_indisponibilita[index_indisponibilita], '%Y-%m-%d %H:%M:%S')
                     if date < sessioni[0][0] or date > sessioni[0][
-                        1]:  # TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
+                        1]:
                         print("Date di indisponibilità errate, non comprese nella sessione Inizio(" + str(
                             sessioni[0][0]) + "-" + str(sessioni[0][1]) + ") inserito: " + str(date))
                         print_GUI_error(error_message_gui,
@@ -457,8 +496,7 @@ def load_exams(input, nome_foglio, anno, error_message_gui):
                 else:
                     date = datetime.strptime(
                         date_indisponibilita[index_indisponibilita].strip(), '%d/%m/%Y')
-                    if date < sessioni[0][0] or date > sessioni[0][
-                        1]:  # TODO: UTILIZZARE DATE GIUSTE ATTUALMENTE SI LAVORA SEMPRE SULLA SESSIONE ESTIVA
+                    if date < sessioni[0][0] or date > sessioni[0][1]:
                         print("Date di indisponibilità errate, non comprese nella sessione: Inizio(" + str(
                             sessioni[0][0]) + "-" + str(sessioni[0][1]) + ") inserito: " + str(date))
                         print_GUI_error(error_message_gui,
@@ -536,9 +574,11 @@ def main():
 def runModel(input, output, progressbar, error_message_gui, model, advanced_settings):
     building = __import__(model)
 
-
     print('Modello utilizzato: ', model)
-    print('Dvanced settings: ', advanced_settings)
+    print('Advanced settings: ', advanced_settings)
+    print("--- PARSING FILE INPUT ---")
+    while len(sessioni)>0:
+        sessioni.pop()
     if not load_date(input, error_message_gui):
         return False
     printSessioni()
@@ -547,13 +587,19 @@ def runModel(input, output, progressbar, error_message_gui, model, advanced_sett
         return False
     printParametri(building)
     progressbar.UpdateBar(200)
+    while len(laboratori)>0:
+        laboratori.pop()
     if not load_laboratori(input, error_message_gui):
         return False
     printLaboratori()
     progressbar.UpdateBar(250)
+    while len(aule) > 0:
+        aule.pop()
     if not load_aule(input, error_message_gui):
         return False
     printAule()
+    while len(exams) > 0:
+        exams.pop()
     if not load_exams(input, 'Corsi I anno triennale', 1, error_message_gui):
         return False
     if not load_exams(input, 'Corsi II anno triennale', 2, error_message_gui):
@@ -563,9 +609,9 @@ def runModel(input, output, progressbar, error_message_gui, model, advanced_sett
     printCorsi()
 
     progressbar.UpdateBar(500)
-    # Test del modello
-    data_inizio = sessioni[0][0]  # Data inizio sessione estiva
-    data_fine = sessioni[0][1]  # Data fine sessione estiva
+    data_inizio = sessioni[0][0]  # Data inizio sessione
+    data_fine = sessioni[0][1]  # Data fine sessione
+    print("--- COSTRUZIONE DEL MODELLO ---")
     model = building.build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
     opt.options['preprocessing presolve'] = 'n'
@@ -584,12 +630,16 @@ def runModel(input, output, progressbar, error_message_gui, model, advanced_sett
         pass
 
     path = os.path.join('log', str(datetime.today().strftime('Resolution_%d-%m-%y_%H-%M-%S.log')))
+    print("--- RISOLUZIONE DEL MODELLO ---")
     opt.solve(model, logfile=path)
+    print("--- RISOLUZIONE  COMPLETATA ---")
     building.print_results(model, exams, data_inizio, data_fine)
+
+    print("--- COSTRUZIONE OUTPUT ---")
     create_output.build_output(input, output, exams, laboratori, aule, model, sessioni)
     create_calendar.build_calendar(exams, model, sessioni, output)
 
-
+    print("--- ESECUZIONE COMPLETATA ---")
     return True
 
 

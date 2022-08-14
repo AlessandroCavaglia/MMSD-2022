@@ -3,7 +3,9 @@ from datetime import timedelta
 import costants
 from mpcal import MplCalendar
 import mpcal
+import PySimpleGUI as sg
 
+print = sg.Print  # TODO modificare in base a che output vogliamo
 
 
 
@@ -56,14 +58,6 @@ def create_calendar(esami,exams,model,anno_sessione,mese_sessione,data_inizio_se
 
 
     cal.show(nome_calendario,output)
-    return
-
-def test_system():
-    feb = MplCalendar(2017, 2)  # 2017, February
-    feb.add_event(1, '1st day of February', 'red')
-    feb.add_event(5, '         1         2         3         4         5         6', 'blue')
-    feb.add_event(5, '123456789012345678901234567890123456789012345678901234567890', 'red')
-    feb.show("out.jpg",'')
     return
 
 

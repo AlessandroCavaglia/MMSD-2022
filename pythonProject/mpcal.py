@@ -2,6 +2,10 @@ import calendar
 import os
 
 import matplotlib.pyplot as plt
+import costants
+import PySimpleGUI as sg
+
+print = sg.Print  # TODO modificare in base a che output vogliamo
 
 calendar.setfirstweekday(0) # Sunday is 1st day in US
 w_days = 'Lun Mar Mer Gio Ven Sab Dom'.split()
@@ -38,7 +42,7 @@ class MplCalendar(object):
         plot_defaults = dict(
             sharex=True,
             sharey=True,
-            figsize=(11, 15),
+            figsize=(13, 15),
             dpi=200,
 
         )
@@ -47,7 +51,7 @@ class MplCalendar(object):
             len(self.cal), 7,
             **plot_defaults
         )
-        f.subplots_adjust(left=0.01, bottom=0.01, right=0.99, top=0.92, wspace=0, hspace=0)
+        f.subplots_adjust(left=0.01, bottom=0.1, right=0.99, top=0.92, wspace=0, hspace=0)
 
         for week, ax_row in enumerate(axs):
             for week_day, ax in enumerate(ax_row):
@@ -76,12 +80,31 @@ class MplCalendar(object):
         f.subplots_adjust(wspace=0)
         f.suptitle(nome.replace(".jpg","") + ' ' + str(self.year),
                    fontsize=20, fontweight='bold')
+        sub = f.text(0.045, 0.05, "Esami 1 anno 1 semestre" + ' ' + str(self.year),
+                     fontsize=15, fontweight='bold')
+        sub.set_bbox(dict(facecolor=costants.ANNI_SEMESTRI_COLORI[0], alpha=0.5, edgecolor='black'))
+        sub = f.text(0.345, 0.05, "Esami 1 anno 2 semestre" + ' ' + str(self.year),
+                     fontsize=15, fontweight='bold')
+        sub.set_bbox(dict(facecolor=costants.ANNI_SEMESTRI_COLORI[1], alpha=0.5, edgecolor='black'))
+        sub = f.text(0.645, 0.05, "Esami 2 anno 1 semestre" + ' ' + str(self.year),
+                     fontsize=15, fontweight='bold')
+        sub.set_bbox(dict(facecolor=costants.ANNI_SEMESTRI_COLORI[2], alpha=0.5, edgecolor='black'))
+        sub = f.text(0.045,  0.02, "Esami 2 anno 2 semestre" + ' ' + str(self.year),
+                     fontsize=15, fontweight='bold')
+        sub.set_bbox(dict(facecolor=costants.ANNI_SEMESTRI_COLORI[3], alpha=0.5, edgecolor='black'))
+        sub = f.text(0.345,  0.02, "Esami 3 anno 1 semestre" + ' ' + str(self.year),
+                     fontsize=15, fontweight='bold')
+        sub.set_bbox(dict(facecolor=costants.ANNI_SEMESTRI_COLORI[4], alpha=0.5, edgecolor='black'))
+        sub = f.text(0.645,  0.02, "Esami 3 anno 2 semestre" + ' ' + str(self.year),
+                     fontsize=15, fontweight='bold')
+        sub.set_bbox(dict(facecolor=costants.ANNI_SEMESTRI_COLORI[5], alpha=0.5, edgecolor='black'))
 
     def show(self,nome,output):
         if output == '':
             output = 'output'
         self._render(nome)
         path = os.path.join(output, nome)
+        print("Salvataggio calendario: "+str(path))
         plt.savefig(path)
         #plt.show()
 

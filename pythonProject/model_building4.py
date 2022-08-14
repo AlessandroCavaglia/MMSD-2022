@@ -331,16 +331,18 @@ def print_results(model, exams, data_inizio, data_fine):
 
     days = (data_fine - data_inizio).days + 1
     for i in range(len(exams)):
-        print(exams[i].nome)
+        print(exams[i].short_name)
         for j in range(days):
             if j in giorni_indisp_generali:
-                print('\033[91m',end="")
-            print("[", end="")
-            if (int(model.x[i, j].value) == 1):
-                print('\033[92m' + str(int(model.x[i, j].value)) + '\033[0m', end="]")
+                print("[", end="")
+                print("0",text_color='red', end="")
+                print("]", end="")
             else:
-                print(int(model.x[i, j].value), end="]")
-            print('\033[0m', end="")
+                print("[", end="")
+                if (int(model.x[i, j].value) == 1):
+                    print(str(int(model.x[i, j].value)),text_color='green',end="]")
+                else:
+                    print(int(model.x[i, j].value), end="]")
 
         print("]")
     print("Dummy: ", '\033[92m', model.dummy_primo_anno.value, '\033[0m')

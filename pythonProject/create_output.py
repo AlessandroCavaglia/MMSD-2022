@@ -301,7 +301,7 @@ def build_exams_output_riassunto(esami_primo_anno,esami_secondo_anno,esami_terzo
             worksheet.write(0, col_num, value, header_format)
 
     for row_num, val in esami_df.iterrows():
-        print(val.values)
+        #print(val.values)
         for col_num in range(0,4):
             if row_num >= 0 and row_num <= esami_primo_anno_primo_semestre+1:
                 worksheet.write(row_num + 1, col_num, val.values[col_num], format_primo_anno_primo_semestre)
@@ -605,7 +605,7 @@ def build_output(input,output,exams, laboratori, aule, model, sessioni):
 
     if(output != '' and input != ''):
         sessioni_df = pd.read_excel(input, sheet_name='Input generali')
-        print(output + '/' + costants.OUTPUT_FILE_NAME)
+        #print(output + '/' + costants.OUTPUT_FILE_NAME)
         writer = pd.ExcelWriter(output + '/' + costants.OUTPUT_FILE_NAME, engine='xlsxwriter')
     else:
         sessioni_df = pd.read_excel('input/' + costants.INPUT_FILE_NAME, sheet_name='Input generali')
@@ -655,6 +655,7 @@ def build_output(input,output,exams, laboratori, aule, model, sessioni):
             esami_secondo_anno.append(esame)
         if (esame.anno == 3):
             esami_terzo_anno.append(esame)
+
     build_exams_output(esami_primo_anno, "esami primo anno", laboratori, aule,
                        model, writer, exams, sessioni)
     build_exams_output(esami_secondo_anno, "esami secondo anno", laboratori, aule,
@@ -673,3 +674,4 @@ def build_output(input,output,exams, laboratori, aule, model, sessioni):
                                    model, writer, exams, sessioni)
 
     writer.save()
+    print("Salvataggio file di ouput: "+output + '/' + costants.OUTPUT_FILE_NAME)
