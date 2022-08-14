@@ -633,12 +633,14 @@ def runModel(input, output, progressbar, error_message_gui, model, advanced_sett
     print("--- RISOLUZIONE DEL MODELLO ---")
     opt.solve(model, logfile=path)
     print("--- RISOLUZIONE  COMPLETATA ---")
+    progressbar.UpdateBar(750)
     building.print_results(model, exams, data_inizio, data_fine)
-
+    progressbar.UpdateBar(800)
     print("--- COSTRUZIONE OUTPUT ---")
     create_output.build_output(input, output, exams, laboratori, aule, model, sessioni)
+    progressbar.UpdateBar(900)
     create_calendar.build_calendar(exams, model, sessioni, output)
-
+    progressbar.UpdateBar(1000)
     print("--- ESECUZIONE COMPLETATA ---")
     return True
 
