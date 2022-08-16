@@ -534,7 +534,7 @@ def parse_list(input, delimiter=','):
 
 
 def main():
-    building = __import__("model_building1")
+    building = __import__("model_building5")
     if not load_date('',''):
         return
     printSessioni()
@@ -561,12 +561,12 @@ def main():
     model = building.build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
     opt.options['preprocessing presolve'] = 'n'
-    opt.options['mip tolerances mipgap'] = 0.1
-    opt.options['mip tolerances absmipgap'] = 0.1
-    opt.options['timelimit'] = 1 * 60
+    #opt.options['mip tolerances mipgap'] = 0.1
+    #opt.options['mip tolerances absmipgap'] = 0.1
+    opt.options['timelimit'] = 1 * 1 * 30
     path = os.path.join('log', str(datetime.today().strftime('Resolution_%d-%m-%y_%H-%M-%S.log')))
     opt.solve(model, logfile=path)
-    building.print_results(model, exams, data_inizio, data_fine)
+    #building.print_results(model, exams, data_inizio, data_fine)
     create_output.build_output('', '', exams, laboratori, aule, model, sessioni)
     create_calendar.build_calendar(exams, model, sessioni, '')
 
