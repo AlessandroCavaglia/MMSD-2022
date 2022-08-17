@@ -365,7 +365,7 @@ def print_results(model, exams, data_inizio, data_fine):
                 print("]", end="")
             else:
                 print("[", end="")
-                if (int(model.x[i, j].value) == 1):
+                if (model.x[i, j].value > 0.5):
                     print(str(int(model.x[i, j].value)),text_color='green',end="]")
                 else:
                     print(int(model.x[i, j].value), end="]")

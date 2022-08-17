@@ -83,6 +83,7 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
         model.correct_exam_days.add(
             sum(model.x[i, j] for j in model.days) == (
                     exams[i].numero_appelli * exams[i].numero_giorni_durata))
+        print("----- "+exams[i].short_name+" "+ str(exams[i].numero_appelli * exams[i].numero_giorni_durata))
 
     model.correct_exam_place_session = ConstraintList() # Per ogni esame verifico che il primo appello sia nella prima metà della sessione, vincolo implicito che il secondo sia nella seconda metà
     middle_session = int(len(model.days) / 2) #TODO da modellare in base alle indicazioni del prof
@@ -304,14 +305,14 @@ def print_results(model, exams, data_inizio, data_fine):
                 print("]", end="")
             else:
                 print("[", end="")
-                if (int(model.x[i, j].value) == 1):
+                if (model.x[i, j].value > 0.5):
                     print(str(int(model.x[i, j].value)),text_color='green',end="]")
                 else:
                     print(int(model.x[i, j].value), end="]")
 
         print("]")
-    print("Dummy primo anno: ", '\033[92m', model.dummy_primo_anno.value, '\033[0m')
-    print("Dummy secondo anno: ", '\033[92m', model.dummy_secondo_anno.value, '\033[0m')
-    print("Dummy terzo anno: ", '\033[92m', model.dummy_terzo_anno.value, '\033[0m')
+    print("Dummy primo anno: ", model.dummy_primo_anno.value,text_color='green')
+    print("Dummy secondo anno: ", model.dummy_secondo_anno.value,text_color='green')
+    print("Dummy terzo anno: ", model.dummy_terzo_anno.value,text_color='green')
 
 

@@ -560,7 +560,7 @@ def main():
     data_fine = sessioni[0][1]  # Data fine sessione estiva
     model = building.build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
-    opt.options['preprocessing presolve'] = 'n'
+    #opt.options['preprocessing presolve'] = 'n'
     #opt.options['mip tolerances mipgap'] = 0.1
     #opt.options['mip tolerances absmipgap'] = 0.1
     opt.options['timelimit'] = 1 * 1 * 30
@@ -614,7 +614,7 @@ def runModel(input, output, progressbar, error_message_gui, model, advanced_sett
     print("--- COSTRUZIONE DEL MODELLO ---")
     model = building.build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
-    opt.options['preprocessing presolve'] = 'n'
+    #opt.options['preprocessing presolve'] = 'n'
     try:
         if (advanced_settings['time_limit'] != "None" and int(advanced_settings['time_limit']) > 0):
             opt.options['timelimit'] = int(advanced_settings['time_limit']) * 60

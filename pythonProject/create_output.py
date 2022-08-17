@@ -46,7 +46,7 @@ def extract_appelli(exams,model,sessione):
         date_esame = []
         durata_sessione = abs(sessione[0][1] - sessione[0][0])
         for i in range(durata_sessione.days + 1):
-            if model.x[index, i].value == 1:
+            if model.x[index, i].value > 0.5:
                 data = sessione[0][0] + timedelta(days=i)
                 date_esame.append(str(data))
         print(str(len(date_esame))+" "+str(esame.numero_giorni_durata)+" "+esame.nome)
@@ -155,7 +155,7 @@ def extract_date_appelli_riassunto(esami,label_primo_semestre,label_secondo_seme
         date_esame = []
         durata_sessione = abs(sessione[0][1] - sessione[0][0])
         for i in range(durata_sessione.days + 1):
-            if model.x[index, i].value == 1:
+            if model.x[index, i].value > 0.5:
                 data = sessione[0][0] + timedelta(days=i)
                 date_esame.append(str(data))
         data_1 = ""
@@ -493,7 +493,7 @@ def get_date_esami(esame,model,durata_sessione,data_inizio,exams):
         index = exams.index(esame)
         date_esame=[]
         for i in range(durata_sessione.days + 1):
-            if model.x[index, i].value == 1:
+            if model.x[index, i].value > 0.5:
                 data = data_inizio + timedelta(days=i)
                 date_esame.append(data)
         if(len(date_esame)==4):
