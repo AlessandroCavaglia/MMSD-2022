@@ -49,6 +49,7 @@ def extract_appelli(exams,model,sessione):
             if model.x[index, i].value == 1:
                 data = sessione[0][0] + timedelta(days=i)
                 date_esame.append(str(data))
+        print(str(len(date_esame))+" "+str(esame.numero_giorni_durata)+" "+esame.nome)
         data_esame_1=""
         for i in range(esame.numero_giorni_durata):
             data_esame_1 +=" "+ date_esame[i]
@@ -58,7 +59,6 @@ def extract_appelli(exams,model,sessione):
         data_esame_1 = data_esame_1.replace("'", "")
         data_esame_1 = data_esame_1.replace("00:00:00", "")
         appello_1.append(data_esame_1)
-
         if(len(date_esame)>esame.numero_giorni_durata):
             for i in range(esame.numero_giorni_durata):
                 data_esame_2=""
@@ -80,11 +80,22 @@ def extract_appelli(exams,model,sessione):
 
 def build_exams_output(esami_anno, nome_foglio, laboratori, aule, model, writer, exams, sessione):
     esami_df = pd.DataFrame({})
+
     esami_df.insert(0, "Nome corso",  extract_exams_names(esami_anno), True)
+
+
     esami_df.insert(1, "Tipologia", extract_exams_type(esami_anno), True)
+
+
     esami_df.insert(2, "Docenti", extract_exams_teachers(esami_anno), True)
+
+
     esami_df.insert(3, "Semestre", extract_exams_semestre(esami_anno), True)
+
+
     (primi_appelli,secondi_appelli)=extract_appelli(esami_anno,model,sessione)
+
+
     esami_df.insert(4, "Primo appello", primi_appelli, True)
     esami_df.insert(5, "Secondo appello", secondi_appelli, True)
     esami_df.to_excel(writer, sheet_name=nome_foglio, index=False)
@@ -655,7 +666,6 @@ def build_output(input,output,exams, laboratori, aule, model, sessioni):
             esami_secondo_anno.append(esame)
         if (esame.anno == 3):
             esami_terzo_anno.append(esame)
-
     build_exams_output(esami_primo_anno, "esami primo anno", laboratori, aule,
                        model, writer, exams, sessioni)
     build_exams_output(esami_secondo_anno, "esami secondo anno", laboratori, aule,
