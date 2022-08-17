@@ -534,7 +534,7 @@ def parse_list(input, delimiter=','):
 
 
 def main():
-    building = __import__("model_building5")
+    building = __import__("model_building6")
     if not load_date('',''):
         return
     printSessioni()

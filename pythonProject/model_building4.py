@@ -4,10 +4,14 @@ from datetime import datetime,timedelta
 from pyomo.environ import *
 import pyomo.environ as pyo
 import holidays
+import PySimpleGUI as sg
+
+print = sg.Print  # TODO modificare in base a che output vogliamo
 
 
 #--------------------------------------
-#VARIAZIONE CON DUMMY UNICO E LAVORO SU DISTANZE NEGLI ANNI ANCHE TERZO ANNO
+#VARIAZIONE CON DUMMY UNICO E LAVORO SU DISTANZE NEGLI ANNI IN TUTTI GLI ANNI
+#CPLEX DICE IRRISOLVIBILE
 #--------------------------------------
 
 MIN_DISTANCE_APPELLI = 10
@@ -72,7 +76,7 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
                     esame in esami_secondo_anno) * COSTANTE_IMPORTANZA_SECONDO_ANNO +
                 sum(model.x[esame, giorno] * model.preferenze_professori[esame][giorno] for giorno in model.days for
                     esame in esami_terzo_anno) * COSTANTE_IMPORTANZA_TERZO_ANNO +
-                (model.dummy_primo_anno * (COSTANTE_IMPORTANZA_PRIMO_ANNO+COSTANTE_IMPORTANZA_SECONDO_ANNO+COSTANTE_IMPORTANZA_TERZO_ANNO)))
+                (model.dummy_primo_anno * COSTANTE_IMPORTANZA_PRIMO_ANNO))
         # return sum(model.x[esame,giorno]*model.preferenze_professori[esame][giorno] for giorno in model.days for esame in model.exams) - (model.dummy_primo_anno * COSTANTE_IMPORTANZA_PRIMO_ANNO + model.dummy_secondo_anno*COSTANTE_IMPORTANZA_SECONDO_ANNO)
 
     model.obj = Objective(expr=obj_rule(model, exams), sense=maximize)
@@ -250,12 +254,25 @@ def build_model(aule, laboratori, data_inizio, data_fine, exams):
                 for giorno1 in model.days:
                     for giorno2 in model.days:
                         if esame1 != esame2 and esame1 > esame2:  # Aumento efficenza
-                            model.esami_secondo_anno_diversi.add(
+                            model.esami_terzo_anno_diversi.add(
                                 (model.x[esame1, giorno1] * (abs(giorno1 - giorno2) / 2) + model.x[esame2, giorno2] * (
                                         abs(giorno1 - giorno2) / 2)) +
                                 ((1 - model.x[esame1, giorno1]) * days + (
-                                        1 - model.x[esame2, giorno2]) * days) >= model.dummy_primo_anno
-                            )
+                                        1 - model.x[esame2, giorno2]) * days) >= model.dummy_primo_anno)
+
+
+    '''
+    model.esami_secondo_anno_diversi = ConstraintList()  # Provo a non assegnare due esami del secondo anno lo stesso giorno
+    esami_secondo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    for esame in model.exams:
+        if exams[esame].anno == 2:
+            esami_secondo_anno.append(esame)
+    if len(esami_secondo_anno) > 1:
+        for giorno in model.days:
+            model.esami_stesso_semestre_diversi.add(
+                sum(model.x[esame1, giorno] for esame1 in esami_secondo_anno) <= 1 + model.dummy_secondo_anno)
+                '''
+
     return model
 
 
