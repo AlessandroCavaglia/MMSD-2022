@@ -97,12 +97,14 @@ ADVANCED_SETTINGS = {
 }
 
 # Nome dei modelli mostrati nel dropdown all'interno della GUI
-MODEL = ['Default Model', 'Variation Model 1', 'Variation Model 2', 'Variation Model 3']
+MODEL = ['Default Model', 'Variation Model 1', 'Variation Model 2', 'Variation Model 3','Variation Model 4', 'Variation Model 5']
 
 # Associazione chive valore nomi modelli nella GUI file.py
 MODEL_MAPPING = {
     'Default Model': 'model_building',
     'Variation Model 1': 'model_building1',
     'Variation Model 2': 'model_building2',
-    'Variation Model 3': 'model_building3'
+    'Variation Model 3': 'model_building3',
+    'Variation Model 4': 'model_building6',
+    'Variation Model 5': 'model_building7'
 }

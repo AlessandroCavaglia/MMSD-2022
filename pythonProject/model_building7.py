@@ -1,0 +1,362 @@
+from classes import Exam
+from classes import ExamRoom
+from datetime import datetime,timedelta
+from pyomo.environ import *
+import pyomo.environ as pyo
+import holidays
+import PySimpleGUI as sg
+
+print = sg.Print  # TODO modificare in base a che output vogliamo
+
+
+#--------------------------------------
+#VARIAZIONE CON DUMMY UNICO E LAVORO SU DISTANZE NEGLI ANNI IN TUTTI GLI ANNI + VARIAZIONE CON TERZO DUMMY
+#--------------------------------------
+
+MIN_DISTANCE_APPELLI = 10
+SLOT_AULE = 2
+SLOT_LABORATORI = 3
+GUADAGNO_GIORNI_PREFERITI = 2
+COSTANTE_IMPORTANZA_PRIMO_ANNO = 10
+COSTANTE_IMPORTANZA_SECONDO_ANNO = 4
+COSTANTE_IMPORTANZA_TERZO_ANNO = 1
+
+
+def get_non_working_days(data_inizio, data_fine):
+
+    delta = data_fine - data_inizio  # as timedelta
+    weekend = []
+    for i in range(delta.days + 1):
+        day = data_inizio + timedelta(days=i)
+        if day.weekday() > 4:
+            weekend.append( (day - data_inizio).days)
+    #Aggiungo i giorni festivi
+        if day in holidays.Italy(years=data_inizio.year) and day not in weekend:
+            weekend.append((day - data_inizio).days)
+    return weekend
+
+def build_model(aule, laboratori, data_inizio, data_fine, exams):
+    model = ConcreteModel()
+    days = (data_fine - data_inizio).days + 1  # Calculate the number of days of the range counting for also the first and last day
+
+    #Parametri del modello
+    model.days = range(days)
+    model.exams = range(len(exams))
+    model.aule = range(len(aule))
+    model.lab = range(len(laboratori))
+    model.richieste_lab_esami = build_richieste_lab_esami(exams, laboratori)
+    model.richieste_aule_esami = build_richieste_aule_esami(exams, aule)
+    model.aule_disponibilita = build_aule_disponibilita(aule, days, data_inizio)
+    model.lab_disponibilita = build_lab_disponibilita(laboratori, days, data_inizio)
+    model.preferenze_professori = build_preferenze_professori(exams, days, data_inizio)
+
+
+    #Variabili
+    model.x = Var(model.exams, model.days, within=pyo.Binary)
+    model.dummy_primo_anno = Var(within=pyo.NonNegativeIntegers)
+    model.dummy_secondo_anno = Var(within=pyo.NonNegativeIntegers)
+
+    # Funzione obiettivo
+    def obj_rule(model, exams):
+        esami_primo_anno = []
+        esami_secondo_anno = []
+        esami_terzo_anno = []
+        for index, esame in enumerate(exams):
+            if (esame.anno == 1):
+                esami_primo_anno.append(index)
+            if (esame.anno == 2):
+                esami_secondo_anno.append(index)
+            if (esame.anno == 3):
+                esami_terzo_anno.append(index)
+        return (sum(
+            model.x[esame, giorno] * model.preferenze_professori[esame][giorno] for giorno in model.days for esame in
+            esami_primo_anno) * COSTANTE_IMPORTANZA_PRIMO_ANNO +
+                sum(model.x[esame, giorno] * model.preferenze_professori[esame][giorno] for giorno in model.days for
+                    esame in esami_secondo_anno) * COSTANTE_IMPORTANZA_SECONDO_ANNO +
+                sum(model.x[esame, giorno] * model.preferenze_professori[esame][giorno] for giorno in model.days for
+                    esame in esami_terzo_anno) * COSTANTE_IMPORTANZA_TERZO_ANNO +
+                (model.dummy_primo_anno * COSTANTE_IMPORTANZA_PRIMO_ANNO) -
+                (model.dummy_secondo_anno * COSTANTE_IMPORTANZA_TERZO_ANNO))
+        # return sum(model.x[esame,giorno]*model.preferenze_professori[esame][giorno] for giorno in model.days for esame in model.exams) - (model.dummy_primo_anno * COSTANTE_IMPORTANZA_PRIMO_ANNO + model.dummy_secondo_anno*COSTANTE_IMPORTANZA_SECONDO_ANNO)
+
+    model.obj = Objective(expr=obj_rule(model, exams), sense=maximize)
+
+    # Vincoli
+    model.correct_exam_days = ConstraintList()  # Assegniamo esattamente il numero di giorni richiesto da un esame
+    for i in model.exams:
+        model.correct_exam_days.add(
+            sum(model.x[i, j] for j in model.days) >= (
+                    exams[i].numero_appelli * exams[i].numero_giorni_durata))
+        model.correct_exam_days.add(
+            sum(model.x[i, j] for j in model.days) <= (
+                    exams[i].numero_appelli * exams[i].numero_giorni_durata))
+
+    model.correct_exam_place_session = ConstraintList() # Per ogni esame verifico che il primo appello sia nella prima metà della sessione, vincolo implicito che il secondo sia nella seconda metà
+    middle_session = int(len(model.days) / 2) #TODO da modellare in base alle indicazioni del prof
+    for i in model.exams:
+        if(exams[i].numero_appelli>1):    #Metto il vincolo solo se modelliamo un solo appello TODO distinguere sessioni full da sessioni small
+            model.correct_exam_place_session.add(
+                sum(model.x[i, j] for j in range(0,middle_session)) == exams[i].numero_giorni_durata)
+
+    model.min_distance_appelli = ConstraintList()  # Per ogni esame la distanza minima tra i due appelli deve essere almeno MIN_DISTANCE_APPELLI
+    for esame in model.exams:
+        for giorno in range(days-1):
+            lower_bound=0
+            if giorno-MIN_DISTANCE_APPELLI>0:
+                lower_bound=giorno-MIN_DISTANCE_APPELLI
+            upper_bound=days-1
+            if giorno+MIN_DISTANCE_APPELLI<upper_bound:
+                upper_bound=giorno+MIN_DISTANCE_APPELLI
+            model.min_distance_appelli.add(     #Per ogni esame se siamo nell'ultimo giorno di assegnamento, nei successivi MIN_DISTANCE_APPELLI giorni non ci devono essere assegniamenti
+                (1-model.x[esame,giorno] + (model.x[esame,giorno+1]))*days >=
+                sum(model.x[esame,giorno_2] for giorno_2 in range((giorno+1) , upper_bound))
+            )
+
+            model.min_distance_appelli.add(
+                # Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarat
+                ((model.x[esame, giorno] * exams[esame].numero_giorni_durata) - ((model.x[esame, giorno + 1])) * exams[esame].numero_giorni_durata) +
+                (model.x[esame, giorno + 1]) * days +
+                (1 - model.x[esame, giorno]) * days >=
+                sum(model.x[esame, giorno_2] for giorno_2 in range(giorno, lower_bound - 1, -1)))
+
+        if exams[esame].numero_giorni_durata > 1:
+            model.min_distance_appelli.add(
+                # Per ogni esame se siamo nell'ultimo giorno di assegnamento nei precedenti MIN_DISTANCE_APPELLI  giorno abbiamo un numero di assegnamenti pari a num_giorni_duarat
+                (model.x[esame, days - 1]) * exams[esame].numero_giorni_durata +
+                (1 - model.x[esame, days - 1]) * days >=
+                sum(model.x[esame, giorno_2] for giorno_2 in range(days - 1, days - 1 - MIN_DISTANCE_APPELLI, -1))
+            )
+
+
+    model.assegniamenti_contigui = ConstraintList()  # Per ogni esame assegno i giorni contigui necessari
+    for esame in model.exams:
+        if (exams[esame].numero_giorni_durata > 1):
+            for giorno in range(1, days - exams[esame].numero_giorni_durata):
+                model.assegniamenti_contigui.add(
+                    (model.x[esame, giorno] * exams[esame].numero_giorni_durata) - ((model.x[esame, (giorno - 1)]) * exams[esame].numero_giorni_durata)  <=
+                    sum(model.x[esame, giorno_2] for giorno_2 in
+                        range(giorno, (giorno + exams[esame].numero_giorni_durata)))
+                )
+            model.assegniamenti_contigui.add(
+                (model.x[esame, 0] * exams[esame].numero_giorni_durata) <=
+                sum(model.x[esame, giorno_2] for giorno_2 in
+                    range(exams[esame].numero_giorni_durata))
+            )
+
+    model.limiti_aule = ConstraintList()  # Per ogni giorno non superiamo i limiti di assegniamento delle aule
+    for giorno in model.days:
+        for aula in model.aule:
+            found = False
+            esami_in_aula=[]
+            for index,exam in enumerate(exams):
+                if (aula in exam.aule_richieste):
+                    found = True
+                    esami_in_aula.append(index)
+            if found:
+                model.limiti_aule.add((
+                        sum(model.x[esame, giorno] * model.richieste_aule_esami[esame][aula]
+                            for esame in esami_in_aula) <=
+                        model.aule_disponibilita[aula][giorno]
+                ))
+
+    model.limiti_lab = ConstraintList()  # Per ogni giorno non superiamo i limiti di assegniamento deli laboratori
+    for giorno in model.days:
+        for lab in model.lab:
+            found = False
+            esame_in_lab=[]
+            for index,exam in enumerate(exams):
+                if (lab in exam.laboratori_richiesti):
+                    found = True
+                    esame_in_lab.append(index)
+            if found:
+                model.limiti_lab.add((
+                        sum(model.x[esame, giorno] * model.richieste_lab_esami[esame][lab]
+                            for esame in esame_in_lab) <=
+                        model.lab_disponibilita[lab][giorno]
+                ))
+    model.indisp_professori = ConstraintList()  # Per ogni esame non lo assegno nei giorni di indisponibilità dei professori
+    for exam in model.exams:
+        for day in model.days:
+            if model.preferenze_professori[exam][day] == 0:
+                model.indisp_professori.add(
+                    model.x[exam, day] == 0
+                )
+
+    model.esami_stesso_semestre_diversi = ConstraintList()  # Non assegno due esami dello stesso semestre lo stesso giorno
+    esami_semestre=list()       #Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    for anno in range(3):
+        esami_semestre.append([])
+        for semestre in range(2):
+            esami_semestre[anno].append([])
+            for esame in model.exams:
+                if exams[esame].anno==(anno+1):
+                    if(semestre+1) in exams[esame].lista_semestri:
+                        esami_semestre[anno][semestre].append(esame)
+            if len(esami_semestre[anno][semestre]) > 1:
+                for giorno in model.days:
+                    model.esami_stesso_semestre_diversi.add(
+                        sum(model.x[esame1,giorno] for esame1 in esami_semestre[anno][semestre])<=1
+                    )
+
+    '''model.esami_primo_anno_diversi = ConstraintList()  # Provo a non assegnare due esami del primo anno lo stesso giorno
+    esami_primo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    for esame in model.exams:
+        if exams[esame].anno == 1:
+            esami_primo_anno.append(esame)
+    if len(esami_primo_anno) > 1:
+        for giorno in model.days:
+            model.esami_stesso_semestre_diversi.add(
+                sum(model.x[esame1, giorno] for esame1 in esami_primo_anno) <= 1 + model.dummy_primo_anno)'''
+
+
+    model.esami_primo_anno_diversi = ConstraintList()
+    esami_primo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    for esame in model.exams:
+        if exams[esame].anno == 1:
+            esami_primo_anno.append(esame)
+    if len(esami_primo_anno) > 1:
+        for esame1 in esami_primo_anno:
+            for esame2 in esami_primo_anno:
+                for giorno1 in model.days:
+                    for giorno2 in model.days:
+                        if esame1 != esame2 and esame1 > esame2: #Aumento efficenza
+                            model.esami_primo_anno_diversi.add(
+                                (model.x[esame1, giorno1] * (abs(giorno1 - giorno2) / 2) + model.x[esame2, giorno2] * ( abs(giorno1 - giorno2) / 2)) +
+                                ((1-model.x[esame1,giorno1])*days + (1-model.x[esame2,giorno2])*days) >= model.dummy_primo_anno
+                            )
+
+
+    model.esami_secondo_anno_diversi = ConstraintList()
+    esami_secondo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    for esame in model.exams:
+        if exams[esame].anno == 2:
+            esami_secondo_anno.append(esame)
+    if len(esami_secondo_anno) > 1:
+        for esame1 in esami_secondo_anno:
+            for esame2 in esami_secondo_anno:
+                for giorno1 in model.days:
+                    for giorno2 in model.days:
+                        if esame1 != esame2 and esame1 > esame2:  # Aumento efficenza
+                            model.esami_secondo_anno_diversi.add(
+                                (model.x[esame1, giorno1] * (abs(giorno1 - giorno2) / 2) + model.x[esame2, giorno2] * (
+                                            abs(giorno1 - giorno2) / 2)) +
+                                ((1 - model.x[esame1, giorno1]) * days + (
+                                            1 - model.x[esame2, giorno2]) * days) >= model.dummy_primo_anno
+                            )
+
+    model.esami_terzo_anno_diversi = ConstraintList()  # Provo a non assegnare due esami del terzo anno lo stesso giorno
+    esami_terzo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    for esame in model.exams:
+        if exams[esame].anno == 3:
+            esami_terzo_anno.append(esame)
+    if len(esami_terzo_anno) > 1:
+        for giorno in model.days:
+            model.esami_stesso_semestre_diversi.add(
+                sum(model.x[esame1, giorno] for esame1 in
+                    esami_terzo_anno) <= 1 + model.dummy_secondo_anno)
+
+
+    '''
+    model.esami_secondo_anno_diversi = ConstraintList()  # Provo a non assegnare due esami del secondo anno lo stesso giorno
+    esami_secondo_anno = list()  # Creo una lista di dimensione [anni][semestre] che contiene liste di corsi
+    for esame in model.exams:
+        if exams[esame].anno == 2:
+            esami_secondo_anno.append(esame)
+    if len(esami_secondo_anno) > 1:
+        for giorno in model.days:
+            model.esami_stesso_semestre_diversi.add(
+                sum(model.x[esame1, giorno] for esame1 in esami_secondo_anno) <= 1 + model.dummy_secondo_anno)
+                '''
+
+    return model
+
+
+def build_richieste_lab_esami(exams, laboratori):
+    richieste_lab_esami = list()  # Lista di laboratori richiesti dagli esami, per ogni esame assegna un array di dimensione aule elementi settati a 0
+    for exam_index in range(len(exams)):
+        richieste_lab_esami.append(list())
+        for lab_index in range(len(laboratori)):
+            richieste_lab_esami[exam_index].append(0)
+        # Ora attivo i lab richiesti
+        for lab in exams[exam_index].laboratori_richiesti:
+            richieste_lab_esami[exam_index][lab] = exams[exam_index].numero_lab_slot
+    return richieste_lab_esami
+
+
+def build_richieste_aule_esami(exams, aule):
+    richieste_aule_esami = list()  # Lista di aule richieste dagli esami, per ogni esame assegna un array di dimensione aule elementi settati a 0
+    for exam_index in range(len(exams)):
+        richieste_aule_esami.append(list())
+        for aula_index in range(len(aule)):
+            richieste_aule_esami[exam_index].append(0)
+        # Ora attivo le aule richieste
+        for aula in exams[exam_index].aule_richieste:
+            richieste_aule_esami[exam_index][aula] = exams[exam_index].numero_aule_slot
+    return richieste_aule_esami
+
+
+def build_lab_disponibilita(laboratori, days, data_inizio):
+    lab_disponibilita = list()  # Lista di giorni di disponibilità dei laboratori, per ogni laboratorio assegna un array di dimensione days elementi settati a 1
+    for lab_index in range(len(laboratori)):
+        lab_disponibilita.append(list())
+        for giorno in range(days):
+            lab_disponibilita[lab_index].append(SLOT_LABORATORI)
+        # Ora metto a 0 i giorni di indisponibilita
+        for data_indisponibilita in laboratori[lab_index].indisponibilita:
+            distance = (data_indisponibilita - data_inizio).days
+            if distance>=0 and distance<len(lab_disponibilita[lab_index]):
+                lab_disponibilita[lab_index][distance] = 0
+    return lab_disponibilita
+
+
+def build_aule_disponibilita(aule, days, data_inizio):
+    aule_disponibilita = list()  # Lista di giorni di disponibilità delle aule, per ogni aula assegna un array di dimensione days elementi settati a 1
+    for aula_index in range(len(aule)):
+        aule_disponibilita.append(list())
+        for giorno in range(days):
+            aule_disponibilita[aula_index].append(SLOT_AULE)
+        # Ora metto a 0 i giorni di indisponibilita
+        for data_indisponibilita in aule[aula_index].indisponibilita:
+            distance = (data_indisponibilita - data_inizio).days
+            aule_disponibilita[aula_index][distance] = 0
+    return aule_disponibilita
+
+
+def build_preferenze_professori(exams, days, data_inizio):
+    preferenze_professori = list()  # Lista di giorni di disponibilità delle aule, per ogni aula assegna un array di dimensione days elementi settati a 1
+    for exam_index in range(len(exams)):
+        preferenze_professori.append(list())
+        for giorno in range(days):
+            preferenze_professori[exam_index].append(1)
+        # Ora metto a 0 i giorni di indisponibilita
+        for data_indisponibilita in exams[exam_index].date_indisponibilita:
+            distance = (data_indisponibilita - data_inizio).days
+            preferenze_professori[exam_index][distance] = 0
+        for data_preferenza in exams[exam_index].date_preferenza:
+            distance = (data_preferenza - data_inizio).days
+            preferenze_professori[exam_index][distance] = GUADAGNO_GIORNI_PREFERITI
+        # Ora metto a costante moltiplicativa le date preferite
+    return preferenze_professori
+
+def print_results(model, exams, data_inizio, data_fine):
+    giorni_indisp_generali=get_non_working_days(data_inizio,data_fine)
+
+    days = (data_fine - data_inizio).days + 1
+    for i in range(len(exams)):
+        print(exams[i].short_name)
+        for j in range(days):
+            if j in giorni_indisp_generali:
+                print("[", end="")
+                print("0",text_color='red', end="")
+                print("]", end="")
+            else:
+                print("[", end="")
+                if (model.x[i, j].value > 0.5):
+                    print(str(int(model.x[i, j].value)),text_color='green',end="]")
+                else:
+                    print(int(model.x[i, j].value), end="]")
+
+        print("]")
+    print("Dummy: ", '\033[92m', model.dummy_primo_anno.value, '\033[0m')
+
+
