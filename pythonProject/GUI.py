@@ -53,6 +53,7 @@ def main():
         if event == sg.WINDOW_CLOSED or event == 'Exit':
             break
         elif event == 'Run Model':
+            succ_message_gui.update(visible=False)
             filenameInput = values['-INPUT-']
             filenameOutput = values['-OUTPUT-']
 
