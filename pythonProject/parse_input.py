@@ -621,13 +621,7 @@ def runModel(input, output, progressbar, error_message_gui, model, advanced_sett
     except ValueError:
         pass
 
-    try:
-        if (advanced_settings['gap_tollerance'] != "None" and float(advanced_settings['gap_tollerance']) > 0 and float(
-                advanced_settings['gap_tollerance']) < 1):
-            opt.options['mip tolerances mipgap'] = round(float(advanced_settings['gap_tollerance']), 2)
-            opt.options['mip tolerances absmipgap'] = round(float(advanced_settings['gap_tollerance']), 2)
-    except ValueError:
-        pass
+
 
     path = os.path.join('log', str(datetime.today().strftime('Resolution_%d-%m-%y_%H-%M-%S.log')))
     print("--- RISOLUZIONE DEL MODELLO ---")
