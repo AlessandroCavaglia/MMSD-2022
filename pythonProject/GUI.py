@@ -28,7 +28,7 @@ def main():
              sg.Input(key='time_limit_input', size=20, default_text=ADVANCED_SETTINGS['time_limit'], visible=False)],
             [sg.T('Output folder  ', visible=False), sg.Input(key='-OUTPUT-', visible=False)],
             [sg.Text(' ')],
-            [sg.Button("Run Model"), sg.Button('Exit'), sg.T('', text_color='#de335e', visible=False, key='ErrGUI'),
+            [sg.Button("Run Model"), sg.Button('Exit'), sg.T('', text_color='#aa080b', visible=False, key='ErrGUI'),
              sg.T('', text_color='#caf17c', visible=False, key='SuccGUI')],
             [sg.T('Progress...   ', visible=False, key='progresstext'),
              sg.ProgressBar(1000, orientation='h', size=(20, 20), key='progressbar', visible=False)]
