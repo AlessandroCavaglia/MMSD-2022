@@ -7,7 +7,7 @@ import os.path
 
 import PySimpleGUI as sg
 
-print = sg.Print  # TODO modificare in base a che output vogliamo
+#print = sg.Print  # TODO modificare in base a che output vogliamo
 
 import pandas as pd
 from datetime import datetime, timedelta
@@ -72,9 +72,9 @@ def printCorsi():
         print("Anno: "+str(corso.anno))
         print("Numero appelli sessione: "+str(corso.numero_appelli))
         print("Aule richieste: "+str(corso.aule_richieste))
-        print("Slot aule: "+str(corso.numero_aule_slot))
+        print("Slot aule: "+str(corso.slot_aule_richieste))
         print("Laboratori richiesti: "+str(corso.laboratori_richiesti))
-        print("Slot laboratori: "+str(corso.numero_lab_slot))
+        print("Slot laboratori: "+str(corso.laboratori_richiesti_slot))
         print("Durata giorni: "+str(corso.numero_giorni_durata))
         print("Date di preferenza: "+str(corso.date_preferenza))
         print("Date di indisponibilità: "+str(corso.date_indisponibilita))
@@ -306,16 +306,29 @@ def load_parametri(input, building, error_message_gui):  # Errori gestiti da tes
                                                             "Dato non valido per Importanza terzo anno: " + str(row[1]))
                                             return False
                                     else:
-                                        print("Tipologia del parametro non comprensibile")
-                                        print_GUI_error(error_message_gui,
-                                                        "Tipologia del parametro non comprensibile")
-                                        return False
+                                        if (row[0] == "Importanza distanza esami"):
+                                            val = row[1]
+                                            try:
+                                                int_val = int(val)
+                                                building.COSTANTE_IMPORTANZA_DISTANZA_ESAMI = int_val
+                                            except:
+                                                print("Dato non valido per Importanza distanza esami: " + str(row[1]))
+                                                print_GUI_error(error_message_gui,
+                                                                "Dato non valido per Importanza distanza esami: " + str(row[1]))
+                                                return False
+                                        else:
+                                            print("Tipologia del parametro non comprensibile")
+                                            print_GUI_error(error_message_gui,
+                                                            "Tipologia del parametro non comprensibile")
+                                            return False
     return True
 
 
 def load_exams(input, nome_foglio, anno, error_message_gui):
     aule_richieste = []
+    aule_richieste_slot = []
     laboratori_richiesti = []
+    laboratori_richiesti_slot = []
     date_indisponibilita = []
     date_preferenza = []
     note = ""
@@ -330,14 +343,12 @@ def load_exams(input, nome_foglio, anno, error_message_gui):
         # row[2] -> Docenti -> String
         # row[3] -> Semestri Corso -> String {1,2}
         # row[4] -> Numero appelli sessioni  -> int
-        # row[5] -> Aule Richieste -> String {Aula1,...,AulaN}
-        # row[6] -> Slot orari richiesti per le aule -> int >= 1 && <= 2
-        # row[7] -> Laboratori richiesti -> String {Laboratorio1,...,LaboratorioN}
-        # row[8] -> Slot orari richiesti per i laboratori -> int >= 1 && <= 3
-        # row[9] -> Giorni di durata dell'esame -> int
-        # row[10] -> Date di preferenza dei professori -> String {Data1,...,DataN}
-        # row[11] -> Date di indisponibilità dei professori -> String {Data1,...,DataN}
-        # row[12] -> Note -> String
+        # row[5] -> Aule Richieste -> String {Aula1,...,AulaN} "NESSUNA AULA" = null
+        # row[6] -> Laboratori richiesti -> String {Laboratorio1,...,LaboratorioN} "NESSUN LABORATORIO" = null
+        # row[7] -> Giorni di durata dell'esame -> int
+        # row[8] -> Date di preferenza dei professori -> String {Data1,...,DataN}
+        # row[9] -> Date di indisponibilità dei professori -> String {Data1,...,DataN}
+        # row[10] -> Note -> String
         semestri = str(row[3]).replace('.0', '')
         semestri = parse_list(semestri, '.')
         for semestre in semestri:
@@ -364,96 +375,140 @@ def load_exams(input, nome_foglio, anno, error_message_gui):
         if not pd.isnull(row[5]):  # Controllo che gli esami abbiano aule esistenti inseriti in input generali
             aule_richieste = parse_list(row[5])
             for index_aule_richieste in range(len(aule_richieste)):
-                for index, aula in enumerate(aule):
-                    if not check_exist(aule, str(aule_richieste[index_aule_richieste]).strip()):
+                if aule_richieste[index_aule_richieste] != '' and aule_richieste[
+                    index_aule_richieste] != ' ' and aule_richieste[index_aule_richieste] != "NESSUNA AULA":
+                    aula_nome=aule_richieste[index_aule_richieste].split("-")
+                    if(len(aula_nome)!=2):
                         print("Errore nel caricamento del flusso " + str(
-                            aule_richieste[index_aule_richieste]).strip() + " mancante")
+                            aule_richieste[index_aule_richieste]).strip() + " non ha un numero di slot valido "+str(aula_nome))
+                        print_GUI_error(error_message_gui,
+                                        "[Errore caricamento esami " + str(anno) + " anno riga " + str(
+                                            index + 2) + "] \n L'aula '" + str(
+                                            aule_richieste[index_aule_richieste]).strip() + "' non ha un numero di slot valido")
+                        return False
+                    else:
+                        try:
+                            slot=int(aula_nome[1])
+                            if slot <0 or slot > costants.SLOT_AULE:
+                                raise ValueError("Error")
+                        except ValueError:
+                            print("Errore nel caricamento del flusso " + str(
+                                aule_richieste[
+                                    index_aule_richieste]).strip() + " non ha un numero di slot valido " + str(
+                                aula_nome))
+                            print_GUI_error(error_message_gui,
+                                            "[Errore caricamento esami " + str(anno) + " anno riga " + str(
+                                                index + 2) + "] \n L'aula '" + str(
+                                                aule_richieste[
+                                                    index_aule_richieste]).strip() + "' non ha un numero di slot valido")
+                            return False
+                    aula_nome=aula_nome[0]
+                    if not check_exist(aule, str(aula_nome).strip()):
+                        print("Errore nel caricamento del flusso " + str(aula_nome).strip() + " mancante")
                         print_GUI_error(error_message_gui,
                                         "[Errore caricamento esami "+str(anno)+" anno riga "+str(index+2)+"] \n L'aula '" + str(
-                                            aule_richieste[index_aule_richieste]).strip() + "' inserita non è valida.")
+                                            aula_nome).strip() + "' inserita non è valida.")
                         return False
 
         if not pd.isnull(row[5]):  # Parsifico le aule e inserisco l'indice associato ad esse
             aule_richieste = parse_list(row[5])
+            aule_richieste_slot = parse_list(row[5])
             for index_aule_richieste in range(len(aule_richieste)):
-                for index, aula in enumerate(aule):
-                    if str(aula.nome).strip() == str(aule_richieste[index_aule_richieste]).strip():
-                        aule_richieste[index_aule_richieste] = index
-
-        if pd.isnull(row[6]):
-            row[6] = 0
-        try:
-            if int( row[6]) < 0:
-                print("Formato degli slot orari richiesti per le aule errato" + str(row[6]))
-                print_GUI_error(error_message_gui,
-                                "[Errore caricamento esami " + str(anno) + " anno riga " + str(
-                                    index + 2) + "] \nFormato degli slot orari richiesti per le aule errato" + str(row[6]))
-                return False
-        except ValueError:
-            print("Formato degli slot orari richiesti per le aule errato" + str(row[6]))
-            print_GUI_error(error_message_gui,
-                            "[Errore caricamento esami " + str(anno) + " anno riga " + str(
-                                index + 2) + "] \nFormato degli slot orari richiesti per le aule errato" + str(row[6]))
-            return False
-
-        if not pd.isnull(row[7]):  # Controllo che gli esami abbiano laboratori esistenti inseriti in input generali
-            laboratori_richiesti = parse_list(row[7])
+                if aule_richieste[index_aule_richieste] != '' and aule_richieste[
+                    index_aule_richieste] != ' ' and aule_richieste[index_aule_richieste]!="NESSUNA AULA":
+                    aula_nome = aule_richieste[index_aule_richieste].split("-")[0]
+                    slot=int(aule_richieste[index_aule_richieste].split("-")[1])
+                    for index, aula in enumerate(aule):
+                        if str(aula.nome).strip() == str(aula_nome).strip():
+                            aule_richieste[index_aule_richieste] = index
+                            aule_richieste_slot[index_aule_richieste] =slot
+                else:
+                    del(aule_richieste[index_aule_richieste])
+                    del(aule_richieste_slot[index_aule_richieste])
+        if not pd.isnull(row[6]):  # Controllo che gli esami abbiano laboratori esistenti inseriti in input generali
+            laboratori_richiesti = parse_list(row[6])
             for index_laboratori_richieste in range(len(laboratori_richiesti)):
                 if laboratori_richiesti[index_laboratori_richieste] != '' and laboratori_richiesti[
-                    index_laboratori_richieste] != ' ':
-                    for index, lab in enumerate(laboratori):
-                        if not check_exist(laboratori, str(laboratori_richiesti[index_laboratori_richieste]).strip()):
+                    index_laboratori_richieste] != ' ' and laboratori_richiesti[index_laboratori_richieste] != "NESSUN LABORATORIO":
+                    lab_nome = laboratori_richiesti[index_laboratori_richieste].split("-")
+                    if (len(lab_nome) != 2):
+                        print("Errore nel caricamento del flusso " + str(
+                            laboratori_richiesti[index_laboratori_richieste]).strip() + " non ha un numero di slot valido " + str(
+                            lab_nome))
+                        print_GUI_error(error_message_gui,
+                                        "[Errore caricamento esami " + str(anno) + " anno riga " + str(
+                                            index + 2) + "] \n Il laboratorio '" + str(
+                                            laboratori_richiesti[
+                                                index_laboratori_richieste]).strip() + "' non ha un numero di slot valido")
+                        return False
+                    else:
+                        try:
+                            slot = int(lab_nome[1])
+                            if slot <0 or slot > costants.SLOT_LABORATORI:
+                                raise ValueError("Error")
+                        except ValueError:
                             print("Errore nel caricamento del flusso " + str(
-                                laboratori_richiesti[index_laboratori_richieste]).strip() + " mancante")
-                            print_GUI_error(error_message_gui, "[Errore caricamento esami "+str(anno)+" anno riga "+str(index+2)+"] \nIl laboratorio '" + str(
-                                            laboratori_richiesti[index_laboratori_richieste]).strip() + "' inserito non è valido.")
+                                laboratori_richiesti[
+                                    index_laboratori_richieste]).strip() + " non ha un numero di slot valido " + str(
+                                lab_nome))
+                            print_GUI_error(error_message_gui,
+                                            "[Errore caricamento esami " + str(anno) + " anno riga " + str(
+                                                index + 2) + "] \n Il laboratorio '" + str(
+                                                laboratori_richiesti[
+                                                    index_laboratori_richieste]).strip() + "' non ha un numero di slot valido")
                             return False
+                    lab_nome=lab_nome[0]
+                    if not check_exist(laboratori, str(lab_nome).strip()):
+                        print("Errore nel caricamento del flusso " + str(
+                                laboratori_richiesti[index_laboratori_richieste]).strip() + " mancante")
+                        print_GUI_error(error_message_gui, "[Errore caricamento esami "+str(anno)+" anno riga "+str(index+2)+"] \nIl laboratorio '" + str(
+                                            laboratori_richiesti[index_laboratori_richieste]).strip() + "' inserito non è valido.")
+                        return False
 
-        if not pd.isnull(row[7]):  # Parsifico i laboratori e inserisco gli indici associati ad essi
-            laboratori_richiesti = parse_list(row[7])
+        if not pd.isnull(row[6]):  # Parsifico i laboratori e inserisco gli indici associati ad essi
+            laboratori_richiesti = parse_list(row[6])
+            laboratori_richiesti_slot = parse_list(row[6])
+            sum_slot=0
             for index_laboratori_richieste in range(len(laboratori_richiesti)):
                 if laboratori_richiesti[index_laboratori_richieste] != '' and laboratori_richiesti[
-                    index_laboratori_richieste] != ' ':
-                    for index, lab in enumerate(laboratori):
-                        if str(lab.nome).strip() == str(laboratori_richiesti[index_laboratori_richieste]).strip():
-                            laboratori_richiesti[index_laboratori_richieste] = index
+                    index_laboratori_richieste] != ' ' and laboratori_richiesti[
+                    index_laboratori_richieste] != "NESSUN LABORATORIO":
+                    aula_nome = laboratori_richiesti[index_laboratori_richieste].split("-")[0]
+                    slot =int(laboratori_richiesti[index_laboratori_richieste].split("-")[1])
+                    if laboratori_richiesti[index_laboratori_richieste] != '' and laboratori_richiesti[
+                        index_laboratori_richieste] != ' ':
+                        for index, lab in enumerate(laboratori):
+                            if str(lab.nome).strip() == str(aula_nome).strip():
+                                laboratori_richiesti[index_laboratori_richieste] = index
+                                laboratori_richiesti_slot[index_laboratori_richieste]=slot
+                                sum_slot+=slot
+                else:
+                    del(laboratori_richiesti[index_laboratori_richieste])
+                    del(laboratori_richiesti_slot[index_laboratori_richieste])
+            if(sum_slot>=len(laboratori)*costants.SLOT_LABORATORI):
+                print("Attenzione, violazione del vincolo di non prendere tutti i laboratori per tutto il giorno violato per l'esame: "+str(row[0])+". Verrà tolto uno slot al laboratorio: "+str(laboratori[laboratori_richiesti[len(laboratori_richiesti)-1]].nome))
+                laboratori_richiesti_slot[len(laboratori_richiesti_slot)-1]=costants.SLOT_LABORATORI-1
 
-        if pd.isnull(row[8]):
-            row[8] = 0
+        if pd.isnull(row[7]):
+            row[7] = 0
         try:
-            if int( row[8]) < 0:
-                print("Formato degli slot orari richiesti per i laboratori errato" + str(row[8]))
+            if int( row[7]) <= 0:
+                print("Formato dei giorni durata esame errato" + str(row[7]))
                 print_GUI_error(error_message_gui,
                                 "[Errore caricamento esami " + str(anno) + " anno riga " + str(
-                                    index + 2) + "] \nFormato degli slot orari richiesti per i laboratori errato: " + str(row[8]))
+                                    index + 2) + "] \nFormato dei giorni durata esame errato: " + str(row[7]))
                 return False
         except ValueError:
-            print("Formato degli slot orari richiesti per i laboratori errato" + str(row[8]))
+            print("Formato dei giorni durata esame errato" + str(row[7]))
             print_GUI_error(error_message_gui,
                             "[Errore caricamento esami " + str(anno) + " anno riga " + str(
-                                index + 2) + "] \nFormato degli slot orari richiesti per i laboratori errato: " + str(row[8]))
+                                index + 2) + "] \nFormato dei giorni durata esame errato: " + str(row[7]))
             return False
 
-        if pd.isnull(row[9]):
-            row[9] = 0
-        try:
-            if int( row[9]) <= 0:
-                print("Formato dei giorni durata esame errato" + str(row[9]))
-                print_GUI_error(error_message_gui,
-                                "[Errore caricamento esami " + str(anno) + " anno riga " + str(
-                                    index + 2) + "] \nFormato dei giorni durata esame errato: " + str(row[9]))
-                return False
-        except ValueError:
-            print("Formato dei giorni durata esame errato" + str(row[9]))
-            print_GUI_error(error_message_gui,
-                            "[Errore caricamento esami " + str(anno) + " anno riga " + str(
-                                index + 2) + "] \nFormato dei giorni durata esame errato: " + str(row[9]))
-            return False
-
-        if not pd.isnull(row[12]):
-            note = row[12]
         if not pd.isnull(row[10]):
-            date_preferenza = parse_list(row[10])
+            note = row[10]
+        if not pd.isnull(row[8]):
+            date_preferenza = parse_list(row[8])
             for index_preferenza in range(len(date_preferenza)):
                 if '00:00:00' in date_preferenza[index_preferenza]:
                     date = datetime.strptime(
@@ -478,8 +533,8 @@ def load_exams(input, nome_foglio, anno, error_message_gui):
                         return False
                     date_preferenza[index_preferenza] = date
 
-        if not pd.isnull(row[11]):
-            date_indisponibilita = parse_list(row[11])
+        if not pd.isnull(row[9]):
+            date_indisponibilita = parse_list(row[9])
             for index_indisponibilita in range(len(date_indisponibilita)):
                 if '00:00:00' in date_indisponibilita[index_indisponibilita]:
                     date = datetime.strptime(
@@ -510,9 +565,10 @@ def load_exams(input, nome_foglio, anno, error_message_gui):
         date_indisponibilita = [*date_indisponibilita, *giorni_indisponibili]
 
         exams.append(
-            classes.Exam(row[0], row[1], row[2], semestri, anno, int(row[4]), aule_richieste, int(row[6]),
-                         laboratori_richiesti, int(row[8]), int(row[9]), date_preferenza, date_indisponibilita, note))
+            classes.Exam(row[0], row[1], row[2], semestri, anno, int(row[4]), aule_richieste,aule_richieste_slot,
+                         laboratori_richiesti,laboratori_richiesti_slot, int(row[7]), date_preferenza, date_indisponibilita, note))
         aule_richieste = []
+        aule_richieste_slot = []
         laboratori_richiesti = []
         date_indisponibilita = []
         date_preferenza = []
@@ -534,7 +590,7 @@ def parse_list(input, delimiter=','):
 
 
 def main():
-    building = __import__("model_building7")
+    building = __import__("model_building")
     if not load_date('',''):
         return
     printSessioni()
@@ -554,7 +610,6 @@ def main():
     if not load_exams('', 'Corsi III anno triennale', 3, ''):
         return
     printCorsi()
-
     # Test del modello
     data_inizio = sessioni[0][0]  # Data inizio sessione estiva
     data_fine = sessioni[0][1]  # Data fine sessione estiva

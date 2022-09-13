@@ -3,8 +3,8 @@ from costants import NOME_CORSO_STRONG, NOME_CORSO_CODE
 
 class Exam:
     def __init__(self, nome, tipo, insegnanti, lista_semestri, anno, numero_appelli_sessione_full,
-                 aule_richieste, numero_aule_slot, laboratori_richiesti,
-                 numero_lab_slot, numero_giorni_durata, date_preferenza, date_indisponibilita, note):
+                 aule_richieste,slot_aule_richieste, laboratori_richiesti,laboratori_richiesti_slot,
+                  numero_giorni_durata, date_preferenza, date_indisponibilita, note):
         self.nome = nome
         #self.short_name = NOME_CORSO[str.replace(str.replace(nome, '\n', ''),' ', '')]
         self.short_name = getShortName(str(nome))
@@ -14,9 +14,11 @@ class Exam:
         self.anno = anno
         self.numero_appelli = numero_appelli_sessione_full
         self.aule_richieste = aule_richieste
-        self.numero_aule_slot = numero_aule_slot
+        self.slot_aule_richieste = slot_aule_richieste
+        self.numero_aule_slot = 0   #Deprecated Value, do not use
         self.laboratori_richiesti = laboratori_richiesti
-        self.numero_lab_slot = numero_lab_slot
+        self.laboratori_richiesti_slot=laboratori_richiesti_slot
+        self.numero_lab_slot = 0 #Deprecated Value do not use
         self.numero_giorni_durata = numero_giorni_durata
         self.date_preferenza = date_preferenza
         self.date_indisponibilita = date_indisponibilita

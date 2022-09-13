@@ -19,6 +19,7 @@ GUADAGNO_GIORNI_PREFERITI = 2
 COSTANTE_IMPORTANZA_PRIMO_ANNO = 10
 COSTANTE_IMPORTANZA_SECONDO_ANNO = 4
 COSTANTE_IMPORTANZA_TERZO_ANNO = 1
+COSTANTE_IMPORTANZA_DISTANZA_ESAMI = 10
 
 def get_non_working_days(data_inizio, data_fine):
 
@@ -292,8 +293,8 @@ def build_richieste_lab_esami(exams, laboratori):
         for lab_index in range(len(laboratori)):
             richieste_lab_esami[exam_index].append(0)
         # Ora attivo i lab richiesti
-        for lab in exams[exam_index].laboratori_richiesti:
-            richieste_lab_esami[exam_index][lab] = exams[exam_index].numero_lab_slot
+        for index,lab in enumerate(exams[exam_index].laboratori_richiesti):
+            richieste_lab_esami[exam_index][lab] = exams[exam_index].laboratori_richiesti_slot[index]
     return richieste_lab_esami
 
 
@@ -304,8 +305,8 @@ def build_richieste_aule_esami(exams, aule):
         for aula_index in range(len(aule)):
             richieste_aule_esami[exam_index].append(0)
         # Ora attivo le aule richieste
-        for aula in exams[exam_index].aule_richieste:
-            richieste_aule_esami[exam_index][aula] = exams[exam_index].numero_aule_slot
+        for index , aula in enumerate(exams[exam_index].aule_richieste):
+            richieste_aule_esami[exam_index][aula] = exams[exam_index].slot_aule_richieste[index]
     return richieste_aule_esami
 
 
