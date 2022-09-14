@@ -669,7 +669,6 @@ def runModel(input, output, progressbar, error_message_gui, model, advanced_sett
     print("--- COSTRUZIONE DEL MODELLO ---")
     model = building.build_model(aule, laboratori, data_inizio, data_fine, exams)
     opt = pyo.SolverFactory('cplex')
-    #opt.options['preprocessing presolve'] = 'n'
     try:
         if (advanced_settings['time_limit'] != "None" and int(advanced_settings['time_limit']) > 0):
             opt.options['timelimit'] = int(advanced_settings['time_limit']) * 60
@@ -683,7 +682,7 @@ def runModel(input, output, progressbar, error_message_gui, model, advanced_sett
     opt.solve(model, logfile=path)
     print("--- RISOLUZIONE  COMPLETATA ---")
     progressbar.UpdateBar(750)
-    building.print_results(model, exams, data_inizio, data_fine)
+    #building.print_results(model, exams, data_inizio, data_fine)
     progressbar.UpdateBar(800)
     print("--- COSTRUZIONE OUTPUT ---")
     create_output.build_output(input, output, exams, laboratori, aule, model, sessioni)

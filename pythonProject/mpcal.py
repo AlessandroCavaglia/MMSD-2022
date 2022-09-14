@@ -80,22 +80,22 @@ class MplCalendar(object):
         f.subplots_adjust(wspace=0)
         f.suptitle(nome.replace(".jpg","") + ' ' + str(self.year),
                    fontsize=20, fontweight='bold')
-        sub = f.text(0.045, 0.05, "Esami 1 anno 1 semestre" + ' ' + str(self.year),
+        sub = f.text(0.045, 0.05, "Esami 1 anno 1 semestre",
                      fontsize=15, fontweight='bold')
         sub.set_bbox(dict(facecolor=costants.ANNI_SEMESTRI_COLORI[0], alpha=0.5, edgecolor='black'))
-        sub = f.text(0.345, 0.05, "Esami 1 anno 2 semestre" + ' ' + str(self.year),
+        sub = f.text(0.345, 0.05, "Esami 1 anno 2 semestre",
                      fontsize=15, fontweight='bold')
         sub.set_bbox(dict(facecolor=costants.ANNI_SEMESTRI_COLORI[1], alpha=0.5, edgecolor='black'))
-        sub = f.text(0.645, 0.05, "Esami 2 anno 1 semestre" + ' ' + str(self.year),
+        sub = f.text(0.645, 0.05, "Esami 2 anno 1 semestre",
                      fontsize=15, fontweight='bold')
         sub.set_bbox(dict(facecolor=costants.ANNI_SEMESTRI_COLORI[2], alpha=0.5, edgecolor='black'))
-        sub = f.text(0.045,  0.02, "Esami 2 anno 2 semestre" + ' ' + str(self.year),
+        sub = f.text(0.045,  0.02, "Esami 2 anno 2 semestre",
                      fontsize=15, fontweight='bold')
         sub.set_bbox(dict(facecolor=costants.ANNI_SEMESTRI_COLORI[3], alpha=0.5, edgecolor='black'))
-        sub = f.text(0.345,  0.02, "Esami 3 anno 1 semestre" + ' ' + str(self.year),
+        sub = f.text(0.345,  0.02, "Esami 3 anno 1 semestre",
                      fontsize=15, fontweight='bold')
         sub.set_bbox(dict(facecolor=costants.ANNI_SEMESTRI_COLORI[4], alpha=0.5, edgecolor='black'))
-        sub = f.text(0.645,  0.02, "Esami 3 anno 2 semestre" + ' ' + str(self.year),
+        sub = f.text(0.645,  0.02, "Esami 3 anno 2 semestre",
                      fontsize=15, fontweight='bold')
         sub.set_bbox(dict(facecolor=costants.ANNI_SEMESTRI_COLORI[5], alpha=0.5, edgecolor='black'))
 
