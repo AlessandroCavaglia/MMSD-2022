@@ -27,7 +27,7 @@ def make_window(theme):
     MAX_ROWS_NUM = [3, 2, 5, 1, 1, 1, 1, 1]
 
     columm_layout = [[
-        sg.Frame((str(cal[i][k]) if str(cal[i][k]) != '0' else ' ') , [[sg.Button('', pad=((1,1) if str(cal[i][k]) != '0' else (2,2)), button_color= (costants.ANNI_SEMESTRI_COLORI[i] if str(cal[i][k]) != '0' else '#64758e'),
+        sg.Frame((str(cal[i][k]) if str(cal[i][k]) != '0' else ' '), [[sg.Button('', pad=((1,1) if str(cal[i][k]) != '0' else (2,2)), button_color= (costants.ANNI_SEMESTRI_COLORI[i] if str(cal[i][k]) != '0' else '#64778d'),
                                                                                   font=("Microsoft JhengHei", 9),size=(20, 1), disabled=(True if str(cal[i][k]) == '0' else False), border_width=(1 if str(cal[i][k]) != '0' else 0), key=(i, j), )] for j in
                                   range(MAX_ROWS_NUM[i])], pad=(0, 0), border_width=1, key=(i, k), ) for k in
         range(MAX_COL)] for i in range(MAX_ROWS)]
@@ -132,7 +132,7 @@ def make_window(theme):
 
     # The final layout is a simple one
     layout = [[col1, col2, col3]]
-    window = sg.Window('All Elements Demo', layout, right_click_menu=right_click_menu_def,
+    window = sg.Window('Ottimizzazione Calendario Esami', layout, right_click_menu=right_click_menu_def,
                        right_click_menu_tearoff=True, grab_anywhere=True, resizable=True, margins=(0, 0),
                        use_custom_titlebar=True, finalize=True, keep_on_top=True)
     window.set_min_size(window.size)
@@ -184,7 +184,5 @@ def main():
 
 if __name__ == '__main__':
     sg.theme('black')
-    sg.theme('dark red')
-    sg.theme('dark green 7')
     # sg.theme('DefaultNoMoreNagging')
     main()
