@@ -1,6 +1,7 @@
 import PySimpleGUI as sg
 from pathlib import Path
 from parse_input import runModel
+import datetime
 import costants
 import os
 import calendar
@@ -112,10 +113,10 @@ def make_window(theme):
 
     col3 = sg.Column([
         # Categories sg.Frame
-        [sg.Frame('Sessione:', [[sg.Radio('Websites', 'radio1', default=True, key='-WEBSITES-', size=(10, 1)),
-                                 sg.Radio('Software', 'radio1', key='-SOFTWARE-', size=(10, 1))]], )],
+        [sg.Frame('Sessione:', [[sg.Text('Inizio:', key='data_start_sessione', size=(20, 1))],
+                                 [sg.Text('Fine:', key='data_end_sessione', size=(20, 1))]], size=(317, 100))],
         # Information sg.Frame
-        [sg.Frame('Information:', [[sg.Text(), sg.Column([[sg.Text('Account:')],
+        [sg.Frame('Dettagli:', [[sg.Text(), sg.Column([[sg.Text('Account:')],
                                                           [sg.Input(key='-ACCOUNT-IN-', size=(19, 1))],
                                                           [sg.Text('User Id:')],
                                                           [sg.Input(key='-USERID-IN-', size=(19, 1)),
@@ -146,6 +147,10 @@ def main():
     error_message_gui = window['ErrGUI']
     succ_message_gui = window['SuccGUI']
 
+    #Inforamtion Exam
+    data_start_sessione = window['data_start_sessione']
+    data_end_sessione = window['data_end_sessione']
+
     # This is an Event Loop
     while True:
         event, values = window.read()
@@ -166,11 +171,16 @@ def main():
                 error_message_gui.update(visible=False)
                 try:
                     progress_bar.update(visible=True)
-                    if runModel(Path(filenameInput), filenameOutput, progress_bar, error_message_gui, model,
-                                advanced_settings):
+                    model_output = runModel(Path(filenameInput), filenameOutput, progress_bar, error_message_gui, model,
+                                advanced_settings)
+                    if model_output:
                         progress_bar.UpdateBar(1000)
                         succ_message_gui.update(visible=True)
                         succ_message_gui.update(value='Esecuzione Completata')
+
+                        #Update information output
+                        data_start_sessione.update(value= 'Inizio: ' + datetime.date.strftime(model_output.sessione[0][0],'%d/%m/%Y')) #TODO: sarebbe bello accedere a questa info con sessione.dataInizio
+                        data_end_sessione.update(value= 'Fine: ' + datetime.date.strftime(model_output.sessione[0][1],'%d/%m/%Y'))
                     else:
                         progress_bar.update(visible=False)
                 except Exception as e:

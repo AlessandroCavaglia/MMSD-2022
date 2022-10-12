@@ -690,7 +690,8 @@ def runModel(input, output, progressbar, error_message_gui, model, advanced_sett
     create_calendar.build_calendar(exams, model, sessioni, output)
     progressbar.UpdateBar(1000)
     print("--- ESECUZIONE COMPLETATA ---")
-    return True
+
+    return classes.Output(sessioni,laboratori,aule,exams)
 
 
 if __name__ == '__main__':
