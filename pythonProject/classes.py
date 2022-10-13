@@ -54,8 +54,10 @@ class Session:
         self.durata = abs(data_fine - data_inizio).days
 
 class Output:
-    def __init__(self, sessione,laboratori,aule,esami):
+    def __init__(self, sessione,laboratori,aule,esami,assegnamenti,model):
         self.sessione = sessione
         self.laboratori = laboratori
         self.aule = aule
         self.esami = esami
+        self.assegnamenti=assegnamenti
+        self.model = model

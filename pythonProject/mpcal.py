@@ -106,6 +106,7 @@ class MplCalendar(object):
         path = os.path.join(output, nome)
         print("Salvataggio calendario: "+str(path))
         plt.savefig(path)
+        plt.close()
         #plt.show()
 
 

@@ -58,6 +58,7 @@ def create_calendar(esami,exams,model,anno_sessione,mese_sessione,data_inizio_se
 
 
     cal.show(nome_calendario,output)
+
     return
 
 

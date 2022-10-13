@@ -625,6 +625,18 @@ def main():
     create_output.build_output('', '', exams, laboratori, aule, model, sessioni)
     create_calendar.build_calendar(exams, model, sessioni, '')
 
+def elaborateSession(exams,model,sessione):
+    appelli = []
+    for esame in exams:
+        index = exams.index(esame)
+        date_esame = []
+        durata_sessione = abs(sessione[0][1] - sessione[0][0])
+        for i in range(durata_sessione.days + 1):
+            if model.x[index, i].value > 0.5:
+                data = sessione[0][0] + timedelta(days=i)
+                date_esame.append(data)
+        appelli.append(date_esame)
+    return appelli
 
 def runModel(input, output, progressbar, error_message_gui, model, advanced_settings):
     building = __import__(model)
@@ -682,7 +694,8 @@ def runModel(input, output, progressbar, error_message_gui, model, advanced_sett
     opt.solve(model, logfile=path)
     print("--- RISOLUZIONE  COMPLETATA ---")
     progressbar.UpdateBar(750)
-    #building.print_results(model, exams, data_inizio, data_fine)
+    #TODO manage possibility of unfeasible solution
+    assegnamenti_modello=elaborateSession(exams,model,sessioni)     #Lista contenente per ogni esame la lista dei suoi assegnamenti
     progressbar.UpdateBar(800)
     print("--- COSTRUZIONE OUTPUT ---")
     create_output.build_output(input, output, exams, laboratori, aule, model, sessioni)
@@ -691,7 +704,7 @@ def runModel(input, output, progressbar, error_message_gui, model, advanced_sett
     progressbar.UpdateBar(1000)
     print("--- ESECUZIONE COMPLETATA ---")
 
-    return classes.Output(sessioni,laboratori,aule,exams)
+    return classes.Output(sessioni,laboratori,aule,exams,assegnamenti_modello,model)
 
 
 if __name__ == '__main__':
