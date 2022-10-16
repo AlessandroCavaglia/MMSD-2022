@@ -698,13 +698,13 @@ def runModel(input, output, progressbar, error_message_gui, model, advanced_sett
     assegnamenti_modello=elaborateSession(exams,model,sessioni)     #Lista contenente per ogni esame la lista dei suoi assegnamenti
     progressbar.UpdateBar(800)
     print("--- COSTRUZIONE OUTPUT ---")
-    create_output.build_output(input, output, exams, laboratori, aule, model, sessioni)
+    #create_output.build_output(input, output, exams, laboratori, aule, model, sessioni)
     progressbar.UpdateBar(900)
-    create_calendar.build_calendar(exams, model, sessioni, output)
+    #create_calendar.build_calendar(exams, model, sessioni, output)
     progressbar.UpdateBar(1000)
     print("--- ESECUZIONE COMPLETATA ---")
 
-    return classes.Output(sessioni,laboratori,aule,exams,assegnamenti_modello,model)
+    return classes.Output(sessioni,laboratori,aule,exams,assegnamenti_modello,model,input,output)
 
 
 if __name__ == '__main__':

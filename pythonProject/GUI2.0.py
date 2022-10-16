@@ -5,7 +5,8 @@ import datetime
 import costants
 import os
 import calendar
-
+import create_output
+import create_calendar
 import output
 
 from pythonProject.costants import MODEL, MODEL_MAPPING, ADVANCED_SETTINGS
@@ -48,7 +49,7 @@ def make_window(theme):
             size=(45, 5), expand_x=True, expand_y=True, k='-MLINE-')],
         [sg.Button('Button'), sg.Button('Popup'), sg.Button(image_data=sg.DEFAULT_BASE64_ICON, key='-LOGO-')]]
 
-    layout = [[sg.TabGroup([[]], key='experiments', size=(1060, 600)),
+    layout = [[sg.TabGroup([[]], key='experiments'),
 
                ]]
 
@@ -78,7 +79,7 @@ def make_window(theme):
         [sg.T('', text_color='#aa080b', visible=False, key='ErrGUI'),
          sg.T('', text_color='#caf17c', visible=False, key='SuccGUI')]], pad=(5, 0))
 
-    col3 = sg.Column([
+    '''col3 = sg.Column([
         # Categories sg.Frame
         [sg.Frame('Sessione:', [[sg.Text('Inizio:', key='data_start_sessione', size=(20, 1))],
                                 [sg.Text('Fine:', key='data_end_sessione', size=(20, 1))]], size=(317, 100))],
@@ -96,10 +97,10 @@ def make_window(theme):
                                                         sg.Button('Copy', key='-LOC-')],
                                                        [sg.Text('Notes:')],
                                                        [sg.Multiline(key='-NOTES-', size=(25, 5))],
-                                                       ], size=(300, 350), pad=(0, 0))]])], ], pad=(0, 0))
+                                                       ], size=(300, 350), pad=(0, 0))]])], ], pad=(0, 0))'''
 
     # The final layout is a simple one
-    layout = [[col1, col2, col3]]
+    layout = [[col1, col2]]
     window = sg.Window('Ottimizzazione Calendario Esami', layout, right_click_menu=right_click_menu_def,
                        right_click_menu_tearoff=True, grab_anywhere=True, resizable=True, margins=(0, 0),
                        use_custom_titlebar=True, finalize=True, keep_on_top=True)
@@ -114,10 +115,11 @@ def main():
     error_message_gui = window['ErrGUI']
     succ_message_gui = window['SuccGUI']
     tab_layout = window['experiments']
+    experiments=[]
 
     # Inforamtion Exam
-    data_start_sessione = window['data_start_sessione']
-    data_end_sessione = window['data_end_sessione']
+    #data_start_sessione = window['data_start_sessione']
+    #data_end_sessione = window['data_end_sessione']
     experiment_count = 1
     # This is an Event Loop
     while True:
@@ -135,24 +137,27 @@ def main():
 
             print(values['time_limit_input'])
 
-            if os.path.isfile(filenameInput) and os.path.isdir(filenameOutput):
+            #and os.path.isdir(filenameOutput)
+
+            if os.path.isfile(filenameInput):
                 error_message_gui.update(visible=False)
                 try:
                     progress_bar.update(visible=True)
                     model_output = runModel(Path(filenameInput), filenameOutput, progress_bar, error_message_gui, model,
                                             advanced_settings)
                     if model_output:
+                        experiments.append(model_output)
                         progress_bar.UpdateBar(1000)
                         succ_message_gui.update(visible=True)
                         succ_message_gui.update(value='Esecuzione Completata')
 
                         # Update information output
-                        data_start_sessione.update(
+                        '''data_start_sessione.update(
                             value='Inizio: ' + datetime.date.strftime(model_output.sessione[0][0],
                                                                       '%d/%m/%Y'))  # TODO: sarebbe bello accedere a questa info con sessione.dataInizio
                         data_end_sessione.update(
-                            value='Fine: ' + datetime.date.strftime(model_output.sessione[0][1], '%d/%m/%Y'))
-                        tab_layout.add_tab(sg.Tab('Esperimento: ' + str(experiment_count), buildTab(model_output)))
+                            value='Fine: ' + datetime.date.strftime(model_output.sessione[0][1], '%d/%m/%Y'))'''
+                        tab_layout.add_tab(sg.Tab('Esperimento: ' + str(experiment_count), buildTab(model_output,experiment_count)))
                         experiment_count += 1
                     else:
                         progress_bar.update(visible=False)
@@ -160,17 +165,31 @@ def main():
                     sg.Print("Error: ", e)
             else:
                 error_message_gui.update(visible=True)
-                error_message_gui.update(value='Input non valido')
+                error_message_gui.update(value='File di Input non valido')
+        elif event[0:17]== 'Esporta risultato':
+            filenameOutput = values['-OUTPUT-']
+            if(os.path.isdir(filenameOutput)):
+                error_message_gui.update(visible=False)
+                export_id=int(event.split('#')[1])-1
+                create_output.build_output(experiments[export_id].input, experiments[export_id].output, experiments[export_id].esami, experiments[export_id].laboratori, experiments[export_id].aule, experiments[export_id].model, experiments[export_id].sessione)
+                create_calendar.build_calendar(experiments[export_id].esami,experiments[export_id].model,experiments[export_id].sessione, experiments[export_id].output)
+            else:
+                error_message_gui.update(visible=True)
+                error_message_gui.update(value='Cartella di output non valida')
 
     window.close()
 
 
-def buildTab(model_output):
+def buildTab(model_output,experiment_count):
     # Table Data
     headings = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
     cal = calendar.monthcalendar(model_output.sessione[0][0].year, model_output.sessione[0][0].month)
     MAX_ROWS = len(cal)
     MAX_COL = len(cal[0])
+    data_inizio_sessione=datetime.date.strftime(model_output.sessione[0][0],
+                                                                      '%d/%m/%Y')
+    data_fine_sessione=datetime.date.strftime(model_output.sessione[0][1], '%d/%m/%Y')
+
     cal_exams = []
 
     for i in range(MAX_ROWS):
@@ -198,7 +217,7 @@ def buildTab(model_output):
                 cal_exams[i][j].append([" ", -1,'black on #64778d'])
         MAX_ROWS_NUM.append(maximus)
 
-    columm_layout = [[
+    columm_layout = [[sg.Column([[
         sg.Frame((str(cal[i][k]) if str(cal[i][k]) != '0' else ' '), [[sg.Button(cal_exams[i][k][j][0], pad=(
             (1, 1) if cal_exams[i][k][j][0] != " " else (2, 2)), button_color=cal_exams[i][k][j][2],
                                                                                  font=("Microsoft JhengHei", 9),
@@ -207,7 +226,14 @@ def buildTab(model_output):
                                                                                  key=(i, j), )] for j in
                                                                       range(MAX_ROWS_NUM[i])], pad=(0, 0),
                  border_width=1, key=(i, k), ) for k in
-        range(MAX_COL)] for i in range(MAX_ROWS)]
+        range(MAX_COL)] for i in range(MAX_ROWS)]),
+        sg.Column([
+            # Categories sg.Frame
+            [sg.Frame('Sessione:', [[sg.Text('Inizio: '+str(data_inizio_sessione), key='data_start_sessione', size=(20, 1))],
+                                    [sg.Text('Fine:'+str(data_fine_sessione), key='data_end_sessione', size=(20, 1))]], size=(317, 100))],
+            # Information sg.Frame
+            [sg.Frame('Dettagli:', [[sg.Text(), sg.Column([[sg.Button('Esporta risultato #'+str(experiment_count))]
+                                                           ], size=(300, 350), pad=(0, 0))]])], ], pad=(0, 0))]]
     return columm_layout
 
 
