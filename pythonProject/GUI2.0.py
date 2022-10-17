@@ -7,6 +7,7 @@ import os
 import calendar
 import create_output
 import create_calendar
+import statistics_model
 import output
 
 from pythonProject.costants import MODEL, MODEL_MAPPING, ADVANCED_SETTINGS
@@ -148,6 +149,7 @@ def main():
                     model_output = runModel(Path(filenameInput), filenameOutput, progress_bar, error_message_gui, model,
                                             advanced_settings)
                     if model_output:
+                        model_output.selected_model=model
                         experiments.append(model_output)
                         progress_bar.UpdateBar(1000)
                         succ_message_gui.update(visible=True)
@@ -187,6 +189,11 @@ def main():
                 error_message_gui.update(value='Cartella di output non valida')
 
     window.close()
+
+def buildStatistics(model_output,experiment_count,session):
+    return [[sg.Column([[sg.Text("Statistiche:")],
+                        [sg.Text(statistics_model.generate_statistics_for_graphic(model_output.model,model_output.esami,model_output.sessione[0][0],model_output.sessione[0][1]),font=("Arial",9))]
+                        ])]]
 
 def buildMonthTab(model_output,experiment_count,year,month):
     # Table Data
@@ -239,6 +246,7 @@ def buildMonthTab(model_output,experiment_count,year,month):
 def buildTwoMonthTab(model_output,experiment_count):
     m_names = '''
    A Gennaio Febbraio Marzo Aprile Maggio Giugno Luglio Agosto Settembre Ottobre Novembre Dicembre'''.split()
+    available_models={"model_building":"Default","model_building1":"Modello1","model_building2":"Modello2","model_building3":"Modello3","model_building4":"Modello4","model_building5":"Modello5"}
     data_inizio_sessione = datetime.date.strftime(model_output.sessione[0][0],
                                                   '%d/%m/%Y')
     data_fine_sessione = datetime.date.strftime(model_output.sessione[0][1], '%d/%m/%Y')
@@ -247,21 +255,31 @@ def buildTwoMonthTab(model_output,experiment_count):
 
     month_1_tab=buildMonthTab(model_output,experiment_count,model_output.sessione[0][0].year,model_output.sessione[0][0].month)
     month_2_tab=None
+    statistics=buildStatistics(model_output,experiment_count,model_output.sessione)
     if(model_output.sessione[0][0].month!=model_output.sessione[0][1].month):
         month_2_tab=buildMonthTab(model_output,experiment_count,model_output.sessione[0][1].year,model_output.sessione[0][1].month)
 
 
-    columm_layout = [[sg.Column([[sg.Text("Calendario esperimento")],[sg.TabGroup([[sg.Tab(m_names[model_output.sessione[0][0].month],layout=month_1_tab),
-                                    sg.Tab(m_names[model_output.sessione[0][1].month] ,layout=month_2_tab)]] if month_2_tab!=None
+    columm_layout = [[sg.Column([[sg.TabGroup([[sg.Tab(m_names[model_output.sessione[0][0].month],layout=month_1_tab),
+                                    sg.Tab(m_names[model_output.sessione[0][1].month] ,layout=month_2_tab),sg.Tab("Statistiche" ,layout=statistics)]] if month_2_tab!=None
                                               else [[sg.Tab(m_names[model_output.sessione[0][0].month],layout=month_1_tab)]], key='experiment' + str(experiment_count), pad=(0,(10,0)))]]),
-                      sg.Column([[sg.Text("Dettagli esperimento")],
+                      sg.Column([
                           # Categories sg.Frame
-                          [sg.Frame('Sessione:',
-                                    [[sg.Text('Data inizio sessione: ' + str(data_inizio_sessione), key='data_start_sessione',
-                                              size=(20, 1))],
-                                     [sg.Text('Data fine sessione:' + str(data_fine_sessione), key='data_end_sessione',
-                                              size=(20, 1))]],
-                                    size=(317, 100), pad=(0,(30,0)))],
+                          [sg.Frame('Input:',
+                                    [
+                                        [sg.Text(
+                                            'Modello utilizzato: ' + str(available_models[model_output.selected_model])
+                                            )],
+                                        [sg.Text(
+                                            'File input: ' + str(os.path.basename(str(model_output.input)))
+                                        )],
+                                        [sg.Text('Data inizio sessione: ' + str(data_inizio_sessione)
+                                              )],
+                                        [sg.Text('Data fine sessione:' + str(data_fine_sessione)
+                                              )]
+                                     ],
+
+                                     pad=(0,(30,0)))],
                           # Information sg.Frame
                           [sg.Frame('Dettagli:',
                                     [[sg.Text(), sg.Column([[sg.Button('Esporta risultato #' + str(experiment_count))]

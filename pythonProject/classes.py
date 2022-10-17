@@ -63,3 +63,4 @@ class Output:
         self.model = model
         self.input=input
         self.output=output
+        self.selected_model=None
