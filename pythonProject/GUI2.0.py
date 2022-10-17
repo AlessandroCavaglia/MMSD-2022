@@ -61,11 +61,13 @@ def make_window(theme):
                                                     [sg.Input(key='-INPUT-', size=(19, 1)), sg.FileBrowse(
                                                         file_types=(("Excel", "*.xlsx"), ("ALL Files", "*.*")))],
                                                     [sg.Text('Output folder:')],
-                                                    [sg.Input(key='-OUTPUT-', size=(19, 1)), sg.FolderBrowse()],
                                                     [sg.Text('Choose Model:')],
                                                     [sg.Combo(MODEL, size=(19, 1), default_value='Default Model',
                                                               readonly=True, key='_MODEL_')],
-                                                    ], size=(300, 250), pad=(0, 0))], ], pad=(5, 0))],
+                                                    ], pad=(0, 10))], ], pad=(10, 5))],
+        [sg.Frame('Output:', [[sg.Text(), sg.Column([
+                                                    [sg.Text('Output folder:')],
+                                                    [sg.Input(key='-OUTPUT-', size=(19, 1)), sg.FolderBrowse()]], pad=(0, 10))]])],
         # Information sg.Frame
         [sg.Frame('Advanced Settings:', [[sg.Text(), sg.Column([[sg.Text('Time limit (M):')],
                                                                 [sg.Input(key='time_limit_input',
@@ -157,7 +159,7 @@ def main():
                                                                       '%d/%m/%Y'))  # TODO: sarebbe bello accedere a questa info con sessione.dataInizio
                         data_end_sessione.update(
                             value='Fine: ' + datetime.date.strftime(model_output.sessione[0][1], '%d/%m/%Y'))'''
-                        tab_layout.add_tab(sg.Tab('Esperimento: ' + str(experiment_count), buildTab(model_output,experiment_count)))
+                        tab_layout.add_tab(sg.Tab('Esperimento: ' + str(experiment_count), buildTwoMonthTab(model_output,experiment_count)))
                         experiment_count += 1
                     else:
                         progress_bar.update(visible=False)
@@ -170,28 +172,29 @@ def main():
             filenameOutput = values['-OUTPUT-']
             if(os.path.isdir(filenameOutput)):
                 error_message_gui.update(visible=False)
+                succ_message_gui.update(visible=False)
                 export_id=int(event.split('#')[1])-1
+                progress_bar.UpdateBar(0)
                 create_output.build_output(experiments[export_id].input, experiments[export_id].output, experiments[export_id].esami, experiments[export_id].laboratori, experiments[export_id].aule, experiments[export_id].model, experiments[export_id].sessione)
+                progress_bar.UpdateBar(500)
                 create_calendar.build_calendar(experiments[export_id].esami,experiments[export_id].model,experiments[export_id].sessione, experiments[export_id].output)
+                progress_bar.UpdateBar(1000)
+                succ_message_gui.update(value='Esperimento #'+str(export_id+1)+" esportato")
+                succ_message_gui.update(visible=True)
             else:
                 error_message_gui.update(visible=True)
+                succ_message_gui.update(visible=False)
                 error_message_gui.update(value='Cartella di output non valida')
 
     window.close()
 
-
-def buildTab(model_output,experiment_count):
+def buildMonthTab(model_output,experiment_count,year,month):
     # Table Data
     headings = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
-    cal = calendar.monthcalendar(model_output.sessione[0][0].year, model_output.sessione[0][0].month)
+    cal = calendar.monthcalendar(year, month)
     MAX_ROWS = len(cal)
     MAX_COL = len(cal[0])
-    data_inizio_sessione=datetime.date.strftime(model_output.sessione[0][0],
-                                                                      '%d/%m/%Y')
-    data_fine_sessione=datetime.date.strftime(model_output.sessione[0][1], '%d/%m/%Y')
-
     cal_exams = []
-
     for i in range(MAX_ROWS):
         cal_exams.append([])
         for j in range(MAX_COL):
@@ -199,12 +202,13 @@ def buildTab(model_output,experiment_count):
 
     for index, assegnamenti_esame in enumerate(model_output.assegnamenti):
         for assegnamento in assegnamenti_esame:
-            if (assegnamento.month == model_output.sessione[0][0].month):
+            if (assegnamento.month == month):
                 day = assegnamento.day
                 for i in range(MAX_ROWS):
                     for j in range(MAX_COL):
                         if (str(cal[i][j]) == str(day)):
-                            cal_exams[i][j].append([model_output.esami[index].short_name, index,"black on "+pick_color_for_exam(model_output.esami[index])])
+                            cal_exams[i][j].append([model_output.esami[index].short_name, index,
+                                                    "black on " + pick_color_for_exam(model_output.esami[index])])
 
     MAX_ROWS_NUM = list()
     for i in range(MAX_ROWS):
@@ -214,7 +218,7 @@ def buildTab(model_output,experiment_count):
                 maximus = len(cal_exams[i][j])
         for j in range(MAX_COL):
             while len(cal_exams[i][j]) < maximus:
-                cal_exams[i][j].append([" ", -1,'black on #64778d'])
+                cal_exams[i][j].append([" ", -1, 'black on #64778d'])
         MAX_ROWS_NUM.append(maximus)
 
     columm_layout = [[sg.Column([[
@@ -222,19 +226,51 @@ def buildTab(model_output,experiment_count):
             (1, 1) if cal_exams[i][k][j][0] != " " else (2, 2)), button_color=cal_exams[i][k][j][2],
                                                                                  font=("Microsoft JhengHei", 9),
                                                                                  size=(20, 1), disabled=(
-                False if cal_exams[i][k][j][0] != " "  else True), border_width=(1 if cal_exams[i][k][j][0] != " " else 0),
+                False if cal_exams[i][k][j][0] != " " else True), border_width=(
+                1 if cal_exams[i][k][j][0] != " " else 0),
                                                                                  key=(i, j), )] for j in
                                                                       range(MAX_ROWS_NUM[i])], pad=(0, 0),
                  border_width=1, key=(i, k), ) for k in
-        range(MAX_COL)] for i in range(MAX_ROWS)]),
-        sg.Column([
-            # Categories sg.Frame
-            [sg.Frame('Sessione:', [[sg.Text('Inizio: '+str(data_inizio_sessione), key='data_start_sessione', size=(20, 1))],
-                                    [sg.Text('Fine:'+str(data_fine_sessione), key='data_end_sessione', size=(20, 1))]], size=(317, 100))],
-            # Information sg.Frame
-            [sg.Frame('Dettagli:', [[sg.Text(), sg.Column([[sg.Button('Esporta risultato #'+str(experiment_count))]
-                                                           ], size=(300, 350), pad=(0, 0))]])], ], pad=(0, 0))]]
+        range(MAX_COL)] for i in range(MAX_ROWS)])]]
+
     return columm_layout
+
+
+def buildTwoMonthTab(model_output,experiment_count):
+    m_names = '''
+   A Gennaio Febbraio Marzo Aprile Maggio Giugno Luglio Agosto Settembre Ottobre Novembre Dicembre'''.split()
+    data_inizio_sessione = datetime.date.strftime(model_output.sessione[0][0],
+                                                  '%d/%m/%Y')
+    data_fine_sessione = datetime.date.strftime(model_output.sessione[0][1], '%d/%m/%Y')
+
+
+
+    month_1_tab=buildMonthTab(model_output,experiment_count,model_output.sessione[0][0].year,model_output.sessione[0][0].month)
+    month_2_tab=None
+    if(model_output.sessione[0][0].month!=model_output.sessione[0][1].month):
+        month_2_tab=buildMonthTab(model_output,experiment_count,model_output.sessione[0][1].year,model_output.sessione[0][1].month)
+
+
+    columm_layout = [[sg.Column([[sg.Text("Calendario esperimento")],[sg.TabGroup([[sg.Tab(m_names[model_output.sessione[0][0].month],layout=month_1_tab),
+                                    sg.Tab(m_names[model_output.sessione[0][1].month] ,layout=month_2_tab)]] if month_2_tab!=None
+                                              else [[sg.Tab(m_names[model_output.sessione[0][0].month],layout=month_1_tab)]], key='experiment' + str(experiment_count), pad=(0,(10,0)))]]),
+                      sg.Column([[sg.Text("Dettagli esperimento")],
+                          # Categories sg.Frame
+                          [sg.Frame('Sessione:',
+                                    [[sg.Text('Data inizio sessione: ' + str(data_inizio_sessione), key='data_start_sessione',
+                                              size=(20, 1))],
+                                     [sg.Text('Data fine sessione:' + str(data_fine_sessione), key='data_end_sessione',
+                                              size=(20, 1))]],
+                                    size=(317, 100), pad=(0,(30,0)))],
+                          # Information sg.Frame
+                          [sg.Frame('Dettagli:',
+                                    [[sg.Text(), sg.Column([[sg.Button('Esporta risultato #' + str(experiment_count))]
+                                                            ], size=(300, 350), pad=(0, 0))]])], ], pad=(0, 0), vertical_alignment='t')]]
+
+    return columm_layout
+
+
+
 
 
 if __name__ == '__main__':
