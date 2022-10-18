@@ -9,6 +9,7 @@ import create_output
 import create_calendar
 import statistics_model
 import output
+import random
 
 from pythonProject.costants import MODEL, MODEL_MAPPING, ADVANCED_SETTINGS
 
@@ -187,6 +188,11 @@ def main():
                 error_message_gui.update(visible=True)
                 succ_message_gui.update(visible=False)
                 error_message_gui.update(value='Cartella di output non valida')
+        elif event[0:11] == "ExamButton_":
+            experiment_id=int(event.split("_")[2])-1
+            exam_id=int(event.split("_")[1])
+            text=window['details_'+str(experiment_id)]
+            text.update(value=buildDetailsText(experiments[experiment_id],exam_id))
 
     window.close()
 
@@ -194,6 +200,35 @@ def buildStatistics(model_output,experiment_count,session):
     return [[sg.Column([[sg.Text("Statistiche:")],
                         [sg.Text(statistics_model.generate_statistics_for_graphic(model_output.model,model_output.esami,model_output.sessione[0][0],model_output.sessione[0][1]),font=("Arial",9))]
                         ])]]
+
+def buildDetailsText(model_output,exam_id):
+    result="\n\n"
+    result+="📕 Esame: "+model_output.esami[exam_id].short_name+"\n"
+    result+="🔢 Giorni durata: "+str(model_output.esami[exam_id].numero_giorni_durata)+"\n"
+    result+="\n🏠 Aule richieste: \n"
+    if(len(model_output.esami[exam_id].aule_richieste)==0):
+        result += "Nessuna aula richiesta\n"
+    for index,aula in enumerate(model_output.esami[exam_id].aule_richieste):
+        result+=model_output.aule[aula].nome+" | "+str(model_output.esami[exam_id].slot_aule_richieste[index])+" slot\n"
+    result += "\n💻 Laboratori richiesti: \n"
+    if (len(model_output.esami[exam_id].laboratori_richiesti) == 0):
+        result += "Nessun laboratorio richiesto\n"
+    for index, lab in enumerate(model_output.esami[exam_id].laboratori_richiesti):
+        result += model_output.laboratori[lab].nome + " | " + str(
+            model_output.esami[exam_id].laboratori_richiesti_slot[index]) + " slot\n"
+    result +="\n⭕ Appelli: \n"
+
+    assegnamenti=model_output.assegnamenti[exam_id]
+    for index,assegnamento in enumerate(assegnamenti):
+        idAssegnamento=index+1
+        if(idAssegnamento<=model_output.esami[exam_id].numero_giorni_durata):
+            idAssegnamento=1
+        else:
+            idAssegnamento=2
+        result+="📅 Appello "+str(idAssegnamento)+" | "
+        result+=datetime.date.strftime(assegnamento,'%d/%m/%Y')+"\n"
+
+    return result
 
 def buildMonthTab(model_output,experiment_count,year,month):
     # Table Data
@@ -215,7 +250,7 @@ def buildMonthTab(model_output,experiment_count,year,month):
                     for j in range(MAX_COL):
                         if (str(cal[i][j]) == str(day)):
                             cal_exams[i][j].append([model_output.esami[index].short_name, index,
-                                                    "black on " + pick_color_for_exam(model_output.esami[index])])
+                                                    "black on " + pick_color_for_exam(model_output.esami[index]),str(index)])
 
     MAX_ROWS_NUM = list()
     for i in range(MAX_ROWS):
@@ -225,7 +260,7 @@ def buildMonthTab(model_output,experiment_count,year,month):
                 maximus = len(cal_exams[i][j])
         for j in range(MAX_COL):
             while len(cal_exams[i][j]) < maximus:
-                cal_exams[i][j].append([" ", -1, 'black on #64778d'])
+                cal_exams[i][j].append([" ", -1, 'black on #64778d',"-1"])
         MAX_ROWS_NUM.append(maximus)
 
     columm_layout = [[sg.Column([[
@@ -234,8 +269,8 @@ def buildMonthTab(model_output,experiment_count,year,month):
                                                                                  font=("Microsoft JhengHei", 9),
                                                                                  size=(20, 1), disabled=(
                 False if cal_exams[i][k][j][0] != " " else True), border_width=(
-                1 if cal_exams[i][k][j][0] != " " else 0),
-                                                                                 key=(i, j), )] for j in
+                1 if cal_exams[i][k][j][0] != " " else 0), key=("ExamButton_" + cal_exams[i][k][j][3] +"_" + experiment_count +"_" + str(
+                str(random.randint(0, 10000)))), )] for j in
                                                                       range(MAX_ROWS_NUM[i])], pad=(0, 0),
                  border_width=1, key=(i, k), ) for k in
         range(MAX_COL)] for i in range(MAX_ROWS)])]]
@@ -253,11 +288,11 @@ def buildTwoMonthTab(model_output,experiment_count):
 
 
 
-    month_1_tab=buildMonthTab(model_output,experiment_count,model_output.sessione[0][0].year,model_output.sessione[0][0].month)
+    month_1_tab=buildMonthTab(model_output,str(experiment_count),model_output.sessione[0][0].year,model_output.sessione[0][0].month)
     month_2_tab=None
     statistics=buildStatistics(model_output,experiment_count,model_output.sessione)
     if(model_output.sessione[0][0].month!=model_output.sessione[0][1].month):
-        month_2_tab=buildMonthTab(model_output,experiment_count,model_output.sessione[0][1].year,model_output.sessione[0][1].month)
+        month_2_tab=buildMonthTab(model_output,str(experiment_count),model_output.sessione[0][1].year,model_output.sessione[0][1].month)
 
 
     columm_layout = [[sg.Column([[sg.TabGroup([[sg.Tab(m_names[model_output.sessione[0][0].month],layout=month_1_tab),
@@ -276,14 +311,16 @@ def buildTwoMonthTab(model_output,experiment_count):
                                         [sg.Text('Data inizio sessione: ' + str(data_inizio_sessione)
                                               )],
                                         [sg.Text('Data fine sessione:' + str(data_fine_sessione)
-                                              )]
+                                              )],
                                      ],
 
                                      pad=(0,(30,0)))],
                           # Information sg.Frame
                           [sg.Frame('Dettagli:',
-                                    [[sg.Text(), sg.Column([[sg.Button('Esporta risultato #' + str(experiment_count))]
-                                                            ], size=(300, 350), pad=(0, 0))]])], ], pad=(0, 0), vertical_alignment='t')]]
+                                    [[sg.Column([[sg.Button('Esporta risultato esperimento #' + str(experiment_count))],
+                                                 [sg.Text('', key="details_" + str(experiment_count-1)
+                                                          )]
+                                                            ], pad=(0, 0))]])], ], pad=(0, 0), vertical_alignment='t')]]
 
     return columm_layout
 
