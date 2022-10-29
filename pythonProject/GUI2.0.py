@@ -314,13 +314,26 @@ def buildTwoMonthTab(model_output,experiment_count):
                                               )],
                                      ],
 
-                                     pad=(0,(30,0)))],
+                                     size=(400,150))],
                           # Information sg.Frame
                           [sg.Frame('Dettagli:',
                                     [[sg.Column([[sg.Button('Esporta risultato esperimento #' + str(experiment_count))],
                                                  [sg.Text('', key="details_" + str(experiment_count-1)
                                                           )]
-                                                            ], pad=(0, 0))]])], ], pad=(0, 0), vertical_alignment='t')]]
+                                                            ])]])],
+
+                          [sg.Frame('Legenda:',[[sg.Column([[sg.Text('Primo Anno Primo semestre',background_color=costants.ANNI_SEMESTRI_COLORI[0], text_color='#000000')],
+                                                            [sg.Text('Primo Anno Secondo semestre',
+                                                                     background_color=costants.ANNI_SEMESTRI_COLORI[1], text_color='#000000')],
+                                                            [sg.Text('Secondo Anno Primo semestre',
+                                                                     background_color=costants.ANNI_SEMESTRI_COLORI[2], text_color='#000000')],
+                                                            [sg.Text('Secondo Anno Secondo semestre',
+                                                                     background_color=costants.ANNI_SEMESTRI_COLORI[3], text_color='#000000')],
+                                                            [sg.Text('Terzo Anno Primo semestre',
+                                                                     background_color=costants.ANNI_SEMESTRI_COLORI[4], text_color='#000000')],
+                                                            [sg.Text('Terzo Anno Secondo semestre',
+                                                                     background_color=costants.ANNI_SEMESTRI_COLORI[5], text_color='#000000')]
+                                                    ])], ], size=(400,230))],], pad=(0, 0), vertical_alignment='t')]]
 
     return columm_layout
 
