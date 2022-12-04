@@ -62,7 +62,6 @@ def make_window(theme):
         [sg.Frame('Input:', [[sg.Text(), sg.Column([[sg.Text('Model Input:')],
                                                     [sg.Input(key='-INPUT-', size=(19, 1)), sg.FileBrowse(
                                                         file_types=(("Excel", "*.xlsx"), ("ALL Files", "*.*")))],
-                                                    [sg.Text('Output folder:')],
                                                     [sg.Text('Choose Model:')],
                                                     [sg.Combo(MODEL, size=(19, 1), default_value='Default Model',
                                                               readonly=True, key='_MODEL_')],
@@ -167,7 +166,7 @@ def main():
                     else:
                         progress_bar.update(visible=False)
                 except Exception as e:
-                    sg.Print("Error: ", e)
+                    sg.Print("Error: ", e.__cause__,e.__context__,e.args)
             else:
                 error_message_gui.update(visible=True)
                 error_message_gui.update(value='File di Input non valido')
@@ -281,7 +280,7 @@ def buildMonthTab(model_output,experiment_count,year,month):
 def buildTwoMonthTab(model_output,experiment_count):
     m_names = '''
    A Gennaio Febbraio Marzo Aprile Maggio Giugno Luglio Agosto Settembre Ottobre Novembre Dicembre'''.split()
-    available_models={"model_building":"Default","model_building1":"Modello1","model_building2":"Modello2","model_building3":"Modello3","model_building4":"Modello4","model_building5":"Modello5"}
+    available_models={"model_building":"Default","model_building1":"Modello1","model_building2":"Modello2","model_building3":"Modello3","model_building6":"Modello4","model_building7":"Modello5"}
     data_inizio_sessione = datetime.date.strftime(model_output.sessione[0][0],
                                                   '%d/%m/%Y')
     data_fine_sessione = datetime.date.strftime(model_output.sessione[0][1], '%d/%m/%Y')
